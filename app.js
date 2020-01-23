@@ -13,7 +13,8 @@ const crawler={
   ftv: require('./crawler/ftv'),
   ebc: require('./crawler/ebc'),
   ett: require('./crawler/ett'),
-  cna: require('./crawler/cna')
+  cna: require('./crawler/cna'),
+  tvbs: require('./crawler/tvbs')
 }
 
 const newsapi=new NewsAPI('999b04c84ac64ac5a3b4625ec41448d8');
@@ -150,11 +151,13 @@ app.get('/cna', async function(req, res) {
   });
 });
 
-//  crawler
-app.get('/test', async function(req, res) {
-
-  
-
+// TVBS crawler
+app.get('/tvbs', async function(req, res) {
+  await crawler.tvbs.get().then(resp => {
+    res.send({data: resp});
+  }).catch(err => {
+    res.status(400).send({error: err});
+  });
 });
 
 
