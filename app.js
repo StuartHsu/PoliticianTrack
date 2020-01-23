@@ -1,5 +1,6 @@
 const express=require('express');
 const request=require('request');
+const asyncModule = require('async');
 
 const superagent = require('superagent');
 const cheerio = require('cheerio');
@@ -10,7 +11,8 @@ const NewsAPI = require('./src/newsapi');
 
 const crawler={
   ftv: require('./crawler/ftv'),
-  ebc: require('./crawler/ebc')
+  ebc: require('./crawler/ebc'),
+  ett: require('./crawler/ett')
 }
 
 const newsapi=new NewsAPI('999b04c84ac64ac5a3b4625ec41448d8');
@@ -129,7 +131,14 @@ app.get('/ebc', async function(req, res) {
   });
 });
 
-
+// ETtoday crawler
+app.get('/ett', async function(req, res) {
+  await crawler.ett.get().then(resp => {
+    res.send({data: resp});
+  }).catch(err => {
+    res.status(400).send({error: err});
+  });
+});
 
 
 
