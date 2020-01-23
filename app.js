@@ -12,7 +12,8 @@ const NewsAPI = require('./src/newsapi');
 const crawler={
   ftv: require('./crawler/ftv'),
   ebc: require('./crawler/ebc'),
-  ett: require('./crawler/ett')
+  ett: require('./crawler/ett'),
+  cna: require('./crawler/cna')
 }
 
 const newsapi=new NewsAPI('999b04c84ac64ac5a3b4625ec41448d8');
@@ -139,6 +140,41 @@ app.get('/ett', async function(req, res) {
     res.status(400).send({error: err});
   });
 });
+
+//  CNA crawler
+app.get('/cna', async function(req, res) {
+  await crawler.cna.get().then(resp => {
+    res.send({data: resp});
+  }).catch(err => {
+    res.status(400).send({error: err});
+  });
+});
+
+//  crawler
+app.get('/test', async function(req, res) {
+
+  
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
