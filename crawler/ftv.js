@@ -24,8 +24,7 @@ module.exports={
               desc:parseResult[i].Preface.replace( /(<([^>]+)>)/ig, ''),
               content:parseResult[i].Content.replace( /(<([^>]+)>)/ig, ''),
               href:parseResult[i].WebLink,
-              image:parseResult[i].Image,
-              pubTime:parseResult[i].CreateDate
+              pubTime:parseResult[i].CreateDate.substr(0, 16)
             }
             data.push(body);
           }

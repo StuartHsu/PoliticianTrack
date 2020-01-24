@@ -43,13 +43,19 @@ function getInfo(url, cb) {
     let $ = cheerio.load(body);
 
     var title = $('header h1.title').text().trim();
-    var desc = $('.story p').eq(3).text().trim();
     let content = '';
-    for(let i = 3; i < $('.story p').length; i++) {
-      content += $('.story p').eq(i).text().trim();
+    for(let i = 1; i < $('.story p').length; i++) {
+      // 多處理照片註解被納入內文
+      content += $('.story p').eq(i).clone().find('strong').remove().end().text().trim();
     };
+    // 濾除 XX記者/XX報導 開頭字樣
+    var strPos = content.indexOf('報導') + 2;
+    content = content.substring(strPos, content.length);
+    var desc = content.substr(0, 150) + '...';
     let href = url;
-    var pubTime = $('.c1 time.date').text().trim();
+    let reg1 = /(['年'|'月'])/ig;
+    let reg2 = /(['日'])/ig;
+    var pubTime = $('.c1 time.date').text().trim().replace(reg1, '/').replace(reg2, '');
 
     cb(null, {title, desc, content, href, pubTime});
   });

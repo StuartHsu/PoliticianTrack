@@ -41,11 +41,18 @@ function getInfo(url, cb) {
     let $ = cheerio.load(body);
 
     var title = $('.centralContent h1').text().trim();
-    var desc = $('.centralContent .paragraph p').eq(0).text().trim();
     let content = '';
     for(let i = 0; i < $('.centralContent .paragraph p').length; i++) {
       content += $('.centralContent .paragraph p').eq(i).text().trim();
     };
+    // 濾除 XX記者/XX報導 開頭字樣
+    if (content.indexOf('電）') > 1) {
+      var strPos = content.indexOf('電）') + 2;
+    } else {
+      strPos = content.indexOf('日）') + 2;
+    }
+    content = content.substring(strPos, content.length);
+    var desc = content.substr(0, 150) + '...';
     let href = url;
     var pubTime = $('.centralContent .updatetime span').text().trim();
 
