@@ -9,14 +9,6 @@ const puppeteer = require('puppeteer');
 
 const NewsAPI = require('./src/newsapi');
 
-const crawler={
-  ftv: require('./crawler/ftv'),
-  ebc: require('./crawler/ebc'),
-  ett: require('./crawler/ett'),
-  cna: require('./crawler/cna'),
-  tvbs: require('./crawler/tvbs')
-}
-
 const newsapi=new NewsAPI('999b04c84ac64ac5a3b4625ec41448d8');
 
 const PORT = process.env.PORT || 3000;
@@ -113,52 +105,54 @@ const url3 = 'https://newsapi.org/v2/sources?' +
 //   })
 // });
 
+// Crawler route
+const crawler = require('./route/crawler');
+app.use('/crawler', crawler);
 
-
-// FTV crawler
-app.get('/ftv', async function(req, res) {
-  await crawler.ftv.get({Cate: 'POL', Page: 1, Sp: 200}).then(resp => {
-    res.send({data: resp});
-  }).catch(err => {
-    res.status(400).send({error: err});
-  });
-});
-
-// EBC crawler
-app.get('/ebc', async function(req, res) {
-  await crawler.ebc.get().then(resp => {
-    res.send({data: resp});
-  }).catch(err => {
-    res.status(400).send({error: err});
-  });
-});
-
-// ETtoday crawler
-app.get('/ett', async function(req, res) {
-  await crawler.ett.get().then(resp => {
-    res.send({data: resp});
-  }).catch(err => {
-    res.status(400).send({error: err});
-  });
-});
-
-//  CNA crawler
-app.get('/cna', async function(req, res) {
-  await crawler.cna.get().then(resp => {
-    res.send({data: resp});
-  }).catch(err => {
-    res.status(400).send({error: err});
-  });
-});
-
-// TVBS crawler
-app.get('/tvbs', async function(req, res) {
-  await crawler.tvbs.get().then(resp => {
-    res.send({data: resp});
-  }).catch(err => {
-    res.status(400).send({error: err});
-  });
-});
+// // FTV crawler
+// app.get('/ftv', async function(req, res) {
+//   await crawler.ftv.get({Cate: 'POL', Page: 1, Sp: 200}).then(resp => {
+//     res.send({data: resp});
+//   }).catch(err => {
+//     res.status(400).send({error: err});
+//   });
+// });
+//
+// // EBC crawler
+// app.get('/ebc', async function(req, res) {
+//   await crawler.ebc.get().then(resp => {
+//     res.send({data: resp});
+//   }).catch(err => {
+//     res.status(400).send({error: err});
+//   });
+// });
+//
+// // ETtoday crawler
+// app.get('/ett', async function(req, res) {
+//   await crawler.ett.get().then(resp => {
+//     res.send({data: resp});
+//   }).catch(err => {
+//     res.status(400).send({error: err});
+//   });
+// });
+//
+// //  CNA crawler
+// app.get('/cna', async function(req, res) {
+//   await crawler.cna.get().then(resp => {
+//     res.send({data: resp});
+//   }).catch(err => {
+//     res.status(400).send({error: err});
+//   });
+// });
+//
+// // TVBS crawler
+// app.get('/tvbs', async function(req, res) {
+//   await crawler.tvbs.get().then(resp => {
+//     res.send({data: resp});
+//   }).catch(err => {
+//     res.status(400).send({error: err});
+//   });
+// });
 
 
 
