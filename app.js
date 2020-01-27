@@ -12,7 +12,8 @@ const app = express();
 const crawler = require('./route/crawler');
 app.use('/crawler', crawler);
 
-
+const news = require('./route/news');
+app.use('/news', news);
 
 
 
