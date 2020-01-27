@@ -61,6 +61,41 @@ router.get('/tvbs', async function(req, res) {
   });
 });
 
+// Save all
+router.get('/all', async function(req, res) {
+  await crawler.ftv.get({Cate: 'POL', Page: 1, Sp: 200}).then(async resp => {
+    await dataForm('ftv', resp);
+  }).catch(err => {
+    res.status(400).send({error: err});
+  });
+  await crawler.ebc.get().then(async resp => {
+    await dataForm('ebc', resp);
+  }).catch(err => {
+    res.status(400).send({error: err});
+  });
+  await crawler.ett.get().then(async resp => {
+    await dataForm('ett', resp);
+  }).catch(err => {
+    res.status(400).send({error: err});
+  });
+  await crawler.tvbs.get().then(async resp => {
+    await dataForm('tvbs', resp);
+  }).catch(err => {
+    res.status(400).send({error: err});
+  });
+  await crawler.cna.get().then(async resp => {
+    await dataForm('cna', resp);
+  }).catch(err => {
+    res.status(400).send({error: err});
+  });
+  await crawler.tvbs.get().then(async resp => {
+    await dataForm('tvbs', resp);
+  }).catch(err => {
+    res.status(400).send({error: err});
+  });
+  res.send("Done");
+});
+
 async function dataForm(publisher, resp) {
   for (let i = 0; i < resp.length; i++) {
     let data = {
