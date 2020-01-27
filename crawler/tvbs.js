@@ -40,7 +40,7 @@ function getInfo(url, cb) {
   request(url, function(err, res, body) {
     let $ = cheerio.load(body);
 
-    var title = $('.newsdetail_content .title.margin_b20 h1').text().trim();    
+    var title = $('.newsdetail_content .title.margin_b20 h1').text().trim();
     let content = $('#news_detail_div').clone().find('strong').remove().end().text().trim();
     var desc = content.substr(0, 150) + '...';
     let href = url;
