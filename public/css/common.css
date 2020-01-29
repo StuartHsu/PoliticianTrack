@@ -1,0 +1,221 @@
+html, body {
+	margin: 0px;
+}
+
+body {
+	font-size: 16px;
+	font-family: "Noto Sans TC", "微軟正黑體", "新細明體", arial, sans-serif;
+	color: #3f3a3a;
+}
+
+form {
+	margin: 0px;
+  padding: 0px;
+}
+
+a {
+	text-decoration: none;
+  color: inherit;
+}
+
+h1,h4,p {
+	margin: 0;
+}
+
+input,select,img {
+	vertical-align: middle;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* header */
+header {
+	display: flex;
+  height: 80px;
+  color: #FFFFFF;
+  background-color: #232323;
+	align-items: center;
+}
+
+header>.logo {
+	flex: none;
+  font-size: 4.5rem;
+  line-height: 4.5rem;
+  width: 150px;
+  margin-left: 30px;
+}
+
+header>nav {
+	flex: auto;
+  display: flex;
+}
+
+header>nav>.item {
+	flex: none;
+  width: 90px;
+  letter-spacing: 25px;
+  margin-left: 30px;
+	border-right: 1px solid #FFFFFF;
+  text-align: center;
+	cursor: pointer;
+}
+
+header>nav>.item:hover,
+header>.feature:hover {
+	color: #FFD479;
+}
+
+header>nav>.item:last-child {
+	border-right-width: 0px;
+}
+
+header>.feature{
+	flex: none;
+  margin-right: 30px;
+}
+
+main {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+}
+
+/* sidenav */
+.sidenav {
+	flex: 1;
+	display: flex;
+	justify-content: space-around;
+	margin: 10px 10px 0;
+}
+
+/* filters */
+.filters {
+	/* flex: 1; */
+	width: 120px;
+	text-align: center;
+}
+
+/* politician */
+.sidenav>.politician {
+	/* display: none; */
+	/* flex: 1; */
+	width: 120px;
+	text-align: center;
+}
+
+/* issue */
+.sidenav>.issue {
+	/* display: none; */
+	/* flex: 1.5; */
+	width: 150px;
+	text-align: center;
+}
+
+.sidenav .filter {
+  margin: 20px 0;
+}
+
+.sidenav .filter a {
+  font-size: 1.3rem;
+  margin: 20px 0;
+}
+
+.sidenav>.politician li,
+.sidenav>.issue li {
+  display: block;
+  font-size: 1.3rem;
+  /* color: #FFFFFF; */
+  padding: 10px;
+  margin: 20px 0;
+}
+
+/* content */
+.content {
+	/* flex: 2; */
+	width: 100%;
+	padding: 0 30px;
+	/* margin-top: 20px; */
+	margin: 20px 10px 0;
+}
+
+.content>.top>.politician {
+	display: inline-block;
+	font-weight: bold;
+	font-size: 3rem;
+	margin-bottom: 10px;
+}
+
+.content>.top>.issue {
+	display: inline-block;
+	font-weight: 500;
+	font-size: 1.2rem;
+	margin-bottom: 15px;
+}
+
+.content>.newslist {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+/* news */
+.news {
+	width: 760px;
+	margin: 10px 0;
+	padding: 15px;
+	border: 1px solid #232323;
+	border-radius: 10px;
+	box-shadow: 0 1px 3px rgba(35,35,35, 0.7);
+}
+
+.news>.news-content .title {
+	font-size: 1.3rem;
+	margin-bottom: 10px;
+
+}
+
+.news>.news-content .publisher {
+	display: inline-block;
+	margin-bottom: 10px;
+	margin-right: 10px;
+}
+
+.news>.news-content .pubTime {
+	display: inline-block;
+	margin-bottom: 10px;
+}
+
+/* .news>.news-content .desc {
+	width: 100%;
+	overflow:hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+} */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* End */

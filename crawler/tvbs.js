@@ -9,8 +9,11 @@ module.exports={
       //  來源 URL
       let fetchUrl = 'https://news.tvbs.com.tw/politics/';
 
-      getUrls(fetchUrl, (err, results) => {
-        asyncModule.map(results, getInfo, (err, results) => {
+      getUrls(fetchUrl, (err, result) => {
+        if(result.length > 40) {
+          result = result.splice(39, result.length - 40)
+        }
+        asyncModule.map(result, getInfo, (err, results) => {
           resolve(results);
         });
       });
@@ -26,7 +29,7 @@ function getUrls(url, cb) {
     let urls = [];
     let urlParent = $('#block_768 .content_center_list_box a');
     let url = '';
-    for(let i = 0; i < urlParent.length; i++) {
+    for(let i = 0; i < urlParent.length; i++) { // urlParent.length
       url = 'https://news.tvbs.com.tw' + urlParent.eq(i).attr('href');
       urls.push(url);
     };
@@ -38,14 +41,18 @@ function getUrls(url, cb) {
 // 取得各新聞詳細內容
 function getInfo(url, cb) {
   request(url, function(err, res, body) {
-    let $ = cheerio.load(body);
+    if(body) {
+      let $ = cheerio.load(body);
 
-    var title = $('.newsdetail_content .title.margin_b20 h1').text().trim();
-    let content = $('#news_detail_div').clone().find('strong').remove().end().text().trim();
-    var desc = content.substr(0, 150) + '...';
-    let href = url;
-    var pubTime = $('.newsdetail_content .icon_time.time.leftBox2').text().trim();
+      var title = $('.newsdetail_content .title.margin_b20 h1').text().trim();
+      let content = $('#news_detail_div').clone().find('strong').remove().end().text().trim();
+      var desc = content.substr(0, 150) + '...';
+      let href = url;
+      var pubTime = $('.newsdetail_content .icon_time.time.leftBox2').text().trim();
+      cb(null, {title, desc, content, href, pubTime});
+    } else {
+      cb(null, null);
+    }
 
-    cb(null, {title, desc, content, href, pubTime});
   });
 };

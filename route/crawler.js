@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router(); // create a router
 const mysql = require("../util/mysqlcon.js");
+const db = require('../model/crawler/savenews');
+const request = require('request');
+const cheerio = require('cheerio');
 
 const crawler = {
   ftv: require('../crawler/ftv'),
@@ -9,7 +12,7 @@ const crawler = {
   cna: require('../crawler/cna'),
   tvbs: require('../crawler/tvbs')
 }
-const db = require('../model/crawler/savenews');
+
 
 // FTV crawler
 router.get('/ftv', async function(req, res) {
@@ -65,31 +68,31 @@ router.get('/tvbs', async function(req, res) {
 router.get('/all', async function(req, res) {
   await crawler.ftv.get({Cate: 'POL', Page: 1, Sp: 200}).then(async resp => {
     await dataForm('ftv', resp);
+    console.log("ftv done");
   }).catch(err => {
     res.status(400).send({error: err});
   });
   await crawler.ebc.get().then(async resp => {
     await dataForm('ebc', resp);
+    console.log("ebc done");
   }).catch(err => {
     res.status(400).send({error: err});
   });
   await crawler.ett.get().then(async resp => {
     await dataForm('ett', resp);
-  }).catch(err => {
-    res.status(400).send({error: err});
-  });
-  await crawler.tvbs.get().then(async resp => {
-    await dataForm('tvbs', resp);
+    console.log("ett done");
   }).catch(err => {
     res.status(400).send({error: err});
   });
   await crawler.cna.get().then(async resp => {
     await dataForm('cna', resp);
+    console.log("cna done");
   }).catch(err => {
     res.status(400).send({error: err});
   });
   await crawler.tvbs.get().then(async resp => {
     await dataForm('tvbs', resp);
+    console.log("tvbs done");
   }).catch(err => {
     res.status(400).send({error: err});
   });
