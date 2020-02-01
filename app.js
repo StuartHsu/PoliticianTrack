@@ -1,5 +1,5 @@
 const express = require('express');
-
+const newData = require('./model/news');
 
 const PORT = process.env.PORT || 3000;
 
@@ -14,15 +14,17 @@ const crawler = require('./route/crawler');
 app.use('/crawler', crawler);
 
 const news = require('./route/news');
-app.use('/news', news);
+app.use('/api/news', news);
 
 
-app.get('/test', function(req, res) {
-  res.render('test', {
-    title: '首頁測試'
+app.get('/politician', async function(req, res) {
+  let results = await newData.get('title', '');
+  res.render('politician', {
+    title: '',
+    issue: '',
+    results: results
   });
 });
-
 
 
 

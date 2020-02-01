@@ -43,9 +43,10 @@ header {
 
 header>.logo {
 	flex: none;
-  font-size: 4.5rem;
-  line-height: 4.5rem;
-  width: 150px;
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+	letter-spacing: 4px;
+  width: 250px;
   margin-left: 30px;
 }
 
@@ -65,7 +66,12 @@ header>nav>.item {
 }
 
 header>nav>.item:hover,
-header>.feature:hover {
+header>.feature:hover,
+.sidenav .filter:hover,
+.sidenav .politician .person:hover,
+.sidenav .issueList .issue:hover,
+.sidenav .partyList li:hover,
+.sidenav .regionList li:hover {
 	color: #FFD479;
 }
 
@@ -73,7 +79,7 @@ header>nav>.item:last-child {
 	border-right-width: 0px;
 }
 
-header>.feature{
+header>.feature {
 	flex: none;
   margin-right: 30px;
 }
@@ -89,34 +95,64 @@ main {
 	flex: 1;
 	display: flex;
 	justify-content: space-around;
-	margin: 10px 10px 0;
+	margin: 0;
 }
 
 /* filters */
 .filters {
 	/* flex: 1; */
 	width: 120px;
-	text-align: center;
+	height: 89.6vh;
+	background-color: #232323;
+}
+
+.sidenav .mainFilter {
+	display: none;
+	justify-content: center;
 }
 
 /* politician */
-.sidenav>.politician {
-	/* display: none; */
+.sidenav .politician {
 	/* flex: 1; */
 	width: 120px;
-	text-align: center;
+	height: 89.6vh;
+	/* overflow-y: scroll; */
+	background-color: #000000;
+	border-right: 1px solid #262626;
 }
 
 /* issue */
-.sidenav>.issue {
-	/* display: none; */
+.sidenav .issueList {
 	/* flex: 1.5; */
 	width: 150px;
-	text-align: center;
+	height: 89.6vh;
+	/* overflow-y: scroll; */
+	background-color: #000000;
+}
+
+/* party */
+.sidenav .partyList {
+	display: none;
+	/* flex: 1.5; */
+	width: 170px;
+	height: 89.6vh;
+	overflow-y: scroll;
+	background-color: #000000;
+}
+
+/* region */
+.sidenav .regionList {
+	display: none;
+	/* flex: 1.5; */
+	width: 150px;
+	height: 89.6vh;
+	overflow-y: scroll;
+	background-color: #000000;
 }
 
 .sidenav .filter {
-  margin: 20px 0;
+	padding: 20px 0;
+  /* margin: 20px 0; */
 }
 
 .sidenav .filter a {
@@ -124,32 +160,69 @@ main {
   margin: 20px 0;
 }
 
-.sidenav>.politician li,
-.sidenav>.issue li {
+.sidenav .filter,
+.sidenav .politician li,
+.sidenav .issueList li,
+.sidenav .partyList li,
+.sidenav .regionList li {
+	color: #FFFFFF;
+	letter-spacing: 3px;
+	text-indent: 3px;
   display: block;
-  font-size: 1.3rem;
-  /* color: #FFFFFF; */
-  padding: 10px;
-  margin: 20px 0;
+	text-align: center;
+  font-size: 1rem;
+  padding: 20px 0;
+	cursor: pointer;
+}
+
+/* 人物、議題標題 */
+.sidenav .politician li.personTitle,
+.sidenav .issueList li.issueTitle {
+	padding-bottom: 10px;
+	font-size: 1.5rem;
+}
+
+/* .box{
+    width:100px;
+    height:100px;
+    background-color:#ccc
+  } */
+
+.politician .box-border {
+  position: relative;
+  left: 24.5px;
+  width: 70px;
+	margin-bottom: 10px;
+  border-bottom: 1.5px solid #FFFFFF;
+}
+
+.issueList .box-border {
+  position: relative;
+  left: 31px;
+  width: 88px;
+	margin-bottom: 10px;
+  border-bottom: 1.5px solid #FFFFFF;
 }
 
 /* content */
 .content {
 	/* flex: 2; */
 	width: 100%;
+	height: 85vh;
+	overflow-y: scroll;
 	padding: 0 30px;
 	/* margin-top: 20px; */
 	margin: 20px 10px 0;
 }
 
-.content>.top>.politician {
+.content>.top>.titleName {
 	display: inline-block;
 	font-weight: bold;
 	font-size: 3rem;
 	margin-bottom: 10px;
 }
 
-.content>.top>.issue {
+.content>.top>.titleIssue {
 	display: inline-block;
 	font-weight: 500;
 	font-size: 1.2rem;
@@ -188,16 +261,27 @@ main {
 	margin-bottom: 10px;
 }
 
-/* .news>.news-content .desc {
-	width: 100%;
-	overflow:hidden;
-	white-space: nowrap;
+.news>.news-content .desc {
+	overflow: hidden;
 	text-overflow: ellipsis;
-} */
+}
+
+.news>.news-content p {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+}
 
 
+.highlight {
+	background-color: #000000;
+}
 
-
+.innerHighlight {
+	background-color: #454545;
+}
 
 
 

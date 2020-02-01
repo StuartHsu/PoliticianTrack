@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+      <title>Politician Track</title>
+      <link rel="stylesheet" href="./css/twicon/twicon.css">
+      <link rel="stylesheet" type="text/css" href="./css/index.css">
+      <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="logo">
+        <a href="./">Politician Track
+          <!-- <i class="twicon-recycling"></i> -->
+          <!-- <img src="imgs/logo.png" alt="logo"> -->
+        </a>
+      </div>
+      <nav>
+        <div class="item">
+          <a href="./politician">篩選</a>
+        </div>
+        <div class="item">
+          <a href="./issue">熱門</a>
+        </div>
+      </nav>
+      <div class="feature">
+        <a href="./about">About Us</a>
+      </div>
+    </header>
+
+
+
+    <main>
+
+      <div class="sidenav">
+        <div class="filters">
+          <ul>
+            <li class="filter" id="main">主選</li>
+            <li class="filter" id="party">政黨</li>
+            <li class="filter" id="region">地區</li>
+            <!-- <li class="filter" id="time">時間</li> -->
+          </ul>
+        </div>
+        <div class="partyList filterItems">
+          <ul>
+            <li class="party">中國國民黨</li>
+            <li class="party">民主進步黨</li>
+            <li class="party">台灣民眾黨</li>
+            <li class="party">時代力量</li>
+            <li class="party">台灣基進</li>
+            <li class="party">親民黨</li>
+            <li class="party">無黨團結聯盟</li>
+            <li class="party">台灣團結聯盟</li>
+            <li class="party">國會政黨聯盟</li>
+            <li class="party">綠黨</li>
+            <li class="party">勞動黨</li>
+            <li class="party">新黨</li>
+            <li class="party">中華民族致公黨</li>
+            <li class="party">社會民主黨</li>
+          </ul>
+        </div>
+        <div class="regionList filterItems">
+          <ul>
+            <li class="region">臺北市</li>
+            <li class="region">新北市</li>
+            <li class="region">桃園市</li>
+            <li class="region">臺中市</li>
+            <li class="region">臺南市</li>
+            <li class="region">高雄市</li>
+            <li class="region">基隆市</li>
+            <li class="region">新竹市</li>
+            <li class="region">嘉義市</li>
+            <li class="region">新竹縣</li>
+            <li class="region">苗栗縣</li>
+            <li class="region">彰化縣</li>
+            <li class="region">南投縣</li>
+            <li class="region">雲林縣</li>
+            <li class="region">嘉義縣</li>
+            <li class="region">屏東縣</li>
+            <li class="region">宜蘭縣</li>
+            <li class="region">花蓮縣</li>
+            <li class="region">臺東縣</li>
+            <li class="region">澎湖縣</li>
+            <li class="region">金門縣</li>
+            <li class="region">連江縣</li>
+          </ul>
+        </div>
+        <div class="mainFilter filterItems">
+          <div class="politician">
+            <ul>
+              <li class="personTitle">人物</li>
+              <div class="box-border"></div>
+              <li class="person">韓國瑜</li>
+              <li class="person">蔡英文</li>
+              <li class="person">柯文哲</li>
+              <li class="person">馬英九</li>
+              <li class="person">吳敦義</li>
+              <li class="person">蘇貞昌</li>
+            </ul>
+          </div>
+          <div class="issueList">
+            <ul>
+              <li class="issueTitle">議題</li>
+              <div class="box-border"></div>
+              <li class="issue">過年</li>
+              <li class="issue">口罩</li>
+              <li class="issue">總統</li>
+              <li class="issue">WHO</li>
+              <li class="issue">一個中國</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="content">
+
+        <div class="top">
+
+          <div class="titleName" id="titleName"><%= title %></div>
+          <br>
+          <div class="titleIssue" id="titleIssue"><%= issue %></div>
+
+        </div>
+        <div class="newslist" id="oncomingNews">
+
+          <% results.forEach(function(result){ %>
+          <div class="news">
+            <div class="news-content">
+              <a href="<%= result.href %>" target="_blank">
+                <div class="title">
+                  <%= result.title %>
+                </div>
+                <div class="publisher">
+                  <%= result.publisher %>
+                </div>
+                <div class="pubTime">
+                  <%= result.pubTime %>
+                </div>
+                <div class="desc">
+                  <p>
+                    <%= result.description %>
+                  </p>
+                </div>
+              </a>
+            </div> <!-- news-content End -->
+          </div> <!-- news End -->
+          <% }); %>
+
+        </div> <!-- NewsList End -->
+        <div class="newslist" id="appendNews">
+
+
+
+        </div>
+      </div> <!-- Content End -->
+
+    </main>
+
+    <footer>
+
+    </footer>
+
+  <script>
+
+    const filters = document.querySelectorAll('.filter');
+    const filterItems = document.querySelectorAll('.filterItems');
+    const mainFilter = document.querySelector('.mainFilter');
+    const partyList = document.querySelector('.partyList');
+    const regionList = document.querySelector('.regionList');
+
+    const people = document.querySelectorAll('.person');
+    const issues = document.querySelectorAll('.issue');
+    const parties = document.querySelectorAll('.party');
+    const regions = document.querySelectorAll('.region');
+    let name = '';
+    let issueName = '';
+
+    // sidenav 選擇處理
+    filters.forEach(filter => filter.addEventListener('click', function(event) {
+      let chooseFilter = event.target.id;
+
+      if(this.classList.contains("highlight")) {
+        this.classList.remove("highlight");
+        switch(chooseFilter) {
+          case "main":
+            mainFilter.style.display = "none";
+            // 主選單取消時全收合
+            // filterItems.forEach(r => r.style.display = "none");
+            // filters.forEach(r => r.classList.remove("highlight"));
+            break;
+          case "party":
+            partyList.style.display = "none";
+            break;
+          case "region":
+            regionList.style.display = "none";
+            break;
+          default:
+        }
+      } else {
+        // filters.forEach(r => r.classList.remove("highlight"));
+        this.classList.add("highlight");
+        // filterItems.forEach(filterItem => filterItem.style.display = "none");
+        switch(chooseFilter) {
+          case "main":
+            mainFilter.style.display = "flex";
+            break;
+          case "party":
+            partyList.style.display = "block";
+            break;
+          case "region":
+            regionList.style.display = "block";
+            break;
+          default:
+        }
+      }
+    }));
+
+    // 人物選擇處理
+    people.forEach(person => person.addEventListener('click', function(event) {
+      if(this.classList.contains("innerHighlight")) {
+        this.classList.remove("innerHighlight");
+      } else {
+        people.forEach(r => r.classList.remove("innerHighlight"));
+        this.classList.add("innerHighlight");
+      }
+      name = toggle(name, event);
+      getData(name, issueName);
+    }));
+
+    // 議題選擇處理
+    issues.forEach(issue => issue.addEventListener('click', function(event) {
+      if(this.classList.contains("innerHighlight")) {
+        this.classList.remove("innerHighlight");
+      } else {
+        issues.forEach(r => r.classList.remove("innerHighlight"));
+        this.classList.add("innerHighlight");
+      }
+      issueName = toggle(issueName, event);
+      getData(name, issueName);
+    }));
+
+
+    childFilter(parties);
+    childFilter(regions);
+
+    // 子 filter 處理
+    function childFilter(items) {
+      items.forEach(item => item.addEventListener('click', function() {
+        if(this.classList.contains("innerHighlight")) {
+          this.classList.remove("innerHighlight");
+        } else {
+          this.classList.add("innerHighlight");
+        }
+      }));
+    }
+
+    // DB 取資料
+    function getData(name, issueName) {
+      $.ajax({
+        url: `http://localhost:3000/api/news/test?name=${name}\&issue=${issueName}`,
+        method: "GET",
+        // data: name,
+        dataType: 'json',
+        contentType: "application/json",
+        success: function(resp) {
+          // console.log(resp);
+          removeData();
+          changeTitle(name);
+          changeIssue(issueName);
+          dataForm(name, resp);
+        }
+      });
+    }
+
+    // 移除重複點擊
+    function toggle(condition, events) {
+      if(!condition) {
+        condition = event.target.innerText;
+      } else {
+        if(condition === event.target.innerText) {
+          condition = '';
+        } else {
+          condition = event.target.innerText;
+        }
+      }
+      return condition;
+    }
+
+    function changeTitle(name) {
+      var titleName = document.getElementById("titleName");
+      titleName.innerHTML = name;
+    }
+
+    function changeIssue(issueName) {
+      var titleIssue = document.getElementById("titleIssue");
+      titleIssue.innerHTML = issueName;
+    }
+
+    function dataForm(name, results) {
+      document.getElementById('oncomingNews').style.display = "none";
+
+      for (let i = 0; i < results.data.length; i ++) {
+        var newsDiv = document.createElement("div");
+        newsDiv.className = "news";
+
+        var newsContentDiv = document.createElement("div");
+        newsContentDiv.className = "news-content";
+
+        var link = document.createElement("a");
+        link.setAttribute("href", `${results.data[i].href}`);
+        link.setAttribute("target", "_blank");
+
+        var titleDiv = document.createElement("div");
+        titleDiv.className = "title";
+        titleDiv.innerHTML = results.data[i].title;
+
+        var publisherDiv = document.createElement("div");
+        publisherDiv.className = "publisher";
+        publisherDiv.innerHTML = results.data[i].publisher;
+
+        var pubTimeDiv = document.createElement("div");
+        pubTimeDiv.className = "pubTime";
+        pubTimeDiv.innerHTML = results.data[i].pubTime;
+
+        var descDiv = document.createElement("div");
+        descDiv.className = "desc";
+
+        var descP = document.createElement("p");
+        descP.innerHTML = results.data[i].description;
+
+        descDiv.appendChild(descP);
+        link.appendChild(titleDiv);
+        link.appendChild(publisherDiv);
+        link.appendChild(pubTimeDiv);
+        link.appendChild(descDiv);
+
+        newsContentDiv.appendChild(link);
+        newsDiv.appendChild(newsContentDiv);
+
+        appendNews.appendChild(newsDiv);
+      }
+    }
+
+    function removeData() {
+      var appendNews = document.getElementById("appendNews");
+      var child = appendNews.lastElementChild;
+      while(child) {
+        appendNews.removeChild(child);
+        child = appendNews.lastElementChild;
+      }
+    }
+
+  </script>
+
+  </body>
+
+
+</html>
