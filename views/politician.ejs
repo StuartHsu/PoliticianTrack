@@ -89,25 +89,26 @@
         </div>
         <div class="mainFilter filterItems">
           <div class="politician">
-            <ul>
+            <ul id="appendPols">
               <li class="personTitle">人物</li>
               <div class="box-border"></div>
-              <li class="person">韓國瑜</li>
-              <li class="person">蔡英文</li>
-              <li class="person">柯文哲</li>
-              <li class="person">馬英九</li>
-              <li class="person">吳敦義</li>
-              <li class="person">蘇貞昌</li>
+              <% polsData.forEach(function(result){ %>
+                <li class="person">
+                  <%= result.name %>
+                </li>
+              <% }); %>
+              <!-- <li class="person">韓國瑜</li> -->
             </ul>
           </div>
           <div class="issueList">
             <ul>
               <li class="issueTitle">議題</li>
               <div class="box-border"></div>
-              <li class="issue">過年</li>
-              <li class="issue">武漢肺炎</li>
-              <li class="issue">總統大選</li>
-              <li class="issue">WHO</li>
+              <% issuesData.forEach(function(result){ %>
+                <li class="issue">
+                  <%= result.name %>
+                </li>
+              <% }); %>
               <li class="issue">一個中國</li>
             </ul>
           </div>
@@ -197,6 +198,8 @@
     const regions = document.querySelectorAll('.region');
 
     const appendNews = document.getElementById("appendNews");
+    const appendPols = document.getElementById('appendPols');
+
 
     // const tagJudge = document.getElementsByClassName("content")[0].offsetWidth;
 
@@ -206,7 +209,7 @@
     // sidenav 選擇處理
     filters.forEach(filter => filter.addEventListener('click', function(event) {
       let chooseFilter = event.target.id;
-
+      // polsEvent(); // 點擊 sidenav 時載入 pols 監聽事件
       if(this.classList.contains("highlight")) {
 
         this.classList.remove("highlight");
@@ -418,8 +421,6 @@
       }
     }
 
-
-
     function tagShow() {
 
       let tagJudge = document.getElementsByClassName("content")[0].offsetWidth;
@@ -438,6 +439,40 @@
       }
     }
 
+
+    // DB 取資料 - Pols
+    // function getPol() {
+    //   $.ajax({
+    //     url: `http://localhost:3000/api/getpolitician`,
+    //     method: "GET",
+    //     // data: name,
+    //     dataType: 'json',
+    //     contentType: "application/json",
+    //     success: function(resp) {
+    //       polDataForm(resp);
+    //     }
+    //   });
+    // }
+    //
+    // function polDataForm(results) {
+    //   var polTitleLi = document.createElement('li');
+    //   polTitleLi.className = "personTitle";
+    //   polTitleLi.innerHTML = "人物";
+    //
+    //   var div = document.createElement('div');
+    //   div.className = "box-border";
+    //
+    //   appendPols.appendChild(polTitleLi);
+    //   appendPols.appendChild(div);
+    //
+    //   for(let i = 0; i < results.data.length; i++) {
+    //     var polLi = document.createElement('li');
+    //     polLi.className = "person";
+    //     polLi.innerHTML = results.data[i].name;
+    //
+    //     appendPols.appendChild(polLi);
+    //   }
+    // }
 
 
   </script>

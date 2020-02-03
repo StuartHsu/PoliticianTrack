@@ -117,7 +117,7 @@ main {
 	/* flex: 1; */
 	width: 120px;
 	height: 89.6vh;
-	/* overflow-y: scroll; */
+	overflow-y: scroll;
 	background-color: #000000;
 	border-right: 1px solid #262626;
 }
