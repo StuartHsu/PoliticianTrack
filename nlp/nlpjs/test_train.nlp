@@ -1,0 +1,172 @@
+{
+  "settings": {
+    "languages": [
+      "zh"
+    ],
+    "tag": "nlp",
+    "threshold": 0.5,
+    "autoLoad": true,
+    "autoSave": true,
+    "modelFileName": "model.nlp"
+  },
+  "nluManager": {
+    "settings": {
+      "tag": "nlu-manager"
+    },
+    "locales": [
+      "zh"
+    ],
+    "languageNames": {},
+    "domainManagers": {
+      "zh": {
+        "settings": {
+          "locale": "zh",
+          "tag": "domain-manager-zh",
+          "nluByDomain": {
+            "default": {
+              "className": "NeuralNlu",
+              "settings": {}
+            }
+          },
+          "trainByDomain": false,
+          "useStemDict": true
+        },
+        "stemDict": {
+          "北,台,國,在,市,廳,法,的,餐": {
+            "intent": "place.search",
+            "domain": "default"
+          }
+        },
+        "intentDict": {
+          "place.search": "default"
+        },
+        "sentences": [
+          {
+            "domain": "default",
+            "utterance": "在台北市的法國餐廳",
+            "intent": "place.search"
+          }
+        ],
+        "domains": {
+          "master_domain": {
+            "settings": {
+              "locale": "zh",
+              "tag": "nlu-zh",
+              "keepStopwords": true,
+              "nonefeatureValue": 1,
+              "nonedeltaMultiplier": 1.2,
+              "spellCheck": false,
+              "spellCheckDistance": 1,
+              "filterZeros": true,
+              "log": true
+            },
+            "features": {
+              "在": 1,
+              "台": 1,
+              "北": 1,
+              "市": 1,
+              "的": 1,
+              "法": 1,
+              "國": 1,
+              "餐": 1,
+              "廳": 1
+            },
+            "intents": {
+              "place.search": 1
+            },
+            "intentFeatures": {
+              "place.search": [
+                "在",
+                "台",
+                "北",
+                "市",
+                "的",
+                "法",
+                "國",
+                "餐",
+                "廳"
+              ]
+            },
+            "neuralNetwork": {
+              "features": [
+                "在",
+                "台",
+                "北",
+                "市",
+                "的",
+                "法",
+                "國",
+                "餐",
+                "廳"
+              ],
+              "intents": [
+                "place.search"
+              ],
+              "perceptrons": [
+                [
+                  1.3130418062210083,
+                  1.3130418062210083,
+                  1.3130418062210083,
+                  1.3130418062210083,
+                  1.3130418062210083,
+                  1.3130418062210083,
+                  1.3130418062210083,
+                  1.3130418062210083,
+                  1.3130418062210083,
+                  0.653350060343846
+                ]
+              ],
+              "perceptronSettings": {
+                "locale": "zh",
+                "tag": "nlu-zh",
+                "keepStopwords": true,
+                "nonefeatureValue": 1,
+                "nonedeltaMultiplier": 1.2,
+                "spellCheck": false,
+                "spellCheckDistance": 1,
+                "filterZeros": true,
+                "log": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "intentDomains": {},
+    "extraSentences": [
+      [
+        "zh",
+        "在台北市的法國餐廳"
+      ]
+    ]
+  },
+  "ner": {
+    "settings": {
+      "tag": "ner",
+      "entityPreffix": "%",
+      "entitySuffix": "%"
+    },
+    "rules": {}
+  },
+  "nlgManager": {
+    "settings": {
+      "tag": "nlg-manager"
+    },
+    "responses": {
+      "zh": {
+        "place.search": [
+          {
+            "answer": "找地點"
+          }
+        ]
+      }
+    }
+  },
+  "actionManager": {
+    "settings": {
+      "tag": "action-manager"
+    },
+    "actions": {}
+  },
+  "slotManager": {}
+}

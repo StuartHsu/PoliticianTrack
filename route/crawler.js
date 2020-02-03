@@ -66,12 +66,12 @@ router.get('/tvbs', async function(req, res) {
 
 // Save all
 router.get('/all', async function(req, res) {
-  await crawler.ftv.get({Cate: 'POL', Page: 1, Sp: 200}).then(async resp => {
-    await dataForm('ftv', resp);
-    console.log("ftv done");
-  }).catch(err => {
-    res.status(400).send({error: err});
-  });
+  // await crawler.ftv.get({Cate: 'POL', Page: 1, Sp: 200}).then(async resp => {
+  //   await dataForm('ftv', resp);
+  //   console.log("ftv done");
+  // }).catch(err => {
+  //   res.status(400).send({error: err});
+  // });
   await crawler.ebc.get().then(async resp => {
     await dataForm('ebc', resp);
     console.log("ebc done");
