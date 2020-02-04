@@ -22,6 +22,9 @@ app.use('/api/news', news);
 const getPolitician = require('./route/politician');
 app.use('/api/getpolitician', getPolitician);
 
+// NLP
+const nlp = require('./route/nlp/nlpjs');
+app.use('/nlp', nlp);
 
 // filter page render data when 1st coming
 app.get('/politician', async function(req, res) {
@@ -38,8 +41,8 @@ app.get('/politician', async function(req, res) {
 });
 
 
-// const nlp = require('./nlp/nlpjs/nlptest');
-//
+
+
 // app.get('/nlp/test', async function(req, res) {
 //   let results = await nlp.get();
 //   res.send(results);

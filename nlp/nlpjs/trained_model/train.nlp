@@ -1,0 +1,323 @@
+{
+  "settings": {
+    "languages": [
+      "zh"
+    ],
+    "tag": "nlp",
+    "threshold": 0.5,
+    "autoLoad": true,
+    "autoSave": true,
+    "modelFileName": "model.nlp"
+  },
+  "nluManager": {
+    "settings": {
+      "tag": "nlu-manager"
+    },
+    "locales": [
+      "zh"
+    ],
+    "languageNames": {},
+    "domainManagers": {
+      "zh": {
+        "settings": {
+          "locale": "zh",
+          "tag": "domain-manager-zh",
+          "nluByDomain": {
+            "default": {
+              "className": "NeuralNlu",
+              "settings": {}
+            }
+          },
+          "trainByDomain": false,
+          "useStemDict": true
+        },
+        "stemDict": {
+          "politician": {
+            "intent": "politician.say",
+            "domain": "default"
+          },
+          "politician,say": {
+            "intent": "politician.say",
+            "domain": "default"
+          },
+          "country": {
+            "intent": "country.say",
+            "domain": "default"
+          },
+          "country,say": {
+            "intent": "country.say",
+            "domain": "default"
+          },
+          "medical": {
+            "intent": "issue.medical",
+            "domain": "default"
+          }
+        },
+        "intentDict": {
+          "politician.say": "default",
+          "country.say": "default",
+          "issue.medical": "default"
+        },
+        "sentences": [
+          {
+            "domain": "default",
+            "utterance": "%politician%：",
+            "intent": "politician.say"
+          },
+          {
+            "domain": "default",
+            "utterance": "%politician%%say%",
+            "intent": "politician.say"
+          },
+          {
+            "domain": "default",
+            "utterance": "%country%：",
+            "intent": "country.say"
+          },
+          {
+            "domain": "default",
+            "utterance": "%country%%say%",
+            "intent": "country.say"
+          },
+          {
+            "domain": "default",
+            "utterance": "%medical%：",
+            "intent": "issue.medical"
+          }
+        ],
+        "domains": {
+          "master_domain": {
+            "settings": {
+              "locale": "zh",
+              "tag": "nlu-zh",
+              "keepStopwords": true,
+              "nonefeatureValue": 1,
+              "nonedeltaMultiplier": 1.2,
+              "spellCheck": false,
+              "spellCheckDistance": 1,
+              "filterZeros": true,
+              "log": true
+            },
+            "features": {
+              "politician": 1,
+              "say": 1,
+              "country": 1,
+              "medical": 1
+            },
+            "intents": {
+              "politician.say": 1,
+              "country.say": 1,
+              "issue.medical": 1
+            },
+            "intentFeatures": {
+              "politician.say": [
+                "politician",
+                "say"
+              ],
+              "country.say": [
+                "country",
+                "say"
+              ],
+              "issue.medical": [
+                "medical"
+              ]
+            },
+            "neuralNetwork": {
+              "features": [
+                "politician",
+                "say",
+                "country",
+                "medical"
+              ],
+              "intents": [
+                "politician.say",
+                "country.say",
+                "issue.medical"
+              ],
+              "perceptrons": [
+                [
+                  10.040420532226562,
+                  0.28451138734817505,
+                  -3.233036518096924,
+                  -2.2494122982025146,
+                  2.277546844973981
+                ],
+                [
+                  -3.182776927947998,
+                  0.2793712317943573,
+                  10.030563354492188,
+                  -2.2634437084198,
+                  2.290765675302837
+                ],
+                [
+                  -2.4849321842193604,
+                  -0.8108307719230652,
+                  -2.4790797233581543,
+                  9.964518547058105,
+                  2.500967700021393
+                ]
+              ],
+              "perceptronSettings": {
+                "locale": "zh",
+                "tag": "nlu-zh",
+                "keepStopwords": true,
+                "nonefeatureValue": 1,
+                "nonedeltaMultiplier": 1.2,
+                "spellCheck": false,
+                "spellCheckDistance": 1,
+                "filterZeros": true,
+                "log": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "intentDomains": {},
+    "extraSentences": [
+      [
+        "zh",
+        "%politician%："
+      ],
+      [
+        "zh",
+        "%politician%%say%"
+      ],
+      [
+        "zh",
+        "%country%："
+      ],
+      [
+        "zh",
+        "%country%%say%"
+      ],
+      [
+        "zh",
+        "%medical%："
+      ]
+    ]
+  },
+  "ner": {
+    "settings": {
+      "tag": "ner",
+      "entityPreffix": "%",
+      "entitySuffix": "%"
+    },
+    "rules": {
+      "zh": {
+        "politician": {
+          "name": "politician",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "人物",
+              "texts": [
+                "賴清德",
+                "韓國瑜",
+                "蘇貞昌",
+                "王世堅",
+                "郝龍斌"
+              ]
+            }
+          ]
+        },
+        "country": {
+          "name": "country",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "國家",
+              "texts": [
+                "美國",
+                "中國",
+                "中國大陸",
+                "大陸",
+                "中共"
+              ]
+            }
+          ]
+        },
+        "say": {
+          "name": "say",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "表示",
+              "texts": [
+                "表示",
+                "認為",
+                "說",
+                "覺得",
+                "痛批",
+                "批",
+                "嗆",
+                "嗆爆",
+                "一句話"
+              ]
+            }
+          ]
+        },
+        "medical": {
+          "name": "medical",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "醫療",
+              "texts": [
+                "WHO"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "nlgManager": {
+    "settings": {
+      "tag": "nlg-manager"
+    },
+    "responses": {
+      "zh": {
+        "politician.say": [
+          {
+            "answer": "政治人物表示"
+          }
+        ],
+        "country.say": [
+          {
+            "answer": "國家表示"
+          }
+        ],
+        "issue.medical": [
+          {
+            "answer": "醫療議題"
+          }
+        ]
+      }
+    }
+  },
+  "actionManager": {
+    "settings": {
+      "tag": "action-manager"
+    },
+    "actions": {}
+  },
+  "slotManager": {
+    "politician.say": {
+      "politician%%say": {
+        "intent": "politician.say",
+        "entity": "politician%%say",
+        "mandatory": false,
+        "locales": {}
+      }
+    },
+    "country.say": {
+      "country%%say": {
+        "intent": "country.say",
+        "entity": "country%%say",
+        "mandatory": false,
+        "locales": {}
+      }
+    }
+  }
+}
