@@ -43,7 +43,7 @@
             <!-- <li class="filter" id="time">時間</li> -->
           </ul>
         </div>
-        <div class="partyList filterItems">
+        <div class="partyList filterItems scrollBar">
           <ul>
             <li class="party">中國國民黨</li>
             <li class="party">民主進步黨</li>
@@ -61,7 +61,7 @@
             <li class="party">社會民主黨</li>
           </ul>
         </div>
-        <div class="regionList filterItems">
+        <div class="regionList filterItems scrollBar">
           <ul>
             <li class="region">臺北市</li>
             <li class="region">新北市</li>
@@ -92,31 +92,35 @@
             <ul id="appendPols">
               <li class="personTitle">人物</li>
               <div class="box-border"></div>
-              <% polsData.forEach(function(result){ %>
-                <li class="person">
-                  <%= result.name %>
-                </li>
-              <% }); %>
-              <!-- <li class="person">韓國瑜</li> -->
+              <div class="inner scrollBar">
+                <% polsData.forEach(function(result){ %>
+                  <li class="person">
+                    <%= result.name %>
+                  </li>
+                <% }); %>
+                <!-- <li class="person">韓國瑜</li> -->
+              </div>
             </ul>
           </div>
-          <div class="issueList">
+          <div class="issueList scrollBar">
             <ul>
               <li class="issueTitle">議題</li>
               <div class="box-border"></div>
-              <% issuesData.forEach(function(result){ %>
-                <li class="issue">
-                  <%= result.name %>
-                </li>
-              <% }); %>
-              <li class="issue">一個中國</li>
+              <div class="inner scrollBar">
+                <% issuesData.forEach(function(result){ %>
+                  <li class="issue">
+                    <%= result.name %>
+                  </li>
+                <% }); %>
+                <li class="issue">一個中國</li>
+              </div>
             </ul>
           </div>
         </div>
 
       </div>
 
-      <div class="content">
+      <div class="content scrollBar">
 
         <div class="top">
 
@@ -344,15 +348,59 @@
         var time = new Date(results.data[i].pubTime);
 
         var yearP = document.createElement("p");
-        yearP.className = "year";
-        yearP.innerHTML = time.getFullYear();
-
         var monthP = document.createElement("p");
+        yearP.className = "year";
         monthP.className = "month";
-        monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+
+        // if(i > 0) {
+        //   var preTime = new Date(results.data[i - 1].pubTime);
+        //
+        //   var preTimeYM = preTime.getFullYear() + preTime.getMonth();
+        //   var curTimeYM = time.getFullYear() + time.getMonth();
+        //
+        //   if(preTimeYM !== curTimeYM) {
+        //     yearP.innerHTML = time.getFullYear();
+        //     monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+        //   } else {
+        //     yearP.innerHTML = "";
+        //     monthP.innerHTML = "";
+        //   }
+        // } else {
+        //   yearP.innerHTML = time.getFullYear();
+        //   monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+        // }
+
+        if(i > 0) {
+          var preTime = new Date(results.data[i - 1].pubTime);
+
+          var preTimeYM = preTime.getFullYear() + preTime.getMonth();
+          var curTimeYM = time.getFullYear() + time.getMonth();
+
+          if(preTimeYM !== curTimeYM) {
+            yearP.innerHTML = time.getFullYear();
+            monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+          } else {
+            yearP.innerHTML = "";
+            monthP.innerHTML = "";
+          }
+        } else {
+          yearP.innerHTML = time.getFullYear();
+          monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+        }
 
         timelineDiv.appendChild(yearP);
         timelineDiv.appendChild(monthP);
+
+        // var yearP = document.createElement("p");
+        // yearP.className = "year";
+        // yearP.innerHTML = time.getFullYear();
+        //
+        // var monthP = document.createElement("p");
+        // monthP.className = "month";
+        // monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+        //
+        // timelineDiv.appendChild(yearP);
+        // timelineDiv.appendChild(monthP);
 
         // news
         var newsDiv = document.createElement("div");
