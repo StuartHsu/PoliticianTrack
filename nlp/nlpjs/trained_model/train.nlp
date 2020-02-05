@@ -48,6 +48,10 @@
             "intent": "country.say",
             "domain": "default"
           },
+          "say": {
+            "intent": "someone.say",
+            "domain": "default"
+          },
           "medical": {
             "intent": "issue.medical",
             "domain": "default"
@@ -56,6 +60,7 @@
         "intentDict": {
           "politician.say": "default",
           "country.say": "default",
+          "someone.say": "default",
           "issue.medical": "default"
         },
         "sentences": [
@@ -78,6 +83,11 @@
             "domain": "default",
             "utterance": "%country%%say%",
             "intent": "country.say"
+          },
+          {
+            "domain": "default",
+            "utterance": "%say%",
+            "intent": "someone.say"
           },
           {
             "domain": "default",
@@ -107,6 +117,7 @@
             "intents": {
               "politician.say": 1,
               "country.say": 1,
+              "someone.say": 1,
               "issue.medical": 1
             },
             "intentFeatures": {
@@ -116,6 +127,9 @@
               ],
               "country.say": [
                 "country",
+                "say"
+              ],
+              "someone.say": [
                 "say"
               ],
               "issue.medical": [
@@ -132,29 +146,37 @@
               "intents": [
                 "politician.say",
                 "country.say",
+                "someone.say",
                 "issue.medical"
               ],
               "perceptrons": [
                 [
-                  10.040420532226562,
-                  0.28451138734817505,
-                  -3.233036518096924,
-                  -2.2494122982025146,
-                  2.277546844973981
+                  12.22802734375,
+                  -0.281633585691452,
+                  -2.097162961959839,
+                  -1.4164458513259888,
+                  0.40316906062567065
                 ],
                 [
-                  -3.182776927947998,
-                  0.2793712317943573,
-                  10.030563354492188,
-                  -2.2634437084198,
-                  2.290765675302837
+                  -1.8457871675491333,
+                  -0.28648650646209717,
+                  12.223341941833496,
+                  -1.4501304626464844,
+                  0.4101164309295199
                 ],
                 [
-                  -2.4849321842193604,
-                  -0.8108307719230652,
-                  -2.4790797233581543,
-                  9.964518547058105,
-                  2.500967700021393
+                  -12.235576629638672,
+                  9.327957153320312,
+                  -12.226557731628418,
+                  -2.970538854598999,
+                  2.98600596196142
+                ],
+                [
+                  -2.170997381210327,
+                  -2.170994520187378,
+                  -2.1709961891174316,
+                  10.328991889953613,
+                  2.1709994669968284
                 ]
               ],
               "perceptronSettings": {
@@ -193,6 +215,10 @@
       ],
       [
         "zh",
+        "%say%"
+      ],
+      [
+        "zh",
         "%medical%："
       ]
     ]
@@ -216,7 +242,8 @@
                 "韓國瑜",
                 "蘇貞昌",
                 "王世堅",
-                "郝龍斌"
+                "郝龍斌",
+                "柯文哲"
               ]
             }
           ]
@@ -288,6 +315,11 @@
             "answer": "國家表示"
           }
         ],
+        "someone.say": [
+          {
+            "answer": "某人表示"
+          }
+        ],
         "issue.medical": [
           {
             "answer": "醫療議題"
@@ -315,6 +347,14 @@
       "country%%say": {
         "intent": "country.say",
         "entity": "country%%say",
+        "mandatory": false,
+        "locales": {}
+      }
+    },
+    "someone.say": {
+      "say": {
+        "intent": "someone.say",
+        "entity": "say",
         "mandatory": false,
         "locales": {}
       }
