@@ -1,0 +1,217 @@
+` <!DOCTYPE html>
+<html lang="en">
+
+  <head>
+      <title>Admin Page</title>
+      <link rel="stylesheet" href="./css/twicon/twicon.css">
+      <link rel="stylesheet" type="text/css" href="./css/index.css">
+      <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="logo">
+        <a href="./">Politician Track
+          <!-- <i class="twicon-recycling"></i> -->
+          <!-- <img src="imgs/logo.png" alt="logo"> -->
+        </a>
+      </div>
+      <nav>
+        <div class="item">
+          <a href="./politician">篩選</a>
+        </div>
+        <div class="item">
+          <a href="./issue">熱門</a>
+        </div>
+      </nav>
+      <div class="feature">
+        <a href="./about">About Us</a>
+      </div>
+    </header>
+
+
+
+    <main>
+
+      <div class="view">
+        <div class="heading">
+          <h1>產品登錄後台</h1>
+
+          <div class="login">
+            <!-- <form class="form" method="GET" enctype="multipart/form-data">
+              <h2>產品基本資訊</h2>
+
+              <div class="form-group">
+                <label>產品編號:</label>
+                <input type="number" class="form-control" id="time" required="required">
+              </div>
+
+
+                <button class="button" id="query">產品基本資訊登錄</button>
+
+            </form> -->
+
+            開始：
+            <input type="date" id="date_start">
+            結束：
+            <input type="date" id="date_end">
+            <button class="button" id="query">產品基本資訊登錄</button>
+
+          </div>
+
+          <div id="results">
+
+          </div>
+
+
+        </div>
+      </div>
+
+    </main>
+
+    <footer>
+
+    </footer>
+
+    <script>
+
+      const query = document.getElementById("query");
+
+      const date_start = document.getElementById("date_start");
+      const date_end = document.getElementById("date_end");
+
+
+
+      query.addEventListener('click', function(event) {
+        let data = {
+          start: date_start.value,
+          end: date_end.value,
+        }
+        getData(data);
+      });
+
+      // DB 取資料
+      function getData(data) {
+        console.log(data);
+        $.ajax({
+          url: "admin/api/seg",
+          type: "POST",
+          data: JSON.stringify(data),
+          contentType: "application/json; charset=utf-8", // 送給 server 的格式
+          success: function(resp) {
+            console.log(resp);
+          }
+        });
+      }
+
+
+
+      // function dataForm(name, results) {
+      //   document.getElementById('oncomingNews').style.display = "none";
+      //
+      //   for (let i = 0; i < results.data.length; i ++) {
+      //     var li = document.createElement("li");
+      //
+      //     // timeline
+      //     var timelineDiv = document.createElement("div");
+      //     timelineDiv.className = "timeline";
+      //
+      //     var time = new Date(results.data[i].pubTime);
+      //
+      //     var yearP = document.createElement("p");
+      //     var monthP = document.createElement("p");
+      //     yearP.className = "year";
+      //     monthP.className = "month";
+      //
+      //
+      //
+      //     if(i > 0) {
+      //       var preTime = new Date(results.data[i - 1].pubTime);
+      //
+      //       var preTimeYM = preTime.getFullYear() + preTime.getMonth();
+      //       var curTimeYM = time.getFullYear() + time.getMonth();
+      //
+      //       if(preTimeYM !== curTimeYM) {
+      //         yearP.innerHTML = time.getFullYear();
+      //         monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+      //       } else {
+      //         yearP.innerHTML = "";
+      //         monthP.innerHTML = "";
+      //       }
+      //     } else {
+      //       yearP.innerHTML = time.getFullYear();
+      //       monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+      //     }
+      //
+      //     timelineDiv.appendChild(yearP);
+      //     timelineDiv.appendChild(monthP);
+      //
+      //
+      //     // news
+      //     var newsDiv = document.createElement("div");
+      //     newsDiv.className = "news";
+      //
+      //     var newsContentDiv = document.createElement("div");
+      //     newsContentDiv.className = "news-content";
+      //
+      //     var link = document.createElement("a");
+      //     link.setAttribute("href", `${results.data[i].href}`);
+      //     link.setAttribute("target", "_blank");
+      //
+      //     var titleDiv = document.createElement("div");
+      //     titleDiv.className = "title";
+      //     titleDiv.innerHTML = results.data[i].title;
+      //
+      //     var publisherDiv = document.createElement("div");
+      //     publisherDiv.className = "publisher";
+      //     publisherDiv.innerHTML = results.data[i].publisher;
+      //
+      //     var pubTimeDiv = document.createElement("div");
+      //     pubTimeDiv.className = "pubTime";
+      //     pubTimeDiv.innerHTML = results.data[i].pubTime;
+      //
+      //     var descDiv = document.createElement("div");
+      //     descDiv.className = "desc";
+      //
+      //     var descP = document.createElement("p");
+      //     descP.innerHTML = results.data[i].description;
+      //
+      //     descDiv.appendChild(descP);
+      //     link.appendChild(titleDiv);
+      //     link.appendChild(publisherDiv);
+      //     link.appendChild(pubTimeDiv);
+      //     link.appendChild(descDiv);
+      //
+      //     newsContentDiv.appendChild(link);
+      //     newsDiv.appendChild(newsContentDiv);
+      //
+      //     // tags
+      //     var tagsDiv = document.createElement("div");
+      //     tagsDiv.className = "newsTags";
+      //
+      //     var tagUl = document.createElement("ul");
+      //
+      //     var tagLi = document.createElement("li");
+      //     tagLi.innerHTML = "測試標籤"
+      //
+      //     tagUl.appendChild(tagLi);
+      //     tagsDiv.appendChild(tagUl);
+      //
+      //     // 組合
+      //     li.appendChild(timelineDiv);
+      //     li.appendChild(newsDiv);
+      //     li.appendChild(tagsDiv);
+      //
+      //     appendNews.appendChild(li);
+      //   }
+      // }
+
+
+    </script>
+
+  </body>
+
+
+</html>
+`

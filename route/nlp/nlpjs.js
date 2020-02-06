@@ -11,7 +11,7 @@ router.get('/train', async function(req, res) {
 
 // NLP run
 router.get('/run', async function(req, res) {
-  let content = '影／喊蓋收容所被稱先知！韓國瑜：我們是先辦，高雄希望做防疫模範生';
+  let content = '賴清德華府見盧比歐 談美台關係及台灣國際參與'.replace('：', '表示');
   nlpProcess.process(content).then(result => {
     res.send(result);
   });

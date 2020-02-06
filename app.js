@@ -2,11 +2,15 @@ const express = require('express');
 const newData = require('./model/news');
 const polsData = require('./model/politicians');
 const issuesData = require('./model/issues');
+const bodyParser = require('body-parser');
 
 const PORT = process.env.PORT || 3000;
 
 
 const app = express();
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 app.use(express.static('public')); // static file
 app.set('view engine', 'ejs');
@@ -25,6 +29,10 @@ app.use('/api/getpolitician', getPolitician);
 // NLP
 const nlp = require('./route/nlp/nlpjs');
 app.use('/nlp', nlp);
+
+// Admin tag
+const adminTag = require('./route/admin/adminTag');
+app.use('/admin', adminTag);
 
 // filter page render data when 1st coming
 app.get('/politician', async function(req, res) {
@@ -67,9 +75,33 @@ app.get('/tagVerify', async function(req, res) {
   res.send(data);
 });
 
+const ttt = require('./nlp/jieba/jiebatest');
+
+app.get('/test', async function(req, res) {
+  let body = '林伯翰說一元復始';
+  let data = await ttt.get(body);
+  res.send(data);
+});
 
 
+const request = require('request');
+const gov_legi = require('./crawler/gov/legislator');
+app.get('/legtest', function(req, res) {
+  let data = gov_legi.get();
+  res.send(data);
+});
 
+
+const fs = require("fs");
+
+app.get('/fstest', async function(req, res) {
+
+  let data = "林伯翰 1 NRP";
+  fs.appendFile('./nlp/jieba/dict.txt', data, (err) => {
+    if (err) throw err;
+    res.send("ok")
+  })
+});
 
 
 

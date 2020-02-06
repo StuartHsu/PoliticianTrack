@@ -10,18 +10,20 @@ module.exports={
         if(error) {
           reject(error);
         }
-        for(let j = 527; j < 550; j++) { // result1.length
+        for(let j = 1190; j < result1.length; j++) { // result1.length 800 1189
           console.log("j: " + j);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
-            let data = {
-              name: jieba[i].word,
-              type: jieba[i].tag,
-              count: 1
+            if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") { //jieba[i].tag.indexOf("N") != -1
+              let data = {
+                name: jieba[i].word,
+                type: jieba[i].tag,
+                count: 1
+              }
+              await db(data).then(async function(result){
+                await db2(data, result);
+              });
             }
-            await db(data).then(async function(result){
-              await db2(data, result);
-            });
           }
         }
         resolve("All tags update!");
@@ -55,7 +57,7 @@ function db(data) {
 
   return new Promise(async function(resolve, reject) {
 
-    mysql.con.query(`select * from tagVerify where name = "${data.name}"`, async function(error, checkResult, fields) {
+    mysql.con.query(`select * from filterCount where name = "${data.name}"`, async function(error, checkResult, fields) {
       if(error){
         reject("Database Insert Error");
       }
@@ -68,14 +70,14 @@ function db2(data, checkResult) {
 
   return new Promise(async function(resolve, reject) {
     if(checkResult.length < 1) {
-      mysql.con.query('insert into tagVerify set ?', data, function(error, results, fields) {
+      mysql.con.query('insert into filterCount set ?', data, function(error, results, fields) {
         if(error){
           reject("Database Insert Error");
         }
         resolve("ok");
       });
     } else {
-      let query = `update tagVerify set count = count + 1 where name = "${data.name}"`;
+      let query = `update filterCount set count = count + 1 where name = "${data.name}"`;
       mysql.con.query(query, function(error, results, fields){
         if(error){
           reject("Database Query Error");
