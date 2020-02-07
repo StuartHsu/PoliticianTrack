@@ -1,10 +1,10 @@
-` <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
   <head>
       <title>Admin Page</title>
       <link rel="stylesheet" href="./css/twicon/twicon.css">
-      <link rel="stylesheet" type="text/css" href="./css/index.css">
+      <link rel="stylesheet" type="text/css" href="./css/admin.css">
       <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
   </head>
 
@@ -12,22 +12,17 @@
 
     <header>
       <div class="logo">
-        <a href="./">Politician Track
+        <a href="./admin.html">Politician Track
           <!-- <i class="twicon-recycling"></i> -->
           <!-- <img src="imgs/logo.png" alt="logo"> -->
         </a>
       </div>
       <nav>
         <div class="item">
-          <a href="./politician">篩選</a>
-        </div>
-        <div class="item">
-          <a href="./issue">熱門</a>
+          <a href="./admin.html">後台</a>
         </div>
       </nav>
-      <div class="feature">
-        <a href="./about">About Us</a>
-      </div>
+
     </header>
 
 
@@ -36,34 +31,49 @@
 
       <div class="view">
         <div class="heading">
-          <h1>產品登錄後台</h1>
+          <h3>斷詞時間範圍</h3>
 
-          <div class="login">
-            <!-- <form class="form" method="GET" enctype="multipart/form-data">
-              <h2>產品基本資訊</h2>
-
-              <div class="form-group">
-                <label>產品編號:</label>
-                <input type="number" class="form-control" id="time" required="required">
-              </div>
-
-
-                <button class="button" id="query">產品基本資訊登錄</button>
-
-            </form> -->
-
-            開始：
-            <input type="date" id="date_start">
-            結束：
-            <input type="date" id="date_end">
-            <button class="button" id="query">產品基本資訊登錄</button>
+          <div class="period">
+            <div class="dateGroup">
+              <div class="dateTitle">開始：</div>
+              <input class="date" type="date" id="date_start">
+            </div>
+            <div class="dateGroup">
+              <div class="dateTitle">結束：</div>
+              <input class="date" type="date" id="date_end">
+            </div>
+            <button class="button" id="execBtn">斷詞</button>
 
           </div>
 
-          <div id="results">
-
+          <div class="segResult">
+            <div class="resultText" id="resultSeg"></div>
           </div>
 
+          <div class="listTitle">
+            <h3>未處理標籤</h3>
+            <button class="button" id="queryBtn">查詢</button>
+          </div>
+          <div class="segTitle">
+            <div class="titleName">名稱</div>
+            <div class="titleCount">數量</div>
+            <div class="titleTag">標籤</div>
+          </div>
+          <div class="segContent scrollBar" id="segResults">
+
+            <!-- <div class="segList">
+              <div class="tagName">口罩</div>
+              <div class="count">321</div>
+              <input type="text" class="inputTag">
+            </div> -->
+
+          </div>
+          <div class="segEnd">
+            <div class="segResult">
+              <div class="resultText" id="resultTag"></div>
+            </div>
+            <button class="button" id="updateBtn">送出</button>
+          </div>
 
         </div>
       </div>
@@ -76,23 +86,65 @@
 
     <script>
 
-      const query = document.getElementById("query");
+      const execBtn = document.getElementById("execBtn");
+      const queryBtn = document.getElementById("queryBtn");
+      const updateBtn = document.getElementById("updateBtn");
 
       const date_start = document.getElementById("date_start");
       const date_end = document.getElementById("date_end");
+      const resultSeg = document.getElementById("resultSeg");
+      const resultTag = document.getElementById("resultTag");
 
 
+      const segResults = document.getElementById("segResults");
 
-      query.addEventListener('click', function(event) {
+
+      // 執行新聞斷詞
+      execBtn.addEventListener('click', function(event) {
+        resultSeg.innerHTML = "斷詞中...";
+        resultSeg.style.color = "red";
+        resultSeg.style.display = "block";
         let data = {
           start: date_start.value,
           end: date_end.value,
         }
-        getData(data);
+        segNews(data);
       });
 
-      // DB 取資料
-      function getData(data) {
+      // 撈出未處理標籤
+      queryBtn.addEventListener('click', function(event) {
+        removeData();
+        querySegs();
+      })
+
+      // 更新標籤
+      updateBtn.addEventListener('click', function(event) {
+        const tagNames = document.querySelectorAll(".tagName");
+        const inputTags = document.querySelectorAll(".inputTag");
+
+        let data = [];
+        for(let i = 0; i < tagNames.length; i ++) {
+
+          let body = {
+            tagName: tagNames[i].innerText,
+            inputTag: inputTags[i].value
+          }
+
+          data.push(body);
+        }
+        resultTag.innerHTML = "標籤更新中";
+        resultTag.style.color = "red";
+        resultTag.style.display = "block";
+        updateTagStatus(data);
+      })
+
+
+
+
+
+
+      // Seg news
+      function segNews(data) {
         console.log(data);
         $.ajax({
           url: "admin/api/seg",
@@ -101,111 +153,74 @@
           contentType: "application/json; charset=utf-8", // 送給 server 的格式
           success: function(resp) {
             console.log(resp);
+            resultSeg.innerHTML = "斷詞處理完成";
+            resultSeg.style.color = "blue";
+            resultSeg.style.display = "block";
           }
         });
       }
 
+      // Get data
+      function querySegs() {
+        $.ajax({
+          url: "admin/api/list",
+          type: "GET",
+          success: function(resp) {
+            listForm(resp);
+          }
+        });
+      }
 
+      // Update tag status & dict
+      function updateTagStatus(data) {
+        $.ajax({
+          url: "admin/api/updateDB",
+          type: "POST",
+          data: JSON.stringify(data),
+          contentType: "application/json; charset=utf-8", // 送給 server 的格式
+          success: function(resp) {
+            console.log(resp);
+            removeData();
+            resultTag.innerHTML = "標籤更新完成";
+            resultTag.style.color = "blue";
+            resultTag.style.display = "block";
+          }
+        });
+      }
 
-      // function dataForm(name, results) {
-      //   document.getElementById('oncomingNews').style.display = "none";
-      //
-      //   for (let i = 0; i < results.data.length; i ++) {
-      //     var li = document.createElement("li");
-      //
-      //     // timeline
-      //     var timelineDiv = document.createElement("div");
-      //     timelineDiv.className = "timeline";
-      //
-      //     var time = new Date(results.data[i].pubTime);
-      //
-      //     var yearP = document.createElement("p");
-      //     var monthP = document.createElement("p");
-      //     yearP.className = "year";
-      //     monthP.className = "month";
-      //
-      //
-      //
-      //     if(i > 0) {
-      //       var preTime = new Date(results.data[i - 1].pubTime);
-      //
-      //       var preTimeYM = preTime.getFullYear() + preTime.getMonth();
-      //       var curTimeYM = time.getFullYear() + time.getMonth();
-      //
-      //       if(preTimeYM !== curTimeYM) {
-      //         yearP.innerHTML = time.getFullYear();
-      //         monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-      //       } else {
-      //         yearP.innerHTML = "";
-      //         monthP.innerHTML = "";
-      //       }
-      //     } else {
-      //       yearP.innerHTML = time.getFullYear();
-      //       monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-      //     }
-      //
-      //     timelineDiv.appendChild(yearP);
-      //     timelineDiv.appendChild(monthP);
-      //
-      //
-      //     // news
-      //     var newsDiv = document.createElement("div");
-      //     newsDiv.className = "news";
-      //
-      //     var newsContentDiv = document.createElement("div");
-      //     newsContentDiv.className = "news-content";
-      //
-      //     var link = document.createElement("a");
-      //     link.setAttribute("href", `${results.data[i].href}`);
-      //     link.setAttribute("target", "_blank");
-      //
-      //     var titleDiv = document.createElement("div");
-      //     titleDiv.className = "title";
-      //     titleDiv.innerHTML = results.data[i].title;
-      //
-      //     var publisherDiv = document.createElement("div");
-      //     publisherDiv.className = "publisher";
-      //     publisherDiv.innerHTML = results.data[i].publisher;
-      //
-      //     var pubTimeDiv = document.createElement("div");
-      //     pubTimeDiv.className = "pubTime";
-      //     pubTimeDiv.innerHTML = results.data[i].pubTime;
-      //
-      //     var descDiv = document.createElement("div");
-      //     descDiv.className = "desc";
-      //
-      //     var descP = document.createElement("p");
-      //     descP.innerHTML = results.data[i].description;
-      //
-      //     descDiv.appendChild(descP);
-      //     link.appendChild(titleDiv);
-      //     link.appendChild(publisherDiv);
-      //     link.appendChild(pubTimeDiv);
-      //     link.appendChild(descDiv);
-      //
-      //     newsContentDiv.appendChild(link);
-      //     newsDiv.appendChild(newsContentDiv);
-      //
-      //     // tags
-      //     var tagsDiv = document.createElement("div");
-      //     tagsDiv.className = "newsTags";
-      //
-      //     var tagUl = document.createElement("ul");
-      //
-      //     var tagLi = document.createElement("li");
-      //     tagLi.innerHTML = "測試標籤"
-      //
-      //     tagUl.appendChild(tagLi);
-      //     tagsDiv.appendChild(tagUl);
-      //
-      //     // 組合
-      //     li.appendChild(timelineDiv);
-      //     li.appendChild(newsDiv);
-      //     li.appendChild(tagsDiv);
-      //
-      //     appendNews.appendChild(li);
-      //   }
-      // }
+      function listForm(results) {
+
+        for(let i = 0; i < results.data.length; i++) {
+          var segListDiv = document.createElement("div");
+          segListDiv.className = "segList";
+
+          var tagNameDiv = document.createElement("div");
+          tagNameDiv.className = "tagName";
+          tagNameDiv.innerHTML = results.data[i].tagName;
+
+          var countDiv = document.createElement("div");
+          countDiv.className = "count";
+          countDiv.innerHTML = results.data[i].count;
+
+          var inputTag = document.createElement("input");
+          inputTag.className = "inputTag";
+          inputTag.setAttribute("type", "text");
+
+          segListDiv.appendChild(tagNameDiv);
+          segListDiv.appendChild(countDiv);
+          segListDiv.appendChild(inputTag);
+
+          segResults.appendChild(segListDiv);
+        }
+      }
+
+      function removeData() {
+        var child = segResults.lastElementChild;
+        while(child) {
+          segResults.removeChild(child);
+          child = segResults.lastElementChild;
+        }
+      }
 
 
     </script>

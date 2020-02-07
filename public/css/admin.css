@@ -1,0 +1,145 @@
+@import "common.css";
+
+
+.view {
+  margin-top: 20px;
+  width: 40%;
+}
+
+.period {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.dateGroup {
+  display: flex;
+  align-items: center;
+}
+
+.period .date {
+  margin-right: 20px;
+}
+
+.segResult {
+  height: 20px;
+  text-align: center;
+  /* margin-bottom: 20px; */
+}
+
+.resultText {
+  display: none;
+  font-size: 1rem;
+}
+
+.listTitle {
+  display: flex;
+  align-items: center;
+}
+
+.listTitle>.button {
+  margin-left: 50px;
+}
+
+.segContent.scrollBar::-webkit-scrollbar {
+	width: 6px;
+  background-color: #DCDCDC;
+}
+
+.segContent.scrollBar::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+  background-color: #424242;
+}
+
+.segContent.scrollBar::-webkit-scrollbar-track {
+	border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #DCDCDC;
+}
+
+.button {
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  color: white;
+  background: #384047;
+  display: inline-block;
+  margin: 10px 15px;
+  padding: 4px 15px;
+  border: 1px solid #384047;
+  border-radius: 5px;
+  box-shadow: 0 2px 0 0 #384047;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: 0.3s;
+}
+
+.button:hover {
+  background: #8d9aa5;
+  border-color: #8d9aa5;
+  box-shadow: 0 2px 0 0 #8d9aa5;
+}
+
+.segContent {
+  width: 100%;
+  height: 45vh;
+	overflow-y: scroll;
+}
+
+.segTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  padding: 20px 25px;
+  border-bottom: 2px solid #484A4D;
+}
+
+/* .titleCount {
+  margin-right: 20px;
+}
+
+.titleTag {
+  margin-right: 16px;
+} */
+
+.segList {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  padding: 20px 25px;
+  border-bottom: 1px solid rgba(183,181,178,.8);
+}
+
+.tagName {
+  flex: 1;
+}
+
+.count {
+  flex: 1;
+}
+
+.inputTag {
+  width: 50px;
+}
+
+.segList:nth-child(odd) {
+  background-color: #E3E2E1;
+}
+
+.segContent .button {
+  margin-top: 30px;
+}
+
+.segEnd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  padding: 10px 25px;
+  border-top: 2px solid #484A4D;
+}

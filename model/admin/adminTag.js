@@ -28,7 +28,7 @@ module.exports={
             }
           }
         }
-        resolve("All tags update!");
+        resolve("Segmentation done");
       });
     });
   },
@@ -50,29 +50,37 @@ module.exports={
       });
     });
   },
-  updateDic: function() {
+  updateDic: function(updateData) {
     return new Promise(function(resolve, reject) {
-      let data = "測試用 1 NRP";
-      fs.appendFile('./nlp/jieba/dict.txt', data, (err) => {
-        if (err) throw err;
-        resolve("Update dict.txt ok");
-      });
+      let data;
+      for(let i = 0; i < updateData.length; i++) {
+        if(updateData[i].inputTag) {
+          data = `${updateData[i].tagName} 1 ${updateData[i].inputTag}\n`
+          fs.appendFile('./nlp/jieba/dict.txt', data, (err) => {
+            if (err) throw err;
+            resolve("Update dict.txt ok");
+          });
+        } else {
+          resolve("No need to update");
+        }
+      }
     });
   },
-  updateDB: function() {
+  updateDB: function(updateData) {
     return new Promise(async function(resolve, reject) {
-      let data = {
-        name: "測試用",
-        type: "NRP",
-        status: "polTag"
-      }
-      let query = `update tagVerify set type = "${data.type}", status = "${data.status}" where name = "${data.name}";`;
-      mysql.con.query(query, function(error, results, fields){
-        if(error){
-          reject("Database Query Error");
+      let data = {};
+      for(let i = 0; i < updateData.length; i++) {
+        data.name = updateData[i].tagName;
+        if(updateData[i].inputTag) {
+          data.type = updateData[i].inputTag;
+          data.status = "Done";
+        } else {
+          data.type = "N";
+          data.status = "Unused";
         }
-        resolve("ok");
-      });
+        await updateTagStatus(data);
+      }
+      resolve("All tag status update ok");
     });
   }
 }
@@ -109,5 +117,21 @@ function db2(data, checkResult) {
         resolve("ok");
       });
     }
+  });
+}
+
+function updateTagStatus(data) {
+
+  return new Promise(async function(resolve, reject) {
+
+    let query = `update tagVerify set type = "${data.type}", status = "${data.status}" where name = "${data.name}";`;
+    mysql.con.query(query, function(error, results, fields) {
+      if(error) {
+        reject("Database Update Error");
+      } else {
+        resolve();
+      }
+    });
+
   });
 }

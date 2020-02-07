@@ -7,8 +7,6 @@ const adminTag = require('../../model/admin/adminTag');
 
 // run segmentation
 router.post('/api/seg', async function(req, res) {
-  console.log(req.body.start.replace(/-/g, "/"));
-  console.log(req.body.end.replace(/-/g, "/"));
   let period = {
     start: req.body.start.replace(/-/g, "/"),
     end:req.body.end.replace(/-/g, "/")
@@ -29,8 +27,11 @@ router.get('/api/updateDict', async function(req, res) {
   res.send({data: data});
 });
 
-router.get('/api/updateDB', async function(req, res) {
-  let data = await adminTag.updateDB();
+// update tag status & tag type & add new tag in dict
+router.post('/api/updateDB', async function(req, res) {
+  let updateData = req.body
+  let data = await adminTag.updateDB(updateData);
+  await adminTag.updateDic(updateData);
   res.send({data: data});
 });
 
