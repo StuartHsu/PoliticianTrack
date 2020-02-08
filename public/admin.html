@@ -75,6 +75,46 @@
             <button class="button" id="updateBtn">送出</button>
           </div>
 
+          <div class="listTitle">
+            <h3>Tag count</h3>
+            <button class="button" id="tagCountBtn">執行</button>
+            <div class="segResult">
+              <div class="resultText" id="resultTagC"></div>
+            </div>
+          </div>
+
+          <h3>NLP Training</h3>
+          <div class="period">
+            <div class="dateGroup">
+              <div class="dateTitle">開始：</div>
+              <input class="date" type="date" id="date_start_nlpT">
+            </div>
+            <div class="dateGroup">
+              <div class="dateTitle">結束：</div>
+              <input class="date" type="date" id="date_end_nlpT">
+            </div>
+            <button class="button" id="nlpTrainBtn">執行</button>
+          </div>
+          <div class="segResult">
+            <div class="resultText" id="resultNlpT"></div>
+          </div>
+
+          <h3>NLP Process</h3>
+          <div class="period">
+            <div class="dateGroup">
+              <div class="dateTitle">開始：</div>
+              <input class="date" type="date" id="date_start_nlpP">
+            </div>
+            <div class="dateGroup">
+              <div class="dateTitle">結束：</div>
+              <input class="date" type="date" id="date_end_nlpP">
+            </div>
+            <button class="button" id="nlpProcessBtn">執行</button>
+          </div>
+          <div class="segResult">
+            <div class="resultText" id="resultNlpP"></div>
+          </div>
+
         </div>
       </div>
 
@@ -89,17 +129,28 @@
       const execBtn = document.getElementById("execBtn");
       const queryBtn = document.getElementById("queryBtn");
       const updateBtn = document.getElementById("updateBtn");
+      const tagCountBtn = document.getElementById("tagCountBtn");
+      const nlpTrainBtn = document.getElementById("nlpTrainBtn");
+      const nlpProcessBtn = document.getElementById("nlpProcessBtn");
 
       const date_start = document.getElementById("date_start");
       const date_end = document.getElementById("date_end");
+      const date_start_nlpT = document.getElementById("date_start_nlpT");
+      const date_end_nlpT = document.getElementById("date_end_nlpT");
+      const date_start_nlpP = document.getElementById("date_start_nlpP");
+      const date_end_nlpP = document.getElementById("date_end_nlpP");
+
       const resultSeg = document.getElementById("resultSeg");
       const resultTag = document.getElementById("resultTag");
+      const resultTagC = document.getElementById("resultTagC");
+      const resultNlpT = document.getElementById("resultNlpT");
+      const resultNlpP = document.getElementById("resultNlpP");
 
 
       const segResults = document.getElementById("segResults");
 
 
-      // 執行新聞斷詞
+      // 1. 執行新聞斷詞
       execBtn.addEventListener('click', function(event) {
         resultSeg.innerHTML = "斷詞中...";
         resultSeg.style.color = "red";
@@ -111,35 +162,62 @@
         segNews(data);
       });
 
-      // 撈出未處理標籤
+      // 2. 撈出未處理標籤
       queryBtn.addEventListener('click', function(event) {
         removeData();
         querySegs();
       })
 
-      // 更新標籤
+      // 3. 更新標籤 & 字典
       updateBtn.addEventListener('click', function(event) {
         const tagNames = document.querySelectorAll(".tagName");
         const inputTags = document.querySelectorAll(".inputTag");
 
         let data = [];
         for(let i = 0; i < tagNames.length; i ++) {
-
           let body = {
             tagName: tagNames[i].innerText,
             inputTag: inputTags[i].value
           }
-
           data.push(body);
         }
         resultTag.innerHTML = "標籤更新中";
         resultTag.style.color = "red";
         resultTag.style.display = "block";
         updateTagStatus(data);
-      })
+      });
 
+      // 4. Tag count refresh (DB: filterCount)
+      tagCountBtn.addEventListener('click', function(event) {
+        resultTagC.innerHTML = "Tag counting...";
+        resultTagC.style.color = "red";
+        resultTagC.style.display = "block";
+        tagCount();
+      });
 
+      // 5. NLP training
+      nlpTrainBtn.addEventListener('click', function(event) {
+        resultNlpT.innerHTML = "NLP model in training...";
+        resultNlpT.style.color = "red";
+        resultNlpT.style.display = "block";
+        let data = {
+          start: date_start_nlpT.value,
+          end: date_end_nlpT.value,
+        }
+        nlpTrain(data);
+      });
 
+      // 6. NLP process
+      nlpProcessBtn.addEventListener('click', function(event) {
+        resultNlpP.innerHTML = "NLP model in processing...";
+        resultNlpP.style.color = "red";
+        resultNlpP.style.display = "block";
+        let data = {
+          start: date_start_nlpP.value,
+          end: date_end_nlpP.value,
+        }
+        nlpProcess(data);
+      });
 
 
 
@@ -187,6 +265,53 @@
           }
         });
       }
+
+      // Tag count refresh
+      function tagCount() {
+        $.ajax({
+          url: "admin/api/tagfreq",
+          type: "GET",
+          success: function(resp) {
+            console.log(resp);
+            resultTagC.innerHTML = "Done";
+            resultTagC.style.color = "blue";
+            resultTagC.style.display = "block";
+          }
+        });
+      }
+
+      // NLP training
+      function nlpTrain(data) {
+        $.ajax({
+          url: "admin/api/nlp/train",
+          type: "POST",
+          data: JSON.stringify(data),
+          contentType: "application/json; charset=utf-8", // 送給 server 的格式
+          success: function(resp) {
+            console.log(resp);
+            resultNlpT.innerHTML = "Done";
+            resultNlpT.style.color = "blue";
+            resultNlpT.style.display = "block";
+          }
+        });
+      }
+
+      // NLP process
+      function nlpProcess(data) {
+        $.ajax({
+          url: "admin/api/nlp/process",
+          type: "POST",
+          data: JSON.stringify(data),
+          contentType: "application/json; charset=utf-8", // 送給 server 的格式
+          success: function(resp) {
+            console.log(resp);
+            resultNlpP.innerHTML = "Done";
+            resultNlpP.style.color = "blue";
+            resultNlpP.style.display = "block";
+          }
+        });
+      }
+
 
       function listForm(results) {
 

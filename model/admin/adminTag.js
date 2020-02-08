@@ -12,6 +12,7 @@ module.exports={
         if(error) {
           reject(error);
         }
+        console.log("預計處理：" + result1.length);
         for(let j = 0; j < result1.length; j++) { // result1.length 800 1189
           console.log("j: " + j);
           let jieba = nodejieba.tag(result1[j].content);
@@ -34,11 +35,12 @@ module.exports={
   },
   get: function() {
     return new Promise(function(resolve, reject) {
-      mysql.con.query('SELECT * FROM tagVerify WHERE status is null ORDER BY count DESC;', async function(error, results, fields) {
+      mysql.con.query('SELECT * FROM tagVerify WHERE status is null AND count > 20 ORDER BY count DESC;', async function(error, results, fields) {
         if(error) {
           reject(error);
         }
         let data = [];
+        console.log("需處理標籤數量：" + results.length);
         for(let i = 0; i < results.length; i++) {
           let body = {
             tagName: results[i].name,

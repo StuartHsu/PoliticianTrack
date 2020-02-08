@@ -21,10 +21,26 @@ module.exports = {
       });
     });
   },
-  getRaw: function(title, titleKeyword, content, contentKeyword) {
+  getRaw: function() {
     return new Promise(function(resolve, reject) {
       let sql = `select * from news;`
       mysql.con.query(sql, function(error, results, fields) {
+        if(error) {
+          reject(error);
+        }
+        resolve(results);
+      });
+    });
+  },
+  getPeriod: function(start, end) {
+    return new Promise(function(resolve, reject) {
+      let sql;
+      if(!start && !end) {
+        sql = `SELECT * FROM news WHERE intent = "";`
+      } else {
+        sql = 'SELECT * FROM news WHERE pubTime > ? AND pubTime < ?';
+      }
+      mysql.con.query(sql, [start, end], function(error, results, fields) {
         if(error) {
           reject(error);
         }

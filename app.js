@@ -30,9 +30,10 @@ app.use('/api/getpolitician', getPolitician);
 const nlp = require('./route/nlp/nlpjs');
 app.use('/nlp', nlp);
 
-// Admin tag
+// Admin tag & NRP/NI 頻率統計
 const adminTag = require('./route/admin/adminTag');
 app.use('/admin', adminTag);
+
 
 // filter page render data when 1st coming
 app.get('/politician', async function(req, res) {
@@ -68,12 +69,8 @@ app.get('/politician', async function(req, res) {
 
 
 
-const ggg = require('./nlp/jieba/tagFreq');
 
-app.get('/tagVerify', async function(req, res) {
-  let data = await ggg.test();
-  res.send(data);
-});
+
 
 const ttt = require('./nlp/jieba/jiebatest');
 
@@ -84,24 +81,16 @@ app.get('/test', async function(req, res) {
 });
 
 
-const request = require('request');
-const gov_legi = require('./crawler/gov/legislator');
-app.get('/legtest', function(req, res) {
-  let data = gov_legi.get();
-  res.send(data);
-});
+
+// 立法院歷屆立委
+// const request = require('request');
+// const gov_legi = require('./crawler/gov/legislator');
+// app.get('/legtest', function(req, res) {
+//   let data = gov_legi.get();
+//   res.send(data);
+// });
 
 
-const fs = require("fs");
-
-app.get('/fstest', async function(req, res) {
-
-  let data = "林伯翰 1 NRP";
-  fs.appendFile('./nlp/jieba/dict.txt', data, (err) => {
-    if (err) throw err;
-    res.send("ok")
-  })
-});
 
 
 

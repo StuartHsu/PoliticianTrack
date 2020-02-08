@@ -5,8 +5,8 @@ const news = require('../../model/news');
 
 const manager = new NlpManager({ languages: ['zh'], nlu: { log: false } });
 
-const polsData = require('../../model/politicians');
-const issuesData = require('../../model/issues');
+const polsData = require('../politicians');
+const issuesData = require('../issues');
 
 
 fs.readFile('./nlp/nlpjs/trained_model/politician.json', async (err, data) => {
@@ -92,42 +92,47 @@ fs.readFile('./nlp/nlpjs/trained_model/politician.json', async (err, data) => {
 
 
 module.exports = {
-  train: async function() {
+  train: async function(start, end) {
     return new Promise(async function(resolve, reject) {
-      // await manager.train();
-      // manager.save('./nlp/nlpjs/trained_model/train.nlp');
-      manager.load('./nlp/nlpjs/trained_model/train.nlp');
-      let data = await news.getRaw();
+      await manager.train();
+      manager.save('./nlp/nlpjs/trained_model/train.nlp');
+
+      let data = await news.getPeriod(start, end);
+      console.log("需處理筆數：" + data.length);
       for(let i = 0; i < data.length; i++) {
+        console.log("train i: " + i + "; news_id: " + data[i].id);
         let content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
         let response = await manager.process('zh', content);
-        let intent = response.nluAnswer.classifications[0].intent;
-        let intent_score = response.nluAnswer.classifications[0].score;
-        await updateIntens(intent, intent_score, data[i].id);
-        console.log(data[i].id);
       }
-      resolve("ok");
-
-      // manager.load('./nlp/nlpjs/trained_model/train.nlp');
-      // const content = '影／Kolas籲「搭公車捷運不用戴口罩」　侯友宜：一切遵照中央命令'.replace('：', '表示').replace(/[A-Za-z]+/, '');
-      // const response = await manager.process('zh', content);
-      // resolve (JSON.stringify(response));
+      console.log("處理完成");
+      resolve("NLP training finished");
     });
   },
-  process: async function() {
+  process: async function(start, end) {
     return new Promise(async function(resolve, reject) {
       manager.load('./nlp/nlpjs/trained_model/train.nlp');
 
-      let data = await news.getRaw();
+      let data = await news.getPeriod(start, end);
+      console.log("需處理筆數：" + data.length);
       for(let i = 0; i < data.length; i++) {
+        console.log("process i: " + i + "; news_id: " + data[i].id);
         let content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
         let response = await manager.process('zh', content);
         let intent = response.nluAnswer.classifications[0].intent;
         let intent_score = response.nluAnswer.classifications[0].score;
         await updateIntens(intent, intent_score, data[i].id);
-        console.log(data[i].id);
       }
-      resolve("ok");
+      console.log("處理完成");
+      resolve("News intent update ok");
+    });
+  },
+  test: async function() {
+    return new Promise(async function(resolve, reject) {
+      manager.load('./nlp/nlpjs/trained_model/train.nlp');
+
+      const content = '影／Kolas籲「搭公車捷運不用戴口罩」　侯友宜：一切遵照中央命令'.replace('：', '表示').replace(/[A-Za-z]+/, '');
+      const response = await manager.process('zh', content);
+      resolve (JSON.stringify(response));
     });
   }
 }

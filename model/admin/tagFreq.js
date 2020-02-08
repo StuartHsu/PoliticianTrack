@@ -4,17 +4,21 @@ const nodejieba = require('nodejieba');
 nodejieba.load({userDict: './nlp/jieba/dict.txt'},);
 
 module.exports={
-  test: function() {
-    return new Promise(function(resolve, reject) {
-      mysql.con.query('select content from news', async function(error, result1, fields) {
+  getPeriodCount: function(start, end) {
+    return new Promise(async function(resolve, reject) {
+      await clearCount();
+
+      let sql = 'SELECT content FROM news WHERE pubTime > ? AND pubTime < ? AND intent = "politician_say"';
+      mysql.con.query(sql, [start, end], async function(error, result1, fields) {
         if(error) {
           reject(error);
         }
-        for(let j = 1190; j < result1.length; j++) { // result1.length 800 1189
-          console.log("j: " + j);
+        console.log("資料數：" + result1.length);
+        for(let j = 0; j < result1.length; j++) {
+          console.log("tagFreq j: " + j);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
-            if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") { //jieba[i].tag.indexOf("N") != -1
+            if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") {
               let data = {
                 name: jieba[i].word,
                 type: jieba[i].tag,
@@ -32,26 +36,18 @@ module.exports={
   }
 }
 
-
-// function updateTagDB(jieba) {
-//   return new Promise(async function(resolve, reject) {
-//     let body = [];
-//     for(let i = 0; i < jieba.length; i++) {
-//       let data = {
-//         name: jieba[i].word,
-//         type: jieba[i].tag,
-//         count: 1
-//       }
-//       body.push(data);
-//       // console.log(data);
-//       await db(data);
-//       // resolve("ok");
-//     }
-//
-//     resolve(body);
-//     // resolve("ok");
-//   });
-// }
+function clearCount() {
+  return new Promise(function(resolve, reject) {
+    let sql = 'UPDATE filterCount SET count = 0;';
+    mysql.con.query(sql, function(error, results, fields) {
+      if(error) {
+        reject(error);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
 
 function db(data) {
 
