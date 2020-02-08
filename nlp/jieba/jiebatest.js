@@ -1,6 +1,6 @@
 const nodejieba = require('nodejieba');
 
-nodejieba.load({userDict: './nlp/jieba/dict.txt'},);
+nodejieba.load({userDict: './util/dict.txt'},);
 
 
 // var result = nodejieba.cut("南京市长江大桥");

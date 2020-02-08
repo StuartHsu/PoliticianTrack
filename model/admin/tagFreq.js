@@ -1,7 +1,7 @@
 const mysql = require("../../util/mysqlcon.js");
 const nodejieba = require('nodejieba');
 
-nodejieba.load({userDict: './nlp/jieba/dict.txt'},);
+nodejieba.load({userDict: './util/dict.txt'},);
 
 module.exports={
   getPeriodCount: function(start, end) {

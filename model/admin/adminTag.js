@@ -2,7 +2,7 @@ const mysql = require("../../util/mysqlcon.js");
 const nodejieba = require('nodejieba');
 const fs = require("fs");
 
-nodejieba.load({userDict: './nlp/jieba/dict.txt'});
+nodejieba.load({userDict: './util/dict.txt'});
 
 module.exports={
   seg: function(start, end) {
@@ -58,7 +58,7 @@ module.exports={
       for(let i = 0; i < updateData.length; i++) {
         if(updateData[i].inputTag) {
           data = `${updateData[i].tagName} 1 ${updateData[i].inputTag}\n`
-          fs.appendFile('./nlp/jieba/dict.txt', data, (err) => {
+          fs.appendFile('./util/dict.txt', data, (err) => {
             if (err) throw err;
             resolve("Update dict.txt ok");
           });
