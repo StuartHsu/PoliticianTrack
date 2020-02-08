@@ -30,7 +30,7 @@ module.exports = {
   get: async function() {
     return new Promise(async function(resolve, reject) {
       await manager.train();
-      manager.save('./test_train.nlp');
+      manager.save('./util/nlp_trained_model/test_train.nlp');
       // const content = '快訊／「原先台灣會世界第二慘」蘇貞昌說話了：生產再多口罩都不夠用'.replace('：', '表示');
       const content = '賴清德：我在亂講話';
       const response = await manager.process('zh', content);

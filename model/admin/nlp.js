@@ -9,7 +9,7 @@ const polsData = require('../politicians');
 const issuesData = require('../issues');
 
 
-fs.readFile('./nlp/nlpjs/trained_model/politician.json', async (err, data) => {
+fs.readFile('./util/nlp_trained_model/politician.json', async (err, data) => {
   if(err) throw err;
   // let politician = JSON.parse(data).politician;
   let country = JSON.parse(data).country;
@@ -95,7 +95,7 @@ module.exports = {
   train: async function(start, end) {
     return new Promise(async function(resolve, reject) {
       await manager.train();
-      manager.save('./nlp/nlpjs/trained_model/train.nlp');
+      manager.save('./util/nlp_trained_model/train.nlp');
 
       let data = await news.getPeriod(start, end);
       console.log("需處理筆數：" + data.length);
@@ -110,7 +110,7 @@ module.exports = {
   },
   process: async function(start, end) {
     return new Promise(async function(resolve, reject) {
-      manager.load('./nlp/nlpjs/trained_model/train.nlp');
+      manager.load('./util/nlp_trained_model/train.nlp');
 
       let data = await news.getPeriod(start, end);
       console.log("需處理筆數：" + data.length);
@@ -128,7 +128,7 @@ module.exports = {
   },
   test: async function() {
     return new Promise(async function(resolve, reject) {
-      manager.load('./nlp/nlpjs/trained_model/train.nlp');
+      manager.load('./util/nlp_trained_model/train.nlp');
 
       const content = '影／Kolas籲「搭公車捷運不用戴口罩」　侯友宜：一切遵照中央命令'.replace('：', '表示').replace(/[A-Za-z]+/, '');
       const response = await manager.process('zh', content);
