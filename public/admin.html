@@ -78,6 +78,7 @@
           <div class="listTitle">
             <h3>Tag count</h3>
             <button class="button" id="tagCountBtn">執行</button>
+            <button class="button" id="tagCountAllBtn">執行-全</button>
             <div class="segResult">
               <div class="resultText" id="resultTagC"></div>
             </div>
@@ -115,6 +116,14 @@
             <div class="resultText" id="resultNlpP"></div>
           </div>
 
+          <div class="listTitle">
+            <h3>News get tag</h3>
+            <button class="button" id="getTagBtn">執行</button>
+            <div class="segResult">
+              <div class="resultText" id="resultGetTag"></div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -130,8 +139,10 @@
       const queryBtn = document.getElementById("queryBtn");
       const updateBtn = document.getElementById("updateBtn");
       const tagCountBtn = document.getElementById("tagCountBtn");
+      const tagCountAllBtn = document.getElementById("tagCountAllBtn");
       const nlpTrainBtn = document.getElementById("nlpTrainBtn");
       const nlpProcessBtn = document.getElementById("nlpProcessBtn");
+      const getTagBtn = document.getElementById("getTagBtn");
 
       const date_start = document.getElementById("date_start");
       const date_end = document.getElementById("date_end");
@@ -145,6 +156,7 @@
       const resultTagC = document.getElementById("resultTagC");
       const resultNlpT = document.getElementById("resultNlpT");
       const resultNlpP = document.getElementById("resultNlpP");
+      const resultGetTag = document.getElementById("resultGetTag");
 
 
       const segResults = document.getElementById("segResults");
@@ -187,12 +199,19 @@
         updateTagStatus(data);
       });
 
-      // 4. Tag count refresh (DB: filterCount)
+      // 4-1. Tag count refresh (DB: filterCount)
       tagCountBtn.addEventListener('click', function(event) {
         resultTagC.innerHTML = "Tag counting...";
         resultTagC.style.color = "red";
         resultTagC.style.display = "block";
         tagCount();
+      });
+      // 4-2. Tag count refresh (DB: filterCount) - ALL
+      tagCountAllBtn.addEventListener('click', function(event) {
+        resultTagC.innerHTML = "Tag counting...";
+        resultTagC.style.color = "red";
+        resultTagC.style.display = "block";
+        tagCountAll();
       });
 
       // 5. NLP training
@@ -219,9 +238,17 @@
         nlpProcess(data);
       });
 
+      // 7. News get tag
+      getTagBtn.addEventListener('click', function(event) {
+        resultGetTag.innerHTML = "Get tag in processing...";
+        resultGetTag.style.color = "red";
+        resultGetTag.style.display = "block";
+        getTag();
+      });
 
 
-      // Seg news
+
+      // 1. 執行新聞斷詞
       function segNews(data) {
         console.log(data);
         $.ajax({
@@ -238,7 +265,7 @@
         });
       }
 
-      // Get data
+      // 2. 撈出未處理標籤
       function querySegs() {
         $.ajax({
           url: "admin/api/list",
@@ -249,7 +276,7 @@
         });
       }
 
-      // Update tag status & dict
+      // 3. 更新標籤 & 字典
       function updateTagStatus(data) {
         $.ajax({
           url: "admin/api/updateDB",
@@ -266,7 +293,7 @@
         });
       }
 
-      // Tag count refresh
+      // 4-1. Tag count refresh (DB: filterCount)
       function tagCount() {
         $.ajax({
           url: "admin/api/tagfreq",
@@ -279,8 +306,21 @@
           }
         });
       }
+      // 4-2. Tag count refresh (DB: filterCount) All
+      function tagCountAll() {
+        $.ajax({
+          url: "admin/api/tagfreqall",
+          type: "GET",
+          success: function(resp) {
+            console.log(resp);
+            resultTagC.innerHTML = "Done";
+            resultTagC.style.color = "blue";
+            resultTagC.style.display = "block";
+          }
+        });
+      }
 
-      // NLP training
+      // 5. NLP training
       function nlpTrain(data) {
         $.ajax({
           url: "admin/api/nlp/train",
@@ -296,7 +336,7 @@
         });
       }
 
-      // NLP process
+      // 6. NLP process
       function nlpProcess(data) {
         $.ajax({
           url: "admin/api/nlp/process",
@@ -308,6 +348,20 @@
             resultNlpP.innerHTML = "Done";
             resultNlpP.style.color = "blue";
             resultNlpP.style.display = "block";
+          }
+        });
+      }
+
+      // 7. News get tag
+      function getTag() {
+        $.ajax({
+          url: "admin/api/gettag",
+          type: "GET",
+          success: function(resp) {
+            console.log(resp);
+            resultGetTag.innerHTML = "Done";
+            resultGetTag.style.color = "blue";
+            resultGetTag.style.display = "block";
           }
         });
       }

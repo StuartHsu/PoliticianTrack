@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const adminTag = require('../../model/admin/adminTag');
 const tagFreq = require('../../model/admin/tagFreq');
 const nlp = require('../../model/admin/nlp');
+const newsGetTag = require('../../model/admin/newsGetTag');
 
 // run segmentation
 router.post('/api/seg', async function(req, res) {
@@ -49,6 +50,17 @@ router.get('/api/tagfreq', async function(req, res) {
   res.send(data);
 });
 
+// NRP & NI 頻率統計 ALL
+router.get('/api/tagfreqall', async function(req, res) {
+  let today = dateForm(new Date()) + " 23:59"; // YYYY/MM/DD
+
+  // let period = {
+  //   end: today + " 23:59"
+  // }
+  let data = await tagFreq.getPeriodCountAll(today);
+  res.send(data);
+});
+
 // NLP training mode
 router.post('/api/nlp/train', async function(req, res) {
   let period = {};
@@ -90,6 +102,15 @@ router.get('/api/nlp/test', async function(req, res) {
   let results = await nlp.test();
   res.send(results);
 });
+
+//  News get tag
+router.get('/api/gettag', async function(req, res) {
+  let results = await newsGetTag.getTag();
+  res.send(results);
+});
+
+
+
 
 
 function dateForm(date) {

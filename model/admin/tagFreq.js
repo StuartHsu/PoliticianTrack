@@ -8,14 +8,14 @@ module.exports={
     return new Promise(async function(resolve, reject) {
       await clearCount();
 
-      let sql = 'SELECT content FROM news WHERE pubTime > ? AND pubTime < ? AND intent = "politician_say"';
+      let sql = 'SELECT content FROM news WHERE pubTime > ? AND pubTime < ? AND intent = "politician_say";';
       mysql.con.query(sql, [start, end], async function(error, result1, fields) {
         if(error) {
           reject(error);
         }
-        console.log("資料數：" + result1.length);
-        for(let j = 0; j < result1.length; j++) {
-          console.log("tagFreq j: " + j);
+        let totalCount = result1.length
+        for(let j = 0; j < totalCount; j++) {
+          console.log("處理中：" + j + "/" + totalCount);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
             if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") {
@@ -30,6 +30,38 @@ module.exports={
             }
           }
         }
+        console.log("處理完成");
+        resolve("All tags update!");
+      });
+    });
+  },
+  getPeriodCountAll: function(end) {
+    return new Promise(async function(resolve, reject) {
+      await clearCount();
+
+      let sql = 'SELECT content FROM news WHERE pubTime < ?;';
+      mysql.con.query(sql, end, async function(error, result1, fields) {
+        if(error) {
+          reject(error);
+        }
+        let totalCount = result1.length
+        for(let j = 0; j < totalCount; j++) {
+          console.log("處理中：" + j + "/" + totalCount);
+          let jieba = nodejieba.tag(result1[j].content);
+          for(let i = 0; i < jieba.length; i++) {
+            if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") {
+              let data = {
+                name: jieba[i].word,
+                type: jieba[i].tag,
+                count: 1
+              }
+              await db(data).then(async function(result){
+                await db2(data, result);
+              });
+            }
+          }
+        }
+        console.log("處理完成");
         resolve("All tags update!");
       });
     });
