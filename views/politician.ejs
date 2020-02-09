@@ -131,32 +131,48 @@
         </div>
         <div class="newslist" id="oncomingNews">
           <ul class="ulNews">
-            <% results.forEach(function(result){ %>
-            <%  var renderTime = new Date(result.pubTime); %>
+            <% for(let i = 0; i < results.length; i++) { %>
             <li>
               <div class="timeline">
-                <p class="year">
-                  <%= renderTime.getFullYear(); %>
-                </p>
-                <p class="month">
-                  <%= (renderTime.getMonth() < 10 ? '0' : '') + (renderTime.getMonth() + 1); %>
-                </p>
+              <% var renderTime = new Date(results[i].pubTime); %>
+              <% if(i > 0) { %>
+                <% var renderPreTime = new Date(results[i - 1].pubTime); %>
+
+                <% var renderPreTimeY = renderPreTime.getFullYear(); %>
+                <% var renderPreTimeM = renderPreTime.getMonth(); %>
+                <% var renderCurTimeY = renderTime.getFullYear(); %>
+                <% var renderCurTimeM = renderTime.getMonth(); %>
+
+                <% if(renderPreTimeY !== renderCurTimeY && renderPreTimeM !== renderCurTimeM) { %>
+                  <p class="year"><%= renderTime.getFullYear() %></p>
+                  <p class="month"><%= (renderTime.getMonth() < 10 ? '0' : '') + (renderTime.getMonth() + 1) %></p>
+                <% } else if (renderPreTimeY == renderCurTimeY && renderPreTimeM !== renderCurTimeM) { %>
+                  <p class="year"><%= "" %></p>
+                  <p class="month"><%= (renderTime.getMonth() < 10 ? '0' : '') + (renderTime.getMonth() + 1) %></p>
+                <% } else { %>
+                  <p class="year"><%= "" %></p>
+                  <p class="month"><%= "" %></p>
+                <% } %>
+              <% } else { %>
+                <p class="year"><%= renderTime.getFullYear() %></p>
+                <p class="month"><%= (renderTime.getMonth() < 10 ? '0' : '') + (renderTime.getMonth() + 1) %></p>
+              <% } %>
               </div>
               <div class="news">
                 <div class="news-content">
-                  <a href="<%= result.href %>" target="_blank">
+                  <a href="<%= results[i].href %>" target="_blank">
                     <div class="title">
-                      <%= result.title %>
+                      <%= results[i].title %>
                     </div>
                     <div class="publisher">
-                      <%= result.publisher %>
+                      <%= results[i].publisher %>
                     </div>
                     <div class="pubTime">
-                      <%= result.pubTime %>
+                      <%= results[i].pubTime %>
                     </div>
                     <div class="desc">
                       <p>
-                        <%= result.description %>
+                        <%= results[i].description %>
                       </p>
                     </div>
                   </a>
@@ -164,17 +180,20 @@
               </div> <!-- news End -->
               <div class="renderTags">
                 <ul>
-                  <li>時事</li>
-                  <li>時事</li>
-                  <li>時事</li>
+                  <% for(let j = 0; j < results[i].tag.length && j < 5; j++) { %>
+                    <% if(results[i].tag[j].tagType === "NRP") { %>
+                      <li class="polTag" onclick="tagCallPol('<%=results[i].tag[j].tagName%>')"><%= results[i].tag[j].tagName %></li>
+                    <% } else { %>
+                      <li class="issueTag" onclick="tagCallIssue('<%=results[i].tag[j].tagName%>')"><%= results[i].tag[j].tagName %></li>
+                    <% } %>
+                  <% } %>
                 </ul>
               </div>
             </li>
-            <% }); %>
+            <% }; %>
           </ul>
-
-
         </div> <!-- NewsList End -->
+
         <div class="newslist">
           <ul class="ulNews" id="appendNews">
 
@@ -277,6 +296,15 @@
       getData(name, issueName);
     }));
 
+    // 新聞旁標籤點選切換
+    function tagCallPol(name) {
+      getData(name, issueName);
+    }
+
+    function tagCallIssue(issueName) {
+      getData('', issueName);
+    }
+
 
     childFilter(parties);
     childFilter(regions);
@@ -295,7 +323,7 @@
     // DB 取資料
     function getData(name, issueName) {
       $.ajax({
-        url: `http://localhost:3000/api/news/test?name=${name}\&issue=${issueName}`,
+        url: `http://localhost:3000/api/news/listtag?name=${name}\&issue=${issueName}`,
         method: "GET",
         // data: name,
         dataType: 'json',
@@ -352,32 +380,19 @@
         yearP.className = "year";
         monthP.className = "month";
 
-        // if(i > 0) {
-        //   var preTime = new Date(results.data[i - 1].pubTime);
-        //
-        //   var preTimeYM = preTime.getFullYear() + preTime.getMonth();
-        //   var curTimeYM = time.getFullYear() + time.getMonth();
-        //
-        //   if(preTimeYM !== curTimeYM) {
-        //     yearP.innerHTML = time.getFullYear();
-        //     monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-        //   } else {
-        //     yearP.innerHTML = "";
-        //     monthP.innerHTML = "";
-        //   }
-        // } else {
-        //   yearP.innerHTML = time.getFullYear();
-        //   monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-        // }
-
         if(i > 0) {
           var preTime = new Date(results.data[i - 1].pubTime);
 
-          var preTimeYM = preTime.getFullYear() + preTime.getMonth();
-          var curTimeYM = time.getFullYear() + time.getMonth();
+          var preTimeY = preTime.getFullYear();
+          var preTimeM = preTime.getMonth();
+          var curTimeY = time.getFullYear();
+          var curTimeM = time.getMonth();
 
-          if(preTimeYM !== curTimeYM) {
+          if(preTimeY !== curTimeY && preTimeM !== curTimeM) {
             yearP.innerHTML = time.getFullYear();
+            monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+          } else if (preTimeY == curTimeY && preTimeM !== curTimeM) {
+            yearP.innerHTML = "";
             monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
           } else {
             yearP.innerHTML = "";
@@ -390,17 +405,6 @@
 
         timelineDiv.appendChild(yearP);
         timelineDiv.appendChild(monthP);
-
-        // var yearP = document.createElement("p");
-        // yearP.className = "year";
-        // yearP.innerHTML = time.getFullYear();
-        //
-        // var monthP = document.createElement("p");
-        // monthP.className = "month";
-        // monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-        //
-        // timelineDiv.appendChild(yearP);
-        // timelineDiv.appendChild(monthP);
 
         // news
         var newsDiv = document.createElement("div");
@@ -446,10 +450,20 @@
 
         var tagUl = document.createElement("ul");
 
-        var tagLi = document.createElement("li");
-        tagLi.innerHTML = "測試標籤"
-
-        tagUl.appendChild(tagLi);
+        for(let j = 0; j < results.data[i].tag.length && j < 5; j++) {
+          var tagLi = document.createElement("li");
+          if(results.data[i].tag[j].tagName != name) {
+            tagLi.innerHTML = results.data[i].tag[j].tagName;
+            if(results.data[i].tag[j].tagType === "NRP") {
+              tagLi.className = "polTag";
+              tagLi.setAttribute("onclick", `tagCallPol("${results.data[i].tag[j].tagName}")`);
+            } else {
+              tagLi.className = "issueTag";
+              tagLi.setAttribute("onclick", `tagCallIssue("${results.data[i].tag[j].tagName}")`);
+            }
+            tagUl.appendChild(tagLi);
+          }
+        }
         tagsDiv.appendChild(tagUl);
 
         // 組合
@@ -486,42 +500,6 @@
         renderTagsShow.forEach(tagShow => tagShow.style.display = "none");
       }
     }
-
-
-    // DB 取資料 - Pols
-    // function getPol() {
-    //   $.ajax({
-    //     url: `http://localhost:3000/api/getpolitician`,
-    //     method: "GET",
-    //     // data: name,
-    //     dataType: 'json',
-    //     contentType: "application/json",
-    //     success: function(resp) {
-    //       polDataForm(resp);
-    //     }
-    //   });
-    // }
-    //
-    // function polDataForm(results) {
-    //   var polTitleLi = document.createElement('li');
-    //   polTitleLi.className = "personTitle";
-    //   polTitleLi.innerHTML = "人物";
-    //
-    //   var div = document.createElement('div');
-    //   div.className = "box-border";
-    //
-    //   appendPols.appendChild(polTitleLi);
-    //   appendPols.appendChild(div);
-    //
-    //   for(let i = 0; i < results.data.length; i++) {
-    //     var polLi = document.createElement('li');
-    //     polLi.className = "person";
-    //     polLi.innerHTML = results.data[i].name;
-    //
-    //     appendPols.appendChild(polLi);
-    //   }
-    // }
-
 
   </script>
 

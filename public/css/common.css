@@ -5,7 +5,7 @@ html, body {
 body {
 	font-size: 16px;
 	font-family: "Noto Sans TC", "微軟正黑體", "新細明體", arial, sans-serif;
-	color: #3f3a3a;
+	color: #3F3A3A;
 }
 
 form {
@@ -324,6 +324,29 @@ main {
   border: 1px solid #000000;
   border-radius: 15px;
   margin: 5px;
+}
+
+.newslist .newsTags .polTag,
+.renderTags .polTag {
+	color: #FFFFFF;
+  background-color: #232323;
+}
+
+.newslist .newsTags .polTag:hover,
+.renderTags .polTag:hover {
+	color: #3F3A3A;
+  background-color: #FFFFFF;
+}
+
+.newslist .newsTags .issueTag,
+.renderTags .issueTag {
+  background-color: #FFFFFF;
+}
+
+.newslist .newsTags .issueTag:hover,
+.renderTags .issueTag:hover {
+	color: #FFFFFF;
+  background-color: #232323;
 }
 
 .news>.news-content .title {

@@ -17,6 +17,16 @@ router.get('/test', async function(req, res) {
   });
 });
 
+router.get('/listtag', async function(req, res) {
+  let name = req.query.name;
+  let issueName = req.query.issue;
+  await news.listTag('title', name, 'content', issueName).then(async resp => {
+    res.send({data: resp});
+  }).catch(err => {
+    res.status(400).send({error: err});
+  });
+});
+
 
 
 

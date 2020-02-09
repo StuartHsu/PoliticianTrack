@@ -1,8 +1,9 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const newData = require('./model/news');
 const polsData = require('./model/politicians');
 const issuesData = require('./model/issues');
-const bodyParser = require('body-parser');
+
 
 const PORT = process.env.PORT || 3000;
 
@@ -37,7 +38,7 @@ app.use('/admin', adminTag);
 
 // filter page render data when 1st coming
 app.get('/politician', async function(req, res) {
-  let results = await newData.get('title', '');
+  let results = await newData.listTag('title', '');
   let polsResults = await polsData.get();
   let issuesResults = await issuesData.get();
   res.render('politician', {
