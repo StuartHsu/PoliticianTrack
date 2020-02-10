@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const newData = require('./model/news');
 const polsData = require('./model/politicians');
 const issuesData = require('./model/issues');
-
+const hotsData = require('./model/hots');
 
 const PORT = process.env.PORT || 3000;
 
@@ -27,6 +27,10 @@ app.use('/api/news', news);
 const getPolitician = require('./route/politician');
 app.use('/api/getpolitician', getPolitician);
 
+// filter page get politician
+const getHots = require('./route/hots');
+app.use('/api/gethots', getHots);
+
 // NLP
 const nlp = require('./route/nlp/nlpjs');
 app.use('/nlp', nlp);
@@ -42,7 +46,7 @@ app.get('/politician', async function(req, res) {
   let polsResults = await polsData.get();
   let issuesResults = await issuesData.get();
   res.render('politician', {
-    title: '',
+    title: '總覽',
     issue: '',
     results: results,
     polsData: polsResults,
@@ -50,6 +54,15 @@ app.get('/politician', async function(req, res) {
   });
 });
 
+// hots page
+app.get('/hots', async function(req, res) {
+  let results = await hotsData.getPol();
+  // let subIssues = await hotsData.getSubIssue();
+  res.render('hots', {
+    results: results
+    // subIssues: subIssues
+  });
+});
 
 
 

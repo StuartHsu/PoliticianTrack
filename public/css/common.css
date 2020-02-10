@@ -26,7 +26,7 @@ input,select,img {
 	vertical-align: middle;
 }
 
-ul {
+ul, li {
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -74,6 +74,7 @@ header>.feature:hover,
 .sidenav .partyList li:hover,
 .sidenav .regionList li:hover {
 	color: #FFD479;
+	transition: color .2s linear;
 }
 
 header>nav>.item:last-child {
@@ -330,6 +331,7 @@ main {
 .renderTags .polTag {
 	color: #FFFFFF;
   background-color: #232323;
+	cursor: pointer;
 }
 
 .newslist .newsTags .polTag:hover,

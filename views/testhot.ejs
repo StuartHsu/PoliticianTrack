@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+      <title>Politician Track</title>
+      <link rel="stylesheet" href="./css/twicon/twicon.css">
+      <link rel="stylesheet" type="text/css" href="./css/hots.css">
+      <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="logo">
+        <a href="./">Politician Track</a>
+      </div>
+      <nav>
+        <div class="item">
+          <a href="./politician">篩選</a>
+        </div>
+        <div class="item">
+          <a href="./hots">熱門</a>
+        </div>
+      </nav>
+      <div class="feature">
+        <a href="./about">About Us</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="content scrollBar">
+        <div class="tabs">
+          <div class="tabFrom">
+            <li class="tabTitle" id="pol">人物</li>
+            <div class="pointer"></div>
+          </div>
+          <div class="tabFrom">
+            <li class="tabTitle" id="issue">議題</li>
+            <div class="pointer toggle"></div>
+          </div>
+        </div>
+
+        <div class="lists" id="oncomingHots">
+          <!-- <div class="list">
+            <div class="polName">孫中山</div>
+            <div class="bar">
+              <div class="process"></div>
+            </div>
+            <div class="count">1234</div>
+          </div> -->
+          <% for(let i = 0; i < results.length; i++) { %>
+            <% let maxCount = results[0].count; %>
+            <% let thisCount = results[i].count; %>
+            <% let ratio = (thisCount / maxCount) * 100; %>
+            <div class="list">
+              <div class="polName"><%= results[i].name %></div>
+              <div class="bar">
+                <div class="process" style="width:<%=ratio%>%"></div>
+              </div>
+              <div class="count"><%= results[i].count %></div>
+            </div>
+          <% } %>
+        </div>
+
+        <div class="lists" id="appendHots"></div>
+      </div>
+
+    </main>
+
+    <footer>
+
+    </footer>
+
+  <script>
+
+    const tabsTitle = document.querySelectorAll(".tabTitle");
+
+    const appendHots = document.getElementById("appendHots");
+
+    tabsTitle.forEach(tabTitle => tabTitle.addEventListener('click', function(event) {
+
+      if(this.nextElementSibling.classList.contains("toggle")) {
+        tabsTitle.forEach(r => r.nextElementSibling.classList.add("toggle"));
+        this.nextElementSibling.classList.remove("toggle");
+      }
+
+      getData(event.target.id);
+
+    }));
+
+    // DB 取資料
+    function getData(item) {
+      $.ajax({
+        url: `/api/gethots/${item}`,
+        method: "GET",
+        success: function(resp) {
+          removeData();
+          dataForm(resp.data);
+        }
+      });
+    }
+
+    function dataForm(data) {
+      document.getElementById('oncomingHots').style.display = "none";
+
+      let dataLength = data.length;
+      let maxCount = data[0].count;
+      for(let i = 0; i < dataLength; i++) {
+        var listDiv = document.createElement("div");
+        listDiv.className = "list";
+
+        // pol name
+        var nameDiv = document.createElement("div");
+        nameDiv.className = "polName";
+        nameDiv.innerHTML = data[i].name;
+
+        // bar handle
+        var barDiv = document.createElement("div");
+        barDiv.className = "bar";
+        var processDiv = document.createElement("div");
+        processDiv.className = "process";
+
+        let thisCount = data[i].count;
+        let ratio = (thisCount / maxCount) * 100;
+        processDiv.setAttribute("style", `width: ${ratio}%`)
+
+        barDiv.appendChild(processDiv);
+
+        // news count
+        var countDiv = document.createElement("div");
+        countDiv.className = "count";
+        countDiv.innerHTML = data[i].count;
+
+        listDiv.appendChild(nameDiv);
+        listDiv.appendChild(barDiv);
+        listDiv.appendChild(countDiv);
+
+        appendHots.appendChild(listDiv);
+      }
+
+    }
+
+    function removeData() {
+      var child = appendHots.lastElementChild;
+      while(child) {
+        appendHots.removeChild(child);
+        child = appendHots.lastElementChild;
+      }
+    }
+
+  </script>
+
+  </body>
+
+
+</html>

@@ -1,0 +1,108 @@
+@import "common.css";
+
+.content {
+  margin-top: 30px;
+}
+
+.tabs {
+  display: flex;
+  margin: 0 20px 40px;
+}
+
+.tabFrom {
+  font-size: 2.6rem;
+  font-weight: bold;
+  width: 120px;
+  margin-right: 40px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.tabFrom:hover {
+  color: #838383;
+  transition: color .2s linear;
+}
+
+.pointer {
+  position: relative;
+  left: 0px;
+  width: 120px;
+  margin-top: 8px;
+  border-bottom: 5px solid #232323;
+  border-radius: 5px;
+  box-shadow: 0 2px 3px rgba(90,90,90, 0.7);
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s, opacity .5s linear;
+}
+
+.toggle {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.lists {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+}
+
+.mainList {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.lists .mainList .polName {
+  width: 120px;
+}
+
+.lists .mainList .count {
+  text-align: right;
+  width: 70px;
+}
+
+.lists .mainList .polName,
+.lists .mainList .count {
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+}
+
+.lists .list .bar {
+  width: 80%;
+  height: 1.8rem;
+  margin: 0 30px;
+  /* background-color: #E6E5E2; */
+}
+
+.lists .mainList .bar .process {
+  height: inherit;
+  /* width: 100%; */
+  background: linear-gradient(0deg, #232323 60%, #535353 75%, #838383 90%, #909090 100%);
+  background: -moz-linear-gradient(0deg, #232323 60%, #535353 75%, #838383 90%, #909090 100%);
+  background: -webkit-linear-gradient(0deg, #232323 60%, #535353 75%, #838383 90%, #909090 100%);
+  background: -o-linear-gradient(0deg, #232323 60%, #535353 75%, #838383 90%, #909090 100%);
+  box-shadow: 0 1px 3px rgba(35,35,35, 0.7);
+}
+
+.subLists {
+  font-size: 1.3rem;
+  width: 30%;
+  padding: 10px;
+  position: relative;
+  top: -10px;
+  left: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.subList {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}

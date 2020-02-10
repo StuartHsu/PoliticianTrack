@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+      <title>Politician Track</title>
+      <link rel="stylesheet" href="./css/twicon/twicon.css">
+      <link rel="stylesheet" type="text/css" href="./css/hots.css">
+      <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="logo">
+        <a href="./">Politician Track</a>
+      </div>
+      <nav>
+        <div class="item">
+          <a href="./politician">篩選</a>
+        </div>
+        <div class="item">
+          <a href="./hots">熱門</a>
+        </div>
+      </nav>
+      <div class="feature">
+        <a href="./about">About Us</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="content scrollBar">
+        <div class="tabs">
+          <div class="tabFrom">
+            <li class="tabTitle" id="pol">人物</li>
+            <div class="pointer"></div>
+          </div>
+          <div class="tabFrom">
+            <li class="tabTitle" id="issue">議題</li>
+            <div class="pointer toggle"></div>
+          </div>
+        </div>
+
+        <div class="lists" id="oncomingHots">
+
+          <!-- <div class="list">
+            <div class="mainList">
+              <div class="polName">孫中山</div>
+              <div class="bar">
+                <div class="process"></div>
+              </div>
+              <div class="count">1234</div>
+            </div>
+            <div class="subLists">
+              <div class="subList">
+                <div class="issueName">第一次革命</div>
+                <div class="issueCount">1234</div>
+              </div>
+            </div>
+          </div> -->
+
+
+          <% for(let i = 0; i < results.length; i++) { %>
+            <% let maxCount = results[0].count; %>
+            <% let thisCount = results[i].count; %>
+            <% let ratio = (thisCount / maxCount) * 100; %>
+            <div class="list">
+              <div class="mainList">
+                <div class="polName"><%= results[i].name %></div>
+                <div class="bar">
+                  <div class="process" style="width:<%=ratio%>%"></div>
+                </div>
+                <div class="count"><%= results[i].count %></div>
+              </div>
+              <div class="subLists" id="<%= results[i].tag_id %>"></div>
+            </div>
+          <% } %>
+        </div>
+
+        <div class="lists" id="appendHots"></div>
+      </div>
+
+    </main>
+
+    <footer>
+
+    </footer>
+
+  <script>
+
+    const tabsTitle = document.querySelectorAll(".tabTitle");
+    const mainLists = document.querySelectorAll(".mainList");
+
+    const oncomingLists = document.getElementById("oncomingHots");
+
+    const appendHots = document.getElementById("appendHots");
+
+    var preSublistId;
+
+    tabsTitle.forEach(tabTitle => tabTitle.addEventListener('click', function(event) {
+      removeData(oncomingLists); // 刪除預先載入的資料
+      if(this.nextElementSibling.classList.contains("toggle")) {
+        tabsTitle.forEach(r => r.nextElementSibling.classList.add("toggle"));
+        this.nextElementSibling.classList.remove("toggle");
+      }
+      getData(event.target.id);
+    }));
+
+    mainLists.forEach(mainList => mainList.addEventListener('click', function(event) {
+      getSubData("pol", this.nextElementSibling.id);
+    }));
+
+    // get Pol sub Issue after click tabTitle
+    function subListCallIssue(pol_id) {
+      getSubData("pol", pol_id);
+    }
+
+    // get Issue sub Pol after click tabTitle
+    function subListCallPol(pol_id) {
+      getSubData("issue", pol_id);
+    }
+
+    // DB 取資料
+    function getData(item) {
+      $.ajax({
+        url: `/api/gethots/${item}`,
+        method: "GET",
+        success: function(resp) {
+          removeData(appendHots);
+          dataForm(resp.data, item);
+        }
+      });
+    }
+
+    // DB 取資料 - subIssue
+    function getSubData(type, tag_id) {
+      $.ajax({
+        url: `/api/gethots/sub/issue?${type}=${tag_id}`,
+        method: "GET",
+        success: function(resp) {
+          if(preSublistId) {
+            if(preSublistId != tag_id) {
+              let removeList = document.getElementById(preSublistId);
+              removeData(removeList);
+              subDataForm(tag_id, resp.data);
+              preSublistId = tag_id;
+            } else {
+              removeList = document.getElementById(tag_id);
+              removeData(removeList);
+              preSublistId = "";
+            }
+          } else {
+            subDataForm(tag_id, resp.data);
+            preSublistId = tag_id;
+          }
+        }
+      });
+    }
+
+
+    function dataForm(data, type) {
+      document.getElementById('oncomingHots').style.display = "none";
+
+      let dataLength = data.length;
+      let maxCount = data[0].count;
+      for(let i = 0; i < dataLength; i++) {
+        var listDiv = document.createElement("div");
+        listDiv.className = "list";
+
+        var mainListDiv = document.createElement("div");
+        mainListDiv.className = "mainList";
+        if(type === "pol") {
+          mainListDiv.setAttribute("onclick", `subListCallIssue(${data[i].tag_id})`);
+        } else {
+          mainListDiv.setAttribute("onclick", `subListCallPol(${data[i].tag_id})`);
+        }
+
+
+        // pol name
+        var nameDiv = document.createElement("div");
+        nameDiv.className = "polName";
+        nameDiv.innerHTML = data[i].name;
+
+        // bar handle
+        var barDiv = document.createElement("div");
+        barDiv.className = "bar";
+        var processDiv = document.createElement("div");
+        processDiv.className = "process";
+
+        let thisCount = data[i].count;
+        let ratio = (thisCount / maxCount) * 100;
+        processDiv.setAttribute("style", `width: ${ratio}%`)
+
+        barDiv.appendChild(processDiv);
+
+        // news count
+        var countDiv = document.createElement("div");
+        countDiv.className = "count";
+        countDiv.innerHTML = data[i].count;
+
+        // subLists
+        var subListsDiv = document.createElement("div");
+        subListsDiv.className = "subLists";
+        subListsDiv.setAttribute("id", `${data[i].tag_id}`)
+
+        mainListDiv.appendChild(nameDiv);
+        mainListDiv.appendChild(barDiv);
+        mainListDiv.appendChild(countDiv);
+
+        listDiv.appendChild(mainListDiv);
+        listDiv.appendChild(subListsDiv);
+
+        appendHots.appendChild(listDiv);
+      }
+
+    }
+
+    function subDataForm(id, data) {
+      const subLists = document.getElementById(id);
+
+      for(let i = 0; i < data.length; i++) {
+        var subListDiv = document.createElement("div");
+        subListDiv.className = "subList";
+
+        var nameDiv = document.createElement("div");
+        nameDiv.className = "issueName";
+        nameDiv.innerHTML = data[i].name;
+
+        var countDiv = document.createElement("div");
+        countDiv.className = "issueCount";
+        countDiv.innerHTML = data[i].count;
+
+        subListDiv.appendChild(nameDiv);
+        subListDiv.appendChild(countDiv);
+
+        subLists.appendChild(subListDiv);
+      }
+    }
+
+    function removeData(element) {
+      var child = element.lastElementChild;
+      while(child) {
+        element.removeChild(child);
+        child = element.lastElementChild;
+      }
+    }
+
+  </script>
+
+  </body>
+
+
+</html>

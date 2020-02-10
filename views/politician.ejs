@@ -12,17 +12,14 @@
 
     <header>
       <div class="logo">
-        <a href="./">Politician Track
-          <!-- <i class="twicon-recycling"></i> -->
-          <!-- <img src="imgs/logo.png" alt="logo"> -->
-        </a>
+        <a href="./">Politician Track</a>
       </div>
       <nav>
         <div class="item">
           <a href="./politician">篩選</a>
         </div>
         <div class="item">
-          <a href="./issue">熱門</a>
+          <a href="./hots">熱門</a>
         </div>
       </nav>
       <div class="feature">
@@ -94,9 +91,7 @@
               <div class="box-border"></div>
               <div class="inner scrollBar">
                 <% polsData.forEach(function(result){ %>
-                  <li class="person">
-                    <%= result.name %>
-                  </li>
+                  <li class="person"><%= result.name %></li>
                 <% }); %>
                 <!-- <li class="person">韓國瑜</li> -->
               </div>
@@ -108,9 +103,7 @@
               <div class="box-border"></div>
               <div class="inner scrollBar">
                 <% issuesData.forEach(function(result){ %>
-                  <li class="issue">
-                    <%= result.name %>
-                  </li>
+                  <li class="issue"><%= result.name %></li>
                 <% }); %>
                 <li class="issue">一個中國</li>
               </div>
@@ -161,19 +154,11 @@
               <div class="news">
                 <div class="news-content">
                   <a href="<%= results[i].href %>" target="_blank">
-                    <div class="title">
-                      <%= results[i].title %>
-                    </div>
-                    <div class="publisher">
-                      <%= results[i].publisher %>
-                    </div>
-                    <div class="pubTime">
-                      <%= results[i].pubTime %>
-                    </div>
+                    <div class="title"><%= results[i].title %></div>
+                    <div class="publisher"><%= results[i].publisher %></div>
+                    <div class="pubTime"><%= results[i].pubTime %></div>
                     <div class="desc">
-                      <p>
-                        <%= results[i].description %>
-                      </p>
+                      <p><%= results[i].description %></p>
                     </div>
                   </a>
                 </div> <!-- news-content End -->
