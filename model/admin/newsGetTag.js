@@ -13,8 +13,8 @@ module.exports={
           reject(error);
         }
         let totalCount = result1.length
-        for(let j = 0; j < result1.length; j++) {
-          console.log("處理中：" + j + "/" + totalCount);
+        for(let j = 0; j < result1.length; j++) { // news error: 960
+          console.log("處理中：" + j + "/" + totalCount + " New_id：" + result1[j].id);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
             if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") {
