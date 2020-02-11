@@ -308,7 +308,7 @@
     // DB 取資料
     function getData(name, issueName) {
       $.ajax({
-        url: `http://localhost:3000/api/news/listtag?name=${name}\&issue=${issueName}`,
+        url: `/api/news/listtag?name=${name}\&issue=${issueName}`,
         method: "GET",
         // data: name,
         dataType: 'json',
