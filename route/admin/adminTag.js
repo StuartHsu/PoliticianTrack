@@ -40,7 +40,7 @@ router.post('/api/updateDB', async function(req, res) {
 // NRP & NI 頻率統計
 router.get('/api/tagfreq', async function(req, res) {
   let today = dateForm(new Date()); // YYYY/MM/DD
-  let beginDay = startDayForm(today, 5);
+  let beginDay = startDayForm(today, 14);
 
   let period = {
     start: beginDay + " 00:00",

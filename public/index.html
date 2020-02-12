@@ -5,39 +5,94 @@
       <title>Politician Track</title>
       <link rel="stylesheet" href="./css/twicon/twicon.css">
       <link rel="stylesheet" type="text/css" href="./css/index.css">
+      <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+      <script src="https://cdn.anychart.com/releases/v8/js/anychart-tag-cloud.min.js"></script>
       <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
   </head>
 
   <body>
 
-    <header>
+    <div class="container">
       <div class="logo">
         <a href="./">Politician Track</a>
       </div>
-      <nav>
-        <div class="item">
-          <a href="./politician">篩選</a>
-        </div>
-        <div class="item">
-          <a href="./issue">熱門</a>
-        </div>
-      </nav>
-      <div class="feature">
-        <a href="./about">About Us</a>
+
+      <div id="wordCloud"></div>
+
+      <div class="enter">
+        <a href="./politician" class="button" id="filterPage">篩選</a>
+        <a href="./hots" class="button" id="hotsPage">熱門</a>
       </div>
-    </header>
+
+      <div class="copyright">
+        <span>&copy; Copyright 2020 StuartHsu. All rights reserved.</span>
+      </div>
+    </div>
 
 
 
-    <main>
+    <script>
 
-    
+      anychart.onDocumentReady(function() {
+        $.ajax({
+          url: "tagFilterCount",
+          type: "GET",
+          success: function(resp) {
+            let data = dataForm(resp.data);
+            drawCloud(data);
+          }
+        });
+      });
 
-    </main>
+      function dataForm(data) {
+        let cloudData = [];
 
-    <footer>
+        let dataLength = data.length;
+        let max = data[0].count;
+        let min = 1;
+        let justfyRatio = (900 / (max - min));
+        for(let i = 0; i < dataLength; i++) {
+          if(data[i].count > min) {
+            let body = {
+              x: data[i].name,
+              value: data[i].count * justfyRatio
+            }
+            cloudData.push(body);
+          }
+        }
+        return cloudData;
+      }
 
-    </footer>
+      function drawCloud(data) {
+        // create a tag (word) cloud chart
+        var chart = anychart.tagCloud(data);
+        // set an array of angles at which the words will be laid out
+        chart.angles([0])
+        // set color present type
+        var customColorScale = anychart.scales.ordinalColor();
+        // chart.scale(anychart.scales.log(4));
+        customColorScale.ranges([
+          {less: 200},
+          {from: 200, to: 300},
+          {from: 300, to: 400},
+          {from: 400, to: 500},
+          {from: 500, to: 600},
+          {from: 600, to: 700},
+          {from: 700, to: 800},
+          {from: 800, to: 900},
+          {greater: 900}
+        ]);
+        customColorScale.colors(["#707070", "#606060", "#505050", "#404040", "#383838", "#303030", "#282828", "#181818", "#000000"]);
+        chart.colorScale(customColorScale);
+        // 去除滑鼠移到標籤上的資訊
+        chart.tooltip(false);
+
+        // set the chart container
+        chart.container("wordCloud");
+        chart.draw();
+      }
+
+    </script>
 
 
   </body>

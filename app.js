@@ -39,6 +39,10 @@ app.use('/nlp', nlp);
 const adminTag = require('./route/admin/adminTag');
 app.use('/admin', adminTag);
 
+// Index page - get tagFilterCount
+const tagFilterCount = require('./route/tagFilterCount');
+app.use('/tagFilterCount', tagFilterCount);
+
 
 // filter page render data when 1st coming
 app.get('/politician', async function(req, res) {

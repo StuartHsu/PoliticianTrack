@@ -426,7 +426,27 @@ main {
 
 
 
+.button {
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  color: white;
+  background: #384047;
+  display: inline-block;
+  margin: 10px 15px;
+  padding: 4px 15px;
+  border: 1px solid #384047;
+  border-radius: 5px;
+  box-shadow: 0 2px 0 0 #384047;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: 0.3s;
+}
 
+.button:hover {
+  background: #8d9aa5;
+  border-color: #8d9aa5;
+  box-shadow: 0 2px 0 0 #8d9aa5;
+}
 
 
 
