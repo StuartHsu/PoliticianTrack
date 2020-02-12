@@ -1,1 +1,69 @@
 @import "common.css";
+
+.container {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.logo {
+  height: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.logo a {
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+	letter-spacing: 4px;
+  width: 250px;
+  margin-left: 28px;
+  text-align: center;
+}
+
+#wordCloud {
+  width: 70%;
+  height: 70%;
+  margin: 0 auto;
+}
+
+.anychart-credits-logo,
+.anychart-credits-text{
+  display: none;
+}
+
+.enter {
+  text-align: center;
+}
+
+.enter .button {
+  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: white;
+  background: #232323;
+  display: inline-block;
+  margin: 10px 15px;
+  padding: 4px 50px;
+  border: 1px solid #232323;
+  border-radius: 15px;
+  box-shadow: 0 2px 0 0 #232323;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: 0.3s;
+}
+
+.enter .button:hover {
+  background: #626262;
+  border-color: #626262;
+  box-shadow: 0 2px 0 0 #626262;
+}
+
+.copyright {
+  color: #626262;
+  font-size: .7rem;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 15px;
+}
