@@ -115,18 +115,13 @@
 
       <div class="content scrollBar">
 
-        <div class="top" id="defaultTop">
+        <div class="top">
 
           <div class="titleName" id="titleName"><%= title %></div>
           <br>
           <div class="titleIssue" id="titleIssue"><%= issue %></div>
 
         </div>
-
-        <div class="top" id="compareTop">
-
-        </div>
-
         <div class="newslist" id="oncomingNews">
           <ul class="ulNews">
             <% for(let i = 0; i < results.length; i++) { %>
@@ -210,8 +205,6 @@
     const parties = document.querySelectorAll('.party');
     const regions = document.querySelectorAll('.region');
 
-    const defaultTop = document.getElementById("defaultTop");
-    const compareTop = document.getElementById("compareTop");
     const appendNews = document.getElementById("appendNews");
     const appendPols = document.getElementById('appendPols');
 
@@ -231,34 +224,9 @@
         switch(chooseFilter) {
           case "main":
             mainFilter.style.display = "none";
-
-            let nameList = [];
-            let issueName;
-            let issueNameTitle;
-            people.forEach(function(person) {
-              if(person.classList.contains("innerHighlight")) {
-                nameList.push(person.innerText);
-              }
-            });
-            issues.forEach(function(issue) {
-              if(issue.classList.contains("innerHighlight")) {
-                issueName = issue.innerText;
-                issueNameTitle = issue.innerText;
-              } else {
-                issueName = "";
-                issueNameTitle = "總覽";
-              }
-            });
-            if(nameList.length > 1) {
-              defaultTop.style.display = "none";
-              compareTop.style.display = "";
-              removeData(compareTop);
-              changeCompareTitle(nameList[0], nameList[1], issueNameTitle);
-              getDataCompare(nameList, issueName);
-            } else {
-              defaultTop.style.display = "";
-              compareTop.style.display = "none";
-            }
+            // 主選單取消時全收合
+            // filterItems.forEach(r => r.style.display = "none");
+            // filters.forEach(r => r.classList.remove("highlight"));
             break;
           case "party":
             partyList.style.display = "none";
@@ -276,28 +244,6 @@
         switch(chooseFilter) {
           case "main":
             mainFilter.style.display = "flex";
-
-            nameList = [];
-            issueName;
-            people.forEach(function(person) {
-              if(person.classList.contains("innerHighlight")) {
-                nameList.push(person.innerText);
-              }
-            });
-            issues.forEach(function(issue) {
-              if(issue.classList.contains("innerHighlight")) {
-                issueName = issue.innerText;
-              }
-            });
-            if(nameList.length > 1) {
-              defaultTop.style.display = "";
-              compareTop.style.display = "none";
-              removeData(compareTop);
-              getData(nameList, issueName);
-            } else {
-              defaultTop.style.display = "";
-              // compareTop.style.display = "";
-            }
             break;
           case "party":
             partyList.style.display = "block";
@@ -311,44 +257,16 @@
       }
     }));
 
-    let firstPolName;
-    let firstPolClass;
-    let oldFirstPolName;
-    let oldFirstPolClass;
     // 人物選擇處理
     people.forEach(person => person.addEventListener('click', function(event) {
-      // console.log("這一輪的 first: " + firstPolName + " " + firstPolClass);
-
       if(this.classList.contains("innerHighlight")) {
-        if(this.innerText === oldFirstPolName) {
-          this.classList.remove("innerHighlight");
-          oldFirstPolName = "";
-          firstPolName = "";
-        } else {
-          this.classList.remove("innerHighlight");
-          firstPolName = oldFirstPolName;
-          firstPolClass = oldFirstPolClass;
-        }
+        this.classList.remove("innerHighlight");
       } else {
-        if(firstPolName) {
-          oldFirstPolName = firstPolName;
-          oldFirstPolClass = firstPolClass;
-          people.forEach(r => r.classList.remove("innerHighlight"));
-          firstPolClass.add("innerHighlight");
-          this.classList.add("innerHighlight");
-        } else {
-          this.classList.add("innerHighlight");
-        }
-        firstPolName = event.target.innerText;
-        firstPolClass = event.target.classList;
+        people.forEach(r => r.classList.remove("innerHighlight"));
+        this.classList.add("innerHighlight");
       }
-
-      // console.log("舊: " + oldFirstPolName + " " + oldFirstPolClass);
-      // console.log("下一輪的 first: " + firstPolName + " " + firstPolClass);
-      // console.log("=======");
-
-      // let nameList = polSelect();
-      getData(polSelect(), issueName);
+      name = toggle(name, event);
+      getData(name, issueName);
     }));
 
     // 議題選擇處理
@@ -360,7 +278,7 @@
         this.classList.add("innerHighlight");
       }
       issueName = toggle(issueName, event);
-      getData(polSelect(), issueName);
+      getData(name, issueName);
     }));
 
     // 新聞旁標籤點選切換
@@ -397,29 +315,10 @@
         contentType: "application/json",
         success: function(resp) {
           // console.log(resp);
-          removeData(appendNews);
+          removeData();
           changeTitle(name);
           changeIssue(issueName);
           dataForm(name, resp);
-          tagShow()
-        }
-      });
-    }
-
-    // DB 取資料
-    function getDataCompare(name, issueName) {
-      $.ajax({
-        url: `/api/news/listtag?name=${name}\&issue=${issueName}`,
-        method: "GET",
-        // data: name,
-        dataType: 'json',
-        contentType: "application/json",
-        success: function(resp) {
-          // console.log(resp);
-          removeData(appendNews);
-          changeTitle(name);
-          changeIssue(issueName);
-          dataCompareForm(name, resp);
           tagShow()
         }
       });
@@ -447,25 +346,6 @@
     function changeIssue(issueName) {
       var titleIssue = document.getElementById("titleIssue");
       titleIssue.innerHTML = issueName;
-    }
-
-    function changeCompareTitle(pol1, pol2, issueName) {
-
-      let compareTitleName = document.createElement("div");
-      compareTitleName.className = "titleName";
-      compareTitleName.innerHTML = pol1;
-
-      let compareTitleIssue = document.createElement("div");
-      compareTitleIssue.className = "titleIssue";
-      compareTitleIssue.innerHTML = issueName;
-
-      let compareTitleName2 = document.createElement("div");
-      compareTitleName2.className = "titleName";
-      compareTitleName2.innerHTML = pol2;
-
-      compareTop.appendChild(compareTitleName);
-      compareTop.appendChild(compareTitleIssue);
-      compareTop.appendChild(compareTitleName2);
     }
 
     function dataForm(name, results) {
@@ -580,91 +460,11 @@
       }
     }
 
-    function dataCompareForm(name, results) {
-      document.getElementById('oncomingNews').style.display = "none";
-
-      for (let i = 0; i < results.data.length; i ++) {
-
-        // timeDivide
-        var timeDivideDiv = document.createElement("div");
-        timeDivideDiv.className = "timeDivide";
-
-        var timeDivideSpan = document.createElement("span");
-
-        var time = new Date(results.data[i].pubTime);
-
-        if(i > 0) {
-          var preRawTime = new Date(results.data[i - 1].pubTime);
-
-          var preTime = preRawTime.getFullYear() + " / " + (preRawTime.getMonth() < 10 ? '0' : '') + (preRawTime.getMonth() + 1);
-          var curTime = time.getFullYear() + " / " + (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-
-          if(preTime !== curTime) {
-            timeDivideSpan.innerHTML = curTime;
-            timeDivideDiv.appendChild(timeDivideSpan);
-          } else {
-            timeDivideDiv.style.display = "none";
-          }
-        } else {
-          timeDivideSpan.innerHTML = time.getFullYear() + " / " + (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-          timeDivideDiv.appendChild(timeDivideSpan);
-        }
-
-        appendNews.appendChild(timeDivideDiv);
-
-        var li = document.createElement("li");
-        li.className = "left";
-
-        // news
-        var newsDiv = document.createElement("div");
-        newsDiv.className = "news leftnews";
-
-        var newsContentDiv = document.createElement("div");
-        newsContentDiv.className = "news-content";
-
-        var link = document.createElement("a");
-        link.setAttribute("href", `${results.data[i].href}`);
-        link.setAttribute("target", "_blank");
-
-        var titleDiv = document.createElement("div");
-        titleDiv.className = "title";
-        titleDiv.innerHTML = results.data[i].title;
-
-        var publisherDiv = document.createElement("div");
-        publisherDiv.className = "publisher";
-        publisherDiv.innerHTML = results.data[i].publisher;
-
-        var pubTimeDiv = document.createElement("div");
-        pubTimeDiv.className = "pubTime";
-        pubTimeDiv.innerHTML = results.data[i].pubTime;
-
-        var descDiv = document.createElement("div");
-        descDiv.className = "desc";
-
-        var descP = document.createElement("p");
-        descP.innerHTML = results.data[i].description;
-
-        descDiv.appendChild(descP);
-        link.appendChild(titleDiv);
-        link.appendChild(publisherDiv);
-        link.appendChild(pubTimeDiv);
-        link.appendChild(descDiv);
-
-        newsContentDiv.appendChild(link);
-        newsDiv.appendChild(newsContentDiv);
-
-        // 組合
-        li.appendChild(newsDiv);
-
-        appendNews.appendChild(li);
-      }
-    }
-
-    function removeData(item) {
-      var child = item.lastElementChild;
+    function removeData() {
+      var child = appendNews.lastElementChild;
       while(child) {
-        item.removeChild(child);
-        child = item.lastElementChild;
+        appendNews.removeChild(child);
+        child = appendNews.lastElementChild;
       }
     }
 
@@ -685,20 +485,6 @@
         renderTagsShow.forEach(tagShow => tagShow.style.display = "none");
       }
     }
-
-    // 偵測是否選兩個
-    function polSelect() {
-      let nameList = [];
-      people.forEach(function(person) {
-        if(person.classList.contains("innerHighlight")) {
-          nameList.push(person.innerText);
-        }
-      });
-      return nameList;
-    }
-
-
-
 
   </script>
 

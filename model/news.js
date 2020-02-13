@@ -82,11 +82,17 @@ module.exports = {
 
 function getNews(title, titleKeyword, content, contentKeyword) {
   return new Promise(function(resolve, reject) {
+    let arrayWord = titleKeyword.split(",");
+    let addSql = ")";
+    if(arrayWord[1]) {
+      addSql = `or ${title} like '%${arrayWord[1]}%') ` ;
+    }
+
     let sql;
     if(titleKeyword && contentKeyword) {
-      sql = `select * from news where ${title} like '%${titleKeyword}%' and ${content} like '%${contentKeyword}%' and intent = "politician_say" order by pubTime desc;`
+      sql = `select * from news where (${title} like '%${arrayWord[0]}%' ${addSql}and ${content} like '%${contentKeyword}%' and intent = "politician_say" order by pubTime desc;`
     } else if (titleKeyword && !contentKeyword) {
-      sql = `select * from news where ${title} like '%${titleKeyword}%' and intent = "politician_say" order by pubTime desc;`
+      sql = `select * from news where (${title} like '%${arrayWord[0]}%' ${addSql}and intent = "politician_say" order by pubTime desc;`
     } else if (!titleKeyword && contentKeyword) {
       sql = `select * from news where ${content} like '%${contentKeyword}%' and intent = "politician_say" order by pubTime desc;`
     } else {

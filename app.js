@@ -69,6 +69,21 @@ app.get('/hots', async function(req, res) {
 });
 
 
+// filter page render data when 1st coming
+app.get('/compare', async function(req, res) {
+  let results = await newData.listTag('title', '');
+  let polsResults = await polsData.get();
+  let issuesResults = await issuesData.get();
+  res.render('compare', {
+    title: '總覽',
+    issue: '',
+    results: results,
+    polsData: polsResults,
+    issuesData: issuesResults
+  });
+});
+
+
 
 // app.get('/nlp/test', async function(req, res) {
 //   let results = await nlp.get();
