@@ -3,7 +3,7 @@
 
   <head>
       <title>Politician Track</title>
-      <link rel="stylesheet" href="./css/twicon/twicon.css">
+      <link rel="shortcut icon" href="#"/>
       <link rel="stylesheet" type="text/css" href="./css/common.css">
       <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
   </head>
@@ -113,7 +113,7 @@
 
       </div>
 
-      <div class="content scrollBar">
+      <div class="content">
 
         <div class="top" id="defaultTop">
 
@@ -127,7 +127,7 @@
 
         </div>
 
-        <div class="newslist" id="oncomingNews">
+        <div class="newslist scrollBar" id="oncomingNews">
           <ul class="ulNews">
             <% for(let i = 0; i < results.length; i++) { %>
             <li>
@@ -184,7 +184,7 @@
           </ul>
         </div> <!-- NewsList End -->
 
-        <div class="newslist">
+        <div class="newslist scrollBar" id="appendNewsP">
           <ul class="ulNews" id="appendNews">
 
           </ul>
@@ -212,11 +212,9 @@
 
     const defaultTop = document.getElementById("defaultTop");
     const compareTop = document.getElementById("compareTop");
+    const appendNewsP = document.getElementById("appendNewsP");
     const appendNews = document.getElementById("appendNews");
     const appendPols = document.getElementById('appendPols');
-
-
-    // const tagJudge = document.getElementsByClassName("content")[0].offsetWidth;
 
     let name = '';
     let issueName = '';
@@ -224,7 +222,7 @@
     // sidenav 選擇處理
     filters.forEach(filter => filter.addEventListener('click', function(event) {
       let chooseFilter = event.target.id;
-      // polsEvent(); // 點擊 sidenav 時載入 pols 監聽事件
+
       if(this.classList.contains("highlight")) {
 
         this.classList.remove("highlight");
@@ -233,28 +231,29 @@
             mainFilter.style.display = "none";
 
             let nameList = [];
+            let condList = [];
             let issueName;
             let issueNameTitle;
             people.forEach(function(person) {
               if(person.classList.contains("innerHighlight")) {
                 nameList.push(person.innerText);
+                condList.push(person.innerText);
               }
             });
+            issueName = "";
+            issueNameTitle = "總覽";
             issues.forEach(function(issue) {
               if(issue.classList.contains("innerHighlight")) {
                 issueName = issue.innerText;
                 issueNameTitle = issue.innerText;
-              } else {
-                issueName = "";
-                issueNameTitle = "總覽";
+                condList.push(issue.innerText);
               }
             });
             if(nameList.length > 1) {
               defaultTop.style.display = "none";
-              compareTop.style.display = "";
+              compareTop.style.display = "flex";
               removeData(compareTop);
-              changeCompareTitle(nameList[0], nameList[1], issueNameTitle);
-              getDataCompare(nameList, issueName);
+              getCompare(condList, [condList[0],condList[1]], condList[2]);
             } else {
               defaultTop.style.display = "";
               compareTop.style.display = "none";
@@ -296,7 +295,8 @@
               getData(nameList, issueName);
             } else {
               defaultTop.style.display = "";
-              // compareTop.style.display = "";
+              // document.getElementById("titleName").innerHTML = "總覽";
+              // document.getElementById("titleIssue").innerHTML = "";
             }
             break;
           case "party":
@@ -341,6 +341,10 @@
         }
         firstPolName = event.target.innerText;
         firstPolClass = event.target.classList;
+      }
+      if(!oldFirstPolName && !firstPolName) {
+        document.getElementById("titleName").innerHTML = "總覽";
+        document.getElementById("titleIssue").innerHTML = "";
       }
 
       // console.log("舊: " + oldFirstPolName + " " + oldFirstPolClass);
@@ -406,20 +410,17 @@
       });
     }
 
-    // DB 取資料
-    function getDataCompare(name, issueName) {
+    // Get compare DB data
+    function getCompare(data, titleName, titleIssue) {
       $.ajax({
-        url: `/api/news/listtag?name=${name}\&issue=${issueName}`,
-        method: "GET",
-        // data: name,
-        dataType: 'json',
-        contentType: "application/json",
+        url: "api/news/gggg",
+        type: "POST",
+        data: JSON.stringify(data),
+        contentType: "application/json; charset=utf-8", // 送給 server 的格式
         success: function(resp) {
-          // console.log(resp);
           removeData(appendNews);
-          changeTitle(name);
-          changeIssue(issueName);
-          dataCompareForm(name, resp);
+          changeCompareTitle(titleName,titleIssue);
+          dataCompareForm(name, resp, titleName);
           tagShow()
         }
       });
@@ -449,19 +450,19 @@
       titleIssue.innerHTML = issueName;
     }
 
-    function changeCompareTitle(pol1, pol2, issueName) {
+    function changeCompareTitle(titleName,titleIssue) {
 
       let compareTitleName = document.createElement("div");
       compareTitleName.className = "titleName";
-      compareTitleName.innerHTML = pol1;
+      compareTitleName.innerHTML = titleName[0];
 
       let compareTitleIssue = document.createElement("div");
       compareTitleIssue.className = "titleIssue";
-      compareTitleIssue.innerHTML = issueName;
+      compareTitleIssue.innerHTML = titleIssue;
 
       let compareTitleName2 = document.createElement("div");
       compareTitleName2.className = "titleName";
-      compareTitleName2.innerHTML = pol2;
+      compareTitleName2.innerHTML = titleName[1];
 
       compareTop.appendChild(compareTitleName);
       compareTop.appendChild(compareTitleIssue);
@@ -470,6 +471,7 @@
 
     function dataForm(name, results) {
       document.getElementById('oncomingNews').style.display = "none";
+      document.getElementById('appendNewsP').style.display = "flex";
 
       for (let i = 0; i < results.data.length; i ++) {
         var li = document.createElement("li");
@@ -580,11 +582,12 @@
       }
     }
 
-    function dataCompareForm(name, results) {
+    function dataCompareForm(name, results, titleName) {
       document.getElementById('oncomingNews').style.display = "none";
+      document.getElementById('appendNewsP').style.display = "flex";
+
 
       for (let i = 0; i < results.data.length; i ++) {
-
         // timeDivide
         var timeDivideDiv = document.createElement("div");
         timeDivideDiv.className = "timeDivide";
@@ -613,11 +616,20 @@
         appendNews.appendChild(timeDivideDiv);
 
         var li = document.createElement("li");
-        li.className = "left";
+
 
         // news
         var newsDiv = document.createElement("div");
-        newsDiv.className = "news leftnews";
+        if(results.data[i].tag_id === titleName[0]) {
+          li.className = "left";
+          newsDiv.className = "news leftnews";
+        } else if (results.data[i].tag_id === titleName[1]) {
+          li.className = "right";
+          newsDiv.className = "news rightnews";
+        } else {
+          li.className = "center";
+          newsDiv.className = "news centernews";
+        }
 
         var newsContentDiv = document.createElement("div");
         newsContentDiv.className = "news-content";
@@ -642,7 +654,7 @@
         descDiv.className = "desc";
 
         var descP = document.createElement("p");
-        descP.innerHTML = results.data[i].description;
+        descP.innerHTML = results.data[i].content;
 
         descDiv.appendChild(descP);
         link.appendChild(titleDiv);
