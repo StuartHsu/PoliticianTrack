@@ -349,14 +349,34 @@
       }));
     }
 
+    let tagParam = {};
+    let tagPolList = [];
+    let tagIssueList = [];
+
     // 新聞旁標籤點選切換
     function tagCallPol(pol) {
-      polList = [];
-      issueList = [];
-      polList.push(pol);
-      param.pol = polList;
-      param.issue = issueList;
-      getNews(param);
+      tagPolList = [];
+      tagIssueList = [];
+      tagPolList.push(pol);
+      tagParam.pol = tagPolList;
+      tagParam.issue = tagIssueList;
+      getNews(tagParam);
+
+      people.forEach(function(person) {
+        if(person.classList.contains("innerHighlight")) {
+          person.classList.remove("innerHighlight");
+        }
+      });
+      issues.forEach(function(issue) {
+        if(issue.classList.contains("innerHighlight")) {
+          issue.classList.remove("innerHighlight");
+        }
+      });
+      firstPolName = "";
+      firstPolClass = "";
+      oldFirstPolName = "";
+      oldFirstPolClass = "";
+      addHLByTag(pol, "person");
     }
 
     function tagCallIssue(issue) {
@@ -366,6 +386,18 @@
       param.pol = polList;
       param.issue = issueList;
       getNews(param);
+
+      people.forEach(function(person) {
+        if(person.classList.contains("innerHighlight")) {
+          person.classList.remove("innerHighlight");
+        }
+      });
+      issues.forEach(function(issue) {
+        if(issue.classList.contains("innerHighlight")) {
+          issue.classList.remove("innerHighlight");
+        }
+      });
+      addHLByTag(issue, "issue");
     }
 
 
@@ -666,6 +698,19 @@
       while(child) {
         item.removeChild(child);
         child = item.lastElementChild;
+      }
+    }
+
+    // 點擊 tag 更新 filter HL
+    function addHLByTag(item, className) {
+      var polClasses = document.getElementsByClassName(className),
+          results = [];
+      for(var i = 0; i < polClasses.length; i++) {
+        var content = polClasses[i].innerText;
+        if (content.indexOf(item) != -1) {
+          results.push(polClasses[i]);
+          polClasses[i].classList.add("innerHighlight")
+        }
       }
     }
 
