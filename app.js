@@ -70,6 +70,7 @@ app.get('/hots', async function(req, res) {
 
 
 
+
 // app.get('/nlp/test', async function(req, res) {
 //   let results = await nlp.get();
 //   res.send(results);

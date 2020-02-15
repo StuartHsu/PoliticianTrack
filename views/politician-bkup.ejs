@@ -3,7 +3,6 @@
 
   <head>
       <title>Politician Track</title>
-      <link rel="shortcut icon" href="#"/>
       <link rel="stylesheet" type="text/css" href="./css/common.css">
       <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
   </head>
@@ -36,7 +35,7 @@
           <ul>
             <li class="filter" id="main">主選</li>
             <li class="filter" id="party">政黨</li>
-            <!-- <li class="filter" id="region">地區</li> -->
+            <li class="filter" id="region">地區</li>
             <!-- <li class="filter" id="time">時間</li> -->
           </ul>
         </div>
@@ -58,7 +57,7 @@
             <li class="party">社會民主黨</li>
           </ul>
         </div>
-        <!-- <div class="regionList filterItems scrollBar">
+        <div class="regionList filterItems scrollBar">
           <ul>
             <li class="region">臺北市</li>
             <li class="region">新北市</li>
@@ -83,7 +82,7 @@
             <li class="region">金門縣</li>
             <li class="region">連江縣</li>
           </ul>
-        </div> -->
+        </div>
         <div class="mainFilter filterItems">
           <div class="politician">
             <ul id="appendPols">
@@ -113,25 +112,16 @@
 
       </div>
 
-      <div class="content">
+      <div class="content scrollBar">
 
-        <div class="top" id="defaultTop">
+        <div class="top">
 
           <div class="titleName" id="titleName"><%= title %></div>
           <br>
           <div class="titleIssue" id="titleIssue"><%= issue %></div>
 
         </div>
-
-        <div class="top" id="compareTop">
-
-          <div class="titleName" id="compTitleName1"></div>
-          <div class="titleIssue" id="compTitleIssue"></div>
-          <div class="titleName" id="compTitleName2"></div>
-
-        </div>
-
-        <div class="newslist scrollBar" id="oncomingNews">
+        <div class="newslist" id="oncomingNews">
           <ul class="ulNews">
             <% for(let i = 0; i < results.length; i++) { %>
             <li>
@@ -188,7 +178,7 @@
           </ul>
         </div> <!-- NewsList End -->
 
-        <div class="newslist scrollBar" id="appendNewsP">
+        <div class="newslist">
           <ul class="ulNews" id="appendNews">
 
           </ul>
@@ -207,69 +197,58 @@
     const filterItems = document.querySelectorAll('.filterItems');
     const mainFilter = document.querySelector('.mainFilter');
     const partyList = document.querySelector('.partyList');
-    // const regionList = document.querySelector('.regionList');
+    const regionList = document.querySelector('.regionList');
 
     const people = document.querySelectorAll('.person');
     const issues = document.querySelectorAll('.issue');
     const parties = document.querySelectorAll('.party');
-    // const regions = document.querySelectorAll('.region');
+    const regions = document.querySelectorAll('.region');
 
-    const defaultTop = document.getElementById("defaultTop");
-    const compareTop = document.getElementById("compareTop");
-    const appendNewsP = document.getElementById("appendNewsP");
     const appendNews = document.getElementById("appendNews");
     const appendPols = document.getElementById('appendPols');
 
-    // Pol, Issue record
-    let param = {};
-    let polList = [];
-    let issueList = [];
 
-    // people eventListener use
-    let firstPolName;
-    let firstPolClass;
-    let oldFirstPolName;
-    let oldFirstPolClass;
+    // const tagJudge = document.getElementsByClassName("content")[0].offsetWidth;
 
-    //------------ User click ------------
+    let name = '';
+    let issueName = '';
 
     // sidenav 選擇處理
     filters.forEach(filter => filter.addEventListener('click', function(event) {
       let chooseFilter = event.target.id;
-
-      if(this.classList.contains("highlight")) { // 關掉 sidenav
+      // polsEvent(); // 點擊 sidenav 時載入 pols 監聽事件
+      if(this.classList.contains("highlight")) {
 
         this.classList.remove("highlight");
         switch(chooseFilter) {
           case "main":
             mainFilter.style.display = "none";
-            if(Object.getOwnPropertyNames(param).length > 1) {
-              if(param.pol.length === 2 && param.issue.length === 1) {
-                hideTitle(defaultTop, compareTop, "flex");
-                getCompare(param);
-              }
-            }
+            // 主選單取消時全收合
+            // filterItems.forEach(r => r.style.display = "none");
+            // filters.forEach(r => r.classList.remove("highlight"));
             break;
           case "party":
             partyList.style.display = "none";
             break;
+          case "region":
+            regionList.style.display = "none";
+            break;
           default:
         }
         tagShow()
-      } else { // 該點擊項目尚未被選擇
+      } else {
+        // filters.forEach(r => r.classList.remove("highlight"));
         this.classList.add("highlight");
+        // filterItems.forEach(filterItem => filterItem.style.display = "none");
         switch(chooseFilter) {
           case "main":
             mainFilter.style.display = "flex";
-            if(Object.getOwnPropertyNames(param).length > 1) {
-              if(param.pol.length === 2 && param.issue.length === 1) {
-                hideTitle(compareTop, defaultTop, "block");
-                getNews(param);
-              }
-            }
             break;
           case "party":
             partyList.style.display = "block";
+            break;
+          case "region":
+            regionList.style.display = "block";
             break;
           default:
         }
@@ -279,64 +258,40 @@
 
     // 人物選擇處理
     people.forEach(person => person.addEventListener('click', function(event) {
-      polList = []; // 清空
       if(this.classList.contains("innerHighlight")) {
-        if(this.innerText === oldFirstPolName) {
-          this.classList.remove("innerHighlight");
-          oldFirstPolName = "";
-          firstPolName = "";
-        } else {
-          this.classList.remove("innerHighlight");
-          firstPolName = oldFirstPolName;
-          firstPolClass = oldFirstPolClass;
-        }
+        this.classList.remove("innerHighlight");
       } else {
-        if(firstPolName) {
-          oldFirstPolName = firstPolName;
-          oldFirstPolClass = firstPolClass;
-          people.forEach(r => r.classList.remove("innerHighlight"));
-          firstPolClass.add("innerHighlight");
-          this.classList.add("innerHighlight");
-        } else {
-          this.classList.add("innerHighlight");
-        }
-        firstPolName = event.target.innerText;
-        firstPolClass = event.target.classList;
+        people.forEach(r => r.classList.remove("innerHighlight"));
+        this.classList.add("innerHighlight");
       }
-
-      people.forEach(function(person) {
-        if(person.classList.contains("innerHighlight")) {
-          polList.push(person.innerText);
-        }
-      });
-
-      param.pol = polList;
-      param.issue = issueList;
-      getNews(param);
+      name = toggle(name, event);
+      getData(name, issueName);
     }));
 
     // 議題選擇處理
     issues.forEach(issue => issue.addEventListener('click', function(event) {
-      issueList = []; // 清空
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
       } else {
         issues.forEach(r => r.classList.remove("innerHighlight"));
         this.classList.add("innerHighlight");
       }
-
-      issues.forEach(function(issue) {
-        if(issue.classList.contains("innerHighlight")) {
-          issueList.push(issue.innerText);
-        }
-      });
-
-      param.pol = polList;
-      param.issue = issueList;
-      getNews(param);
+      issueName = toggle(issueName, event);
+      getData(name, issueName);
     }));
 
+    // 新聞旁標籤點選切換
+    function tagCallPol(name) {
+      getData(name, issueName);
+    }
+
+    function tagCallIssue(issueName) {
+      getData('', issueName);
+    }
+
+
     childFilter(parties);
+    childFilter(regions);
 
     // 子 filter 處理
     function childFilter(items) {
@@ -349,91 +304,24 @@
       }));
     }
 
-    // 新聞旁標籤點選切換
-    function tagCallPol(pol) {
-      polList = [];
-      issueList = [];
-      polList.push(pol);
-      param.pol = polList;
-      param.issue = issueList;
-      getNews(param);
-
-      people.forEach(function(person) {
-        if(person.classList.contains("innerHighlight")) {
-          person.classList.remove("innerHighlight");
-        }
-      });
-      issues.forEach(function(issue) {
-        if(issue.classList.contains("innerHighlight")) {
-          issue.classList.remove("innerHighlight");
-        }
-      });
-      firstPolName = "";
-      firstPolClass = "";
-      oldFirstPolName = "";
-      oldFirstPolClass = "";
-      addHLByTag(pol, "person");
-    }
-
-    function tagCallIssue(issue) {
-      polList = [];
-      issueList = [];
-      issueList.push(issue);
-      param.pol = polList;
-      param.issue = issueList;
-      getNews(param);
-
-      people.forEach(function(person) {
-        if(person.classList.contains("innerHighlight")) {
-          person.classList.remove("innerHighlight");
-        }
-      });
-      issues.forEach(function(issue) {
-        if(issue.classList.contains("innerHighlight")) {
-          issue.classList.remove("innerHighlight");
-        }
-      });
-      addHLByTag(issue, "issue");
-    }
-
-
-    //------------ Server ------------
-
     // DB 取資料
-    function getNews(param) {
+    function getData(name, issueName) {
       $.ajax({
-        url: "api/news/getNews",
-        type: "POST",
-        data: JSON.stringify(param),
-        contentType: "application/json; charset=utf-8",
+        url: `/api/news/listtag?name=${name}\&issue=${issueName}`,
+        method: "GET",
+        // data: name,
+        dataType: 'json',
+        contentType: "application/json",
         success: function(resp) {
-          removeData(appendNews);
-          changeTitle(param.pol, param.issue);
-          if(resp.data) {
-            dataForm(resp.data, param.pol);
-            tagShow();
-          }
+          // console.log(resp);
+          removeData();
+          changeTitle(name);
+          changeIssue(issueName);
+          dataForm(name, resp);
+          tagShow()
         }
       });
     }
-
-    // Get compare DB data
-    function getCompare(param) {
-      $.ajax({
-        url: "api/news/getNews",
-        type: "POST",
-        data: JSON.stringify(param),
-        contentType: "application/json; charset=utf-8",
-        success: function(resp) {
-          removeData(appendNews);
-          changeCompTitle(param.pol, param.issue);
-          dataCompareForm(resp.data, param.pol);
-          tagShow();
-        }
-      });
-    }
-
-    //------------ Function ------------
 
     // 移除重複點擊
     function toggle(condition, events) {
@@ -449,55 +337,27 @@
       return condition;
     }
 
-    // 更改原始標題
-    function changeTitle(polName, issueName) {
-      let titleName = document.getElementById("titleName");
-      let titleIssue = document.getElementById("titleIssue");
-      if(polName.length === 0 && issueName.length === 0) {
-        titleName.innerHTML = "總覽";
-        titleIssue.innerHTML = "";
-      } else if(polName.length === 2) {
-        titleName.innerHTML = polName[0] + " " + polName[1];
-        titleIssue.innerHTML = issueName;
-      } else if(polName.length === 0) {
-        titleName.innerHTML = issueName;
-        titleIssue.innerHTML = "";
-      } else {
-        titleName.innerHTML = polName;
-        titleIssue.innerHTML = issueName;
-      }
+    function changeTitle(name) {
+      var titleName = document.getElementById("titleName");
+      titleName.innerHTML = name;
     }
 
-    // 更改比較標題
-    function changeCompTitle(polName, issueName) {
-      let compTitleName1 = document.getElementById("compTitleName1");
-      let compTitleIssue = document.getElementById("compTitleIssue");
-      let compTitleName2 = document.getElementById("compTitleName2");
-
-      compTitleName1.innerHTML = polName[0];
-      compTitleIssue.innerHTML = issueName;
-      compTitleName2.innerHTML = polName[1];
+    function changeIssue(issueName) {
+      var titleIssue = document.getElementById("titleIssue");
+      titleIssue.innerHTML = issueName;
     }
 
-    // 隱藏標題
-    function hideTitle(hideTitle, disTitle, style) {
-      hideTitle.style.display = "none";
-      disTitle.style.display = style;
-    }
-
-    // Data 組裝
-    function dataForm(respData, pol) {
+    function dataForm(name, results) {
       document.getElementById('oncomingNews').style.display = "none";
-      document.getElementById('appendNewsP').style.display = "flex";
 
-      for (let i = 0; i < respData.length; i ++) {
+      for (let i = 0; i < results.data.length; i ++) {
         var li = document.createElement("li");
 
         // timeline
         var timelineDiv = document.createElement("div");
         timelineDiv.className = "timeline";
 
-        var time = new Date(respData[i].pubTime);
+        var time = new Date(results.data[i].pubTime);
 
         var yearP = document.createElement("p");
         var monthP = document.createElement("p");
@@ -505,7 +365,7 @@
         monthP.className = "month";
 
         if(i > 0) {
-          var preTime = new Date(respData[i - 1].pubTime);
+          var preTime = new Date(results.data[i - 1].pubTime);
 
           var preTimeY = preTime.getFullYear();
           var preTimeM = preTime.getMonth();
@@ -538,26 +398,26 @@
         newsContentDiv.className = "news-content";
 
         var link = document.createElement("a");
-        link.setAttribute("href", `${respData[i].href}`);
+        link.setAttribute("href", `${results.data[i].href}`);
         link.setAttribute("target", "_blank");
 
         var titleDiv = document.createElement("div");
         titleDiv.className = "title";
-        titleDiv.innerHTML = respData[i].title;
+        titleDiv.innerHTML = results.data[i].title;
 
         var publisherDiv = document.createElement("div");
         publisherDiv.className = "publisher";
-        publisherDiv.innerHTML = respData[i].publisher;
+        publisherDiv.innerHTML = results.data[i].publisher;
 
         var pubTimeDiv = document.createElement("div");
         pubTimeDiv.className = "pubTime";
-        pubTimeDiv.innerHTML = respData[i].pubTime;
+        pubTimeDiv.innerHTML = results.data[i].pubTime;
 
         var descDiv = document.createElement("div");
         descDiv.className = "desc";
 
         var descP = document.createElement("p");
-        descP.innerHTML = respData[i].description;
+        descP.innerHTML = results.data[i].description;
 
         descDiv.appendChild(descP);
         link.appendChild(titleDiv);
@@ -574,17 +434,16 @@
 
         var tagUl = document.createElement("ul");
 
-        for(let j = 0; j < respData[i].tag.length && j < 5; j++) {
+        for(let j = 0; j < results.data[i].tag.length && j < 5; j++) {
           var tagLi = document.createElement("li");
-          // if(respData[i].tag[j].tagName != name) {
-          if(pol.indexOf(respData[i].tag[j].tagName) == -1) {
-            tagLi.innerHTML = respData[i].tag[j].tagName;
-            if(respData[i].tag[j].tagType === "NRP") {
+          if(results.data[i].tag[j].tagName != name) {
+            tagLi.innerHTML = results.data[i].tag[j].tagName;
+            if(results.data[i].tag[j].tagType === "NRP") {
               tagLi.className = "polTag";
-              tagLi.setAttribute("onclick", `tagCallPol("${respData[i].tag[j].tagName}")`);
+              tagLi.setAttribute("onclick", `tagCallPol("${results.data[i].tag[j].tagName}")`);
             } else {
               tagLi.className = "issueTag";
-              tagLi.setAttribute("onclick", `tagCallIssue("${respData[i].tag[j].tagName}")`);
+              tagLi.setAttribute("onclick", `tagCallIssue("${results.data[i].tag[j].tagName}")`);
             }
             tagUl.appendChild(tagLi);
           }
@@ -600,117 +459,14 @@
       }
     }
 
-    // Compare data 組裝
-    function dataCompareForm(respData, pol) {
-
-      for (let i = 0; i < respData.length; i ++) {
-        // timeDivide
-        var timeDivideDiv = document.createElement("div");
-        timeDivideDiv.className = "timeDivide";
-
-        var timeDivideSpan = document.createElement("span");
-
-        var time = new Date(respData[i].pubTime);
-
-        if(i > 0) {
-          var preRawTime = new Date(respData[i - 1].pubTime);
-
-          var preTime = preRawTime.getFullYear() + " / " + (preRawTime.getMonth() < 10 ? '0' : '') + (preRawTime.getMonth() + 1);
-          var curTime = time.getFullYear() + " / " + (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-
-          if(preTime !== curTime) {
-            timeDivideSpan.innerHTML = curTime;
-            timeDivideDiv.appendChild(timeDivideSpan);
-          } else {
-            timeDivideDiv.style.display = "none";
-          }
-        } else {
-          timeDivideSpan.innerHTML = time.getFullYear() + " / " + (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-          timeDivideDiv.appendChild(timeDivideSpan);
-        }
-
-        appendNews.appendChild(timeDivideDiv);
-
-        var li = document.createElement("li");
-
-
-        // news
-        var newsDiv = document.createElement("div");
-        if(respData[i].tag_id === pol[0]) {
-          li.className = "left";
-          newsDiv.className = "news leftnews";
-        } else if (respData[i].tag_id === pol[1]) {
-          li.className = "right";
-          newsDiv.className = "news rightnews";
-        } else {
-          li.className = "center";
-          newsDiv.className = "news centernews";
-        }
-
-        var newsContentDiv = document.createElement("div");
-        newsContentDiv.className = "news-content";
-
-        var link = document.createElement("a");
-        link.setAttribute("href", `${respData[i].href}`);
-        link.setAttribute("target", "_blank");
-
-        var titleDiv = document.createElement("div");
-        titleDiv.className = "title";
-        titleDiv.innerHTML = respData[i].title;
-
-        var publisherDiv = document.createElement("div");
-        publisherDiv.className = "publisher";
-        publisherDiv.innerHTML = respData[i].publisher;
-
-        var pubTimeDiv = document.createElement("div");
-        pubTimeDiv.className = "pubTime";
-        pubTimeDiv.innerHTML = respData[i].pubTime;
-
-        var descDiv = document.createElement("div");
-        descDiv.className = "desc";
-
-        var descP = document.createElement("p");
-        descP.innerHTML = respData[i].content;
-
-        descDiv.appendChild(descP);
-        link.appendChild(titleDiv);
-        link.appendChild(publisherDiv);
-        link.appendChild(pubTimeDiv);
-        link.appendChild(descDiv);
-
-        newsContentDiv.appendChild(link);
-        newsDiv.appendChild(newsContentDiv);
-
-        // 組合
-        li.appendChild(newsDiv);
-
-        appendNews.appendChild(li);
-      }
-    }
-
-    // 移除子項目
-    function removeData(item) {
-      var child = item.lastElementChild;
+    function removeData() {
+      var child = appendNews.lastElementChild;
       while(child) {
-        item.removeChild(child);
-        child = item.lastElementChild;
+        appendNews.removeChild(child);
+        child = appendNews.lastElementChild;
       }
     }
 
-    // 點擊 tag 更新 filter HL
-    function addHLByTag(item, className) {
-      var polClasses = document.getElementsByClassName(className),
-          results = [];
-      for(var i = 0; i < polClasses.length; i++) {
-        var content = polClasses[i].innerText;
-        if (content.indexOf(item) != -1) {
-          results.push(polClasses[i]);
-          polClasses[i].classList.add("innerHighlight")
-        }
-      }
-    }
-
-    // 標籤顯示處理 -> CSS??
     function tagShow() {
 
       let tagJudge = document.getElementsByClassName("content")[0].offsetWidth;
@@ -728,7 +484,6 @@
         renderTagsShow.forEach(tagShow => tagShow.style.display = "none");
       }
     }
-
 
   </script>
 
