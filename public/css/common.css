@@ -408,6 +408,7 @@ main {
 .newslist .newsTags .issueTag,
 .renderTags .issueTag {
   background-color: #FFFFFF;
+	cursor: pointer;
 }
 
 .newslist .newsTags .issueTag:hover,
