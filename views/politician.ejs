@@ -349,18 +349,14 @@
       }));
     }
 
-    let tagParam = {};
-    let tagPolList = [];
-    let tagIssueList = [];
-
     // 新聞旁標籤點選切換
     function tagCallPol(pol) {
-      tagPolList = [];
-      tagIssueList = [];
-      tagPolList.push(pol);
-      tagParam.pol = tagPolList;
-      tagParam.issue = tagIssueList;
-      getNews(tagParam);
+      polList = [];
+      issueList = [];
+      polList.push(pol);
+      param.pol = polList;
+      param.issue = issueList;
+      getNews(param);
 
       people.forEach(function(person) {
         if(person.classList.contains("innerHighlight")) {
