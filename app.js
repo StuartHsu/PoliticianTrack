@@ -58,6 +58,16 @@ app.get('/politician', async function(req, res) {
   });
 });
 
+// Compare page
+app.get('/compare', async function(req, res) {
+  let polsResults = await polsData.get();
+  let issuesResults = await issuesData.get();
+  res.render('compare', {
+    polsData: polsResults,
+    issuesData: issuesResults
+  });
+});
+
 // hots page
 app.get('/hots', async function(req, res) {
   let results = await hotsData.getPol();

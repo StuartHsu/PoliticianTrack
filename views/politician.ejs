@@ -19,6 +19,9 @@
           <a href="./politician">篩選</a>
         </div>
         <div class="item">
+          <a href="./compare">比較</a>
+        </div>
+        <div class="item">
           <a href="./hots">熱門</a>
         </div>
       </nav>
@@ -105,7 +108,7 @@
                 <% issuesData.forEach(function(result){ %>
                   <li class="issue"><%= result.name %></li>
                 <% }); %>
-                <li class="issue">一個中國</li>
+                <!-- <li class="issue">一個中國</li> -->
               </div>
             </ul>
           </div>
@@ -122,15 +125,6 @@
           <div class="titleIssue" id="titleIssue"><%= issue %></div>
 
         </div>
-
-        <div class="top" id="compareTop">
-
-          <div class="titleName" id="compTitleName1"></div>
-          <div class="titleIssue" id="compTitleIssue"></div>
-          <div class="titleName" id="compTitleName2"></div>
-
-        </div>
-
         <div class="newslist scrollBar" id="oncomingNews">
           <ul class="ulNews">
             <% for(let i = 0; i < results.length; i++) { %>
@@ -160,18 +154,18 @@
                 <p class="month"><%= (renderTime.getMonth() < 10 ? '0' : '') + (renderTime.getMonth() + 1) %></p>
               <% } %>
               </div>
-              <div class="news">
+
+              <a class="news" href="<%= results[i].href %>" target="_blank">
                 <div class="news-content">
-                  <a href="<%= results[i].href %>" target="_blank">
-                    <div class="title"><%= results[i].title %></div>
-                    <div class="publisher"><%= results[i].publisher %></div>
-                    <div class="pubTime"><%= results[i].pubTime %></div>
-                    <div class="desc">
-                      <p><%= results[i].description %></p>
-                    </div>
-                  </a>
+                  <div class="title"><%= results[i].title %></div>
+                  <div class="publisher"><%= results[i].publisher %></div>
+                  <div class="pubTime"><%= results[i].pubTime %></div>
+                  <div class="desc">
+                    <p><%= results[i].description %></p>
+                  </div>
                 </div> <!-- news-content End -->
-              </div> <!-- news End -->
+              </a> <!-- news End -->
+
               <div class="renderTags">
                 <ul>
                   <% for(let j = 0; j < results[i].tag.length && j < 5; j++) { %>
@@ -204,32 +198,19 @@
   <script>
 
     const filters = document.querySelectorAll('.filter');
-    const filterItems = document.querySelectorAll('.filterItems');
     const mainFilter = document.querySelector('.mainFilter');
     const partyList = document.querySelector('.partyList');
-    // const regionList = document.querySelector('.regionList');
 
     const people = document.querySelectorAll('.person');
     const issues = document.querySelectorAll('.issue');
     const parties = document.querySelectorAll('.party');
-    // const regions = document.querySelectorAll('.region');
 
-    const defaultTop = document.getElementById("defaultTop");
-    const compareTop = document.getElementById("compareTop");
-    const appendNewsP = document.getElementById("appendNewsP");
     const appendNews = document.getElementById("appendNews");
-    const appendPols = document.getElementById('appendPols');
 
     // Pol, Issue record
     let param = {};
     let polList = [];
     let issueList = [];
-
-    // people eventListener use
-    let firstPolName;
-    let firstPolClass;
-    let oldFirstPolName;
-    let oldFirstPolClass;
 
     //------------ User click ------------
 
@@ -243,12 +224,6 @@
         switch(chooseFilter) {
           case "main":
             mainFilter.style.display = "none";
-            if(Object.getOwnPropertyNames(param).length > 1) {
-              if(param.pol.length === 2 && param.issue.length === 1) {
-                hideTitle(defaultTop, compareTop, "flex");
-                getCompare(param);
-              }
-            }
             break;
           case "party":
             partyList.style.display = "none";
@@ -261,12 +236,6 @@
         switch(chooseFilter) {
           case "main":
             mainFilter.style.display = "flex";
-            if(Object.getOwnPropertyNames(param).length > 1) {
-              if(param.pol.length === 2 && param.issue.length === 1) {
-                hideTitle(compareTop, defaultTop, "block");
-                getNews(param);
-              }
-            }
             break;
           case "party":
             partyList.style.display = "block";
@@ -281,27 +250,10 @@
     people.forEach(person => person.addEventListener('click', function(event) {
       polList = []; // 清空
       if(this.classList.contains("innerHighlight")) {
-        if(this.innerText === oldFirstPolName) {
-          this.classList.remove("innerHighlight");
-          oldFirstPolName = "";
-          firstPolName = "";
-        } else {
-          this.classList.remove("innerHighlight");
-          firstPolName = oldFirstPolName;
-          firstPolClass = oldFirstPolClass;
-        }
+        this.classList.remove("innerHighlight");
       } else {
-        if(firstPolName) {
-          oldFirstPolName = firstPolName;
-          oldFirstPolClass = firstPolClass;
-          people.forEach(r => r.classList.remove("innerHighlight"));
-          firstPolClass.add("innerHighlight");
-          this.classList.add("innerHighlight");
-        } else {
-          this.classList.add("innerHighlight");
-        }
-        firstPolName = event.target.innerText;
-        firstPolClass = event.target.classList;
+        people.forEach(r => r.classList.remove("innerHighlight"));
+        this.classList.add("innerHighlight");
       }
 
       people.forEach(function(person) {
@@ -368,10 +320,7 @@
           issue.classList.remove("innerHighlight");
         }
       });
-      firstPolName = "";
-      firstPolClass = "";
-      oldFirstPolName = "";
-      oldFirstPolClass = "";
+
       addHLByTag(pol, "person");
     }
 
@@ -417,37 +366,7 @@
       });
     }
 
-    // Get compare DB data
-    function getCompare(param) {
-      $.ajax({
-        url: "api/news/getNews",
-        type: "POST",
-        data: JSON.stringify(param),
-        contentType: "application/json; charset=utf-8",
-        success: function(resp) {
-          removeData(appendNews);
-          changeCompTitle(param.pol, param.issue);
-          dataCompareForm(resp.data, param.pol);
-          tagShow();
-        }
-      });
-    }
-
     //------------ Function ------------
-
-    // 移除重複點擊
-    function toggle(condition, events) {
-      if(!condition) {
-        condition = event.target.innerText;
-      } else {
-        if(condition === event.target.innerText) {
-          condition = '';
-        } else {
-          condition = event.target.innerText;
-        }
-      }
-      return condition;
-    }
 
     // 更改原始標題
     function changeTitle(polName, issueName) {
@@ -466,23 +385,6 @@
         titleName.innerHTML = polName;
         titleIssue.innerHTML = issueName;
       }
-    }
-
-    // 更改比較標題
-    function changeCompTitle(polName, issueName) {
-      let compTitleName1 = document.getElementById("compTitleName1");
-      let compTitleIssue = document.getElementById("compTitleIssue");
-      let compTitleName2 = document.getElementById("compTitleName2");
-
-      compTitleName1.innerHTML = polName[0];
-      compTitleIssue.innerHTML = issueName;
-      compTitleName2.innerHTML = polName[1];
-    }
-
-    // 隱藏標題
-    function hideTitle(hideTitle, disTitle, style) {
-      hideTitle.style.display = "none";
-      disTitle.style.display = style;
     }
 
     // Data 組裝
@@ -531,15 +433,13 @@
         timelineDiv.appendChild(monthP);
 
         // news
-        var newsDiv = document.createElement("div");
-        newsDiv.className = "news";
+        var link = document.createElement("a");
+        link.className = "news";
+        link.setAttribute("href", `${respData[i].href}`);
+        link.setAttribute("target", "_blank");
 
         var newsContentDiv = document.createElement("div");
         newsContentDiv.className = "news-content";
-
-        var link = document.createElement("a");
-        link.setAttribute("href", `${respData[i].href}`);
-        link.setAttribute("target", "_blank");
 
         var titleDiv = document.createElement("div");
         titleDiv.className = "title";
@@ -559,14 +459,14 @@
         var descP = document.createElement("p");
         descP.innerHTML = respData[i].description;
 
-        descDiv.appendChild(descP);
-        link.appendChild(titleDiv);
-        link.appendChild(publisherDiv);
-        link.appendChild(pubTimeDiv);
-        link.appendChild(descDiv);
 
-        newsContentDiv.appendChild(link);
-        newsDiv.appendChild(newsContentDiv);
+        descDiv.appendChild(descP);
+        newsContentDiv.appendChild(titleDiv);
+        newsContentDiv.appendChild(publisherDiv);
+        newsContentDiv.appendChild(pubTimeDiv);
+        newsContentDiv.appendChild(descDiv);
+
+        link.appendChild(newsContentDiv);
 
         // tags
         var tagsDiv = document.createElement("div");
@@ -593,96 +493,8 @@
 
         // 組合
         li.appendChild(timelineDiv);
-        li.appendChild(newsDiv);
+        li.appendChild(link);
         li.appendChild(tagsDiv);
-
-        appendNews.appendChild(li);
-      }
-    }
-
-    // Compare data 組裝
-    function dataCompareForm(respData, pol) {
-
-      for (let i = 0; i < respData.length; i ++) {
-        // timeDivide
-        var timeDivideDiv = document.createElement("div");
-        timeDivideDiv.className = "timeDivide";
-
-        var timeDivideSpan = document.createElement("span");
-
-        var time = new Date(respData[i].pubTime);
-
-        if(i > 0) {
-          var preRawTime = new Date(respData[i - 1].pubTime);
-
-          var preTime = preRawTime.getFullYear() + " / " + (preRawTime.getMonth() < 10 ? '0' : '') + (preRawTime.getMonth() + 1);
-          var curTime = time.getFullYear() + " / " + (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-
-          if(preTime !== curTime) {
-            timeDivideSpan.innerHTML = curTime;
-            timeDivideDiv.appendChild(timeDivideSpan);
-          } else {
-            timeDivideDiv.style.display = "none";
-          }
-        } else {
-          timeDivideSpan.innerHTML = time.getFullYear() + " / " + (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
-          timeDivideDiv.appendChild(timeDivideSpan);
-        }
-
-        appendNews.appendChild(timeDivideDiv);
-
-        var li = document.createElement("li");
-
-
-        // news
-        var newsDiv = document.createElement("div");
-        if(respData[i].tag_id === pol[0]) {
-          li.className = "left";
-          newsDiv.className = "news leftnews";
-        } else if (respData[i].tag_id === pol[1]) {
-          li.className = "right";
-          newsDiv.className = "news rightnews";
-        } else {
-          li.className = "center";
-          newsDiv.className = "news centernews";
-        }
-
-        var newsContentDiv = document.createElement("div");
-        newsContentDiv.className = "news-content";
-
-        var link = document.createElement("a");
-        link.setAttribute("href", `${respData[i].href}`);
-        link.setAttribute("target", "_blank");
-
-        var titleDiv = document.createElement("div");
-        titleDiv.className = "title";
-        titleDiv.innerHTML = respData[i].title;
-
-        var publisherDiv = document.createElement("div");
-        publisherDiv.className = "publisher";
-        publisherDiv.innerHTML = respData[i].publisher;
-
-        var pubTimeDiv = document.createElement("div");
-        pubTimeDiv.className = "pubTime";
-        pubTimeDiv.innerHTML = respData[i].pubTime;
-
-        var descDiv = document.createElement("div");
-        descDiv.className = "desc";
-
-        var descP = document.createElement("p");
-        descP.innerHTML = respData[i].content;
-
-        descDiv.appendChild(descP);
-        link.appendChild(titleDiv);
-        link.appendChild(publisherDiv);
-        link.appendChild(pubTimeDiv);
-        link.appendChild(descDiv);
-
-        newsContentDiv.appendChild(link);
-        newsDiv.appendChild(newsContentDiv);
-
-        // 組合
-        li.appendChild(newsDiv);
 
         appendNews.appendChild(li);
       }
