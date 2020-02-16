@@ -46,11 +46,20 @@ app.use('/tagFilterCount', tagFilterCount);
 
 // filter page render data when 1st coming
 app.get('/politician', async function(req, res) {
-  let results = await newData.listTag('title', '');
+  let tagName;
+  let results;
+  if(req.query.tag) {
+    tagName = req.query.tag;
+    results = await newData.getNoIssNews(tagName);
+  } else {
+    tagName = '總覽';
+    results = await newData.listTag('title', '');
+  }
+  // let results = await newData.listTag('title', '');
   let polsResults = await polsData.get();
   let issuesResults = await issuesData.get();
   res.render('politician', {
-    title: '總覽',
+    title: tagName,
     issue: '',
     results: results,
     polsData: polsResults,
@@ -77,7 +86,6 @@ app.get('/hots', async function(req, res) {
     // subIssues: subIssues
   });
 });
-
 
 
 

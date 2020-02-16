@@ -20,6 +20,7 @@
 
       <div class="enter">
         <a href="./politician" class="button" id="filterPage">篩選</a>
+        <a href="./compare" class="button" id="filterPage">比較</a>
         <a href="./hots" class="button" id="hotsPage">熱門</a>
       </div>
 
@@ -89,6 +90,13 @@
         // set the chart container
         chart.container("wordCloud");
         chart.draw();
+        // add an event listener
+        chart.listen("pointClick", function(e){
+          // var url = "/indextag/" + e.point.get("x");
+          var url = "/politician?tag=" + e.point.get("x");
+          // var url = "/politician";
+          window.open(url, "_self");
+        });
       }
 
     </script>
