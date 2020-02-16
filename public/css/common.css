@@ -71,8 +71,7 @@ header>.feature:hover,
 .sidenav .filter:hover,
 .sidenav .politician .person:hover,
 .sidenav .issueList .issue:hover,
-.sidenav .partyList li:hover,
-.sidenav .regionList li:hover {
+.sidenav .partyList li:hover {
 	color: #FFD479;
 	transition: color .2s linear;
 }
@@ -102,7 +101,6 @@ main {
 
 /* filters */
 .filters {
-	/* flex: 1; */
 	width: 120px;
 	height: calc(100vh - 80px);
 	background-color: #232323;
@@ -115,7 +113,6 @@ main {
 
 /* politician */
 .sidenav .politician {
-	/* flex: 1; */
 	width: 120px;
 	background-color: #000000;
 	border-right: 1px solid #262626;
@@ -128,7 +125,6 @@ main {
 
 /* issue */
 .sidenav .issueList {
-	/* flex: 1.5; */
 	width: 150px;
 	background-color: #000000;
 }
@@ -141,17 +137,6 @@ main {
 /* party */
 .sidenav .partyList {
 	display: none;
-	/* flex: 1.5; */
-	width: 170px;
-	height: calc(100vh - 80px);
-	overflow-y: scroll;
-	background-color: #000000;
-}
-
-/* region */
-.sidenav .regionList {
-	display: none;
-	/* flex: 1.5; */
 	width: 170px;
 	height: calc(100vh - 80px);
 	overflow-y: scroll;
@@ -160,7 +145,6 @@ main {
 
 .sidenav .filter {
 	padding: 20px 0;
-  /* margin: 20px 0; */
 }
 
 .sidenav .filter a {
@@ -171,8 +155,7 @@ main {
 .sidenav .filter,
 .sidenav .politician li,
 .sidenav .issueList li,
-.sidenav .partyList li,
-.sidenav .regionList li {
+.sidenav .partyList li {
 	color: #FFFFFF;
 	letter-spacing: 3px;
 	text-indent: 3px;
@@ -189,12 +172,6 @@ main {
 	padding-bottom: 10px;
 	font-size: 1.5rem;
 }
-
-/* .box{
-    width:100px;
-    height:100px;
-    background-color:#ccc
-  } */
 
 .politician .box-border {
   position: relative;
@@ -214,20 +191,13 @@ main {
 
 /* content */
 .content {
-	/* flex: 2; */
 	width: 100%;
 	height: 85vh;
 	padding: 0 30px;
-	/* margin-top: 20px; */
 	margin: 20px 10px 0;
 }
 
 .content .top {
-	height: 120px;
-}
-
-.content .top#compareTop {
-	display: none;
 	height: 120px;
 }
 
@@ -243,31 +213,6 @@ main {
 	font-weight: 500;
 	font-size: 1.2rem;
 	margin-bottom: 15px;
-}
-
-.content #compareTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.content #compareTop .titleName {
-	display: inline-block;
-	font-weight: bold;
-	font-size: 3rem;
-	margin-bottom: 10px;
-}
-
-.content #compareTop .titleIssue {
-	display: inline-block;
-  letter-spacing: 2px;
-	font-weight: 500;
-	font-size: 1.2rem;
-  padding: 5px 10px;
-  color: #FFFFFF;
-  background-color: #FF9300;
-  border: 1px solid #FF9300;
-  border-radius: 1.2rem;
 }
 
 .content>.newslist {
@@ -292,51 +237,9 @@ main {
   flex: 7;
 }
 
-.ulNews .news.rightnews {
-  color: #000000;
-  background-color: rgba(23,23,23, .1)
-}
-
-.ulNews .news.centernews {
-  max-width: 100%;
-  color: #FFFFFF;
-  background-color: #232323;
-}
-
-.ulNews .news.centernews .title {
-  font-size: 1.5rem;
-}
-
-.ulNews .news.centernews .desc {
-  font-size: 1.3rem;
-}
-
-.news.centernews .news-content p {
-	-webkit-line-clamp: 3;
-}
-
 .newslist>ul>li {
   display: flex;
   align-items: center;
-  /* justify-content: space-between; */
-}
-
-.newslist>ul>li.left {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.newslist>ul>li.right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.newslist>ul>li.center {
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
 }
 
 .newslist>ul {
@@ -420,7 +323,6 @@ main {
 .news>.news-content .title {
 	font-size: 1.3rem;
 	margin-bottom: 10px;
-
 }
 
 .news>.news-content .publisher {
@@ -430,6 +332,7 @@ main {
 }
 
 .news>.news-content .pubTime {
+	font-size: .7rem;
 	display: inline-block;
 	margin-bottom: 10px;
 }
@@ -447,7 +350,6 @@ main {
 	-webkit-box-orient: vertical;
 }
 
-
 .highlight {
 	background-color: #000000;
 }
@@ -455,7 +357,6 @@ main {
 .innerHighlight {
 	background-color: #424242;
 }
-
 
 .scrollBar::-webkit-scrollbar {
 	width: 6px;
@@ -473,25 +374,6 @@ main {
   background-color: #000000;
 }
 
-/* .content.scrollBar::-webkit-scrollbar {
-	width: 6px;
-  background-color: #DCDCDC;
-}
-
-.content.scrollBar::-webkit-scrollbar-thumb {
-	border-radius: 10px;
-  background-color: #424242;
-}
-
-.content.scrollBar::-webkit-scrollbar-track {
-	border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-  background-color: #DCDCDC;
-} */
-
-
-
-
 .newslist.scrollBar::-webkit-scrollbar {
 	width: 6px;
   background-color: #DCDCDC;
@@ -508,25 +390,6 @@ main {
   background-color: #DCDCDC;
 }
 
-
-
-
-
-.timeDivide {
-  height: 1px;
-  border: 0;
-  background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
-  text-align: center;
-  margin: 25px 0;
-}
-
-.timeDivide span {
-  font-size: 1.3rem;
-  position: relative;
-  top: -11px;
-  background: #FFFFFF;
-  padding: 0 20px;
-}
 
 
 .button {

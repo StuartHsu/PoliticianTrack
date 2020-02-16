@@ -1,233 +1,11 @@
+@import "common.css";
 
-
-html, body {
-	margin: 0px;
-}
-
-body {
-	font-size: 16px;
-	font-family: "Noto Sans TC", "微軟正黑體", "新細明體", arial, sans-serif;
-	color: #3F3A3A;
-}
-
-form {
-	margin: 0px;
-  padding: 0px;
-}
-
-a {
-	text-decoration: none;
-  color: inherit;
-}
-
-h1, h3, h4, p {
-	margin: 0;
-}
-
-input,select,img {
-	vertical-align: middle;
-}
-
-ul, li {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* header */
-header {
-	display: flex;
-  height: 80px;
-  color: #FFFFFF;
-  background-color: #232323;
-	align-items: center;
-  box-shadow: 0 1px 3px rgba(35,35,35, 0.7);
-}
-
-header>.logo {
-	flex: none;
-  font-size: 1.5rem;
-  line-height: 1.5rem;
-	letter-spacing: 4px;
-  width: 250px;
-  margin-left: 30px;
-}
-
-header>nav {
-	flex: auto;
-  display: flex;
-}
-
-header>nav>.item {
-	flex: none;
-  width: 90px;
-  letter-spacing: 25px;
-  margin-left: 30px;
-	border-right: 1px solid #FFFFFF;
-  text-align: center;
-	cursor: pointer;
-}
-
-header>nav>.item:hover,
-header>.feature:hover,
-.sidenav .filter:hover,
-.sidenav .politician .person:hover,
-.sidenav .issueList .issue:hover,
-.sidenav .partyList li:hover,
-.sidenav .regionList li:hover {
-	color: #FFD479;
-	transition: color .2s linear;
-}
-
-header>nav>.item:last-child {
-	border-right-width: 0px;
-}
-
-header>.feature {
-	flex: none;
-  margin-right: 30px;
-}
-
-main {
-	display: flex;
-	align-items: flex-start;
-	justify-content: center;
-}
-
-/* sidenav */
-.sidenav {
-	flex: 1;
-	display: flex;
-	justify-content: space-around;
-	margin: 0;
-}
-
-/* filters */
-.filters {
-	/* flex: 1; */
-	width: 120px;
-	height: 89.6vh;
-	background-color: #232323;
-}
-
-.sidenav .mainFilter {
-	display: none;
-	justify-content: center;
-}
-
-/* politician */
-.sidenav .politician {
-	/* flex: 1; */
-	width: 120px;
-	background-color: #000000;
-	border-right: 1px solid #262626;
-}
-
-.sidenav .politician .inner {
-	height: 79.8vh;
-	overflow-y: scroll;
-}
-
-/* issue */
-.sidenav .issueList {
-	/* flex: 1.5; */
-	width: 150px;
-	background-color: #000000;
-}
-
-.sidenav .issueList .inner {
-	height: 79.8vh;
-	overflow-y: scroll;
-}
-
-/* party */
-.sidenav .partyList {
-	display: none;
-	/* flex: 1.5; */
-	width: 170px;
-	height: 89.6vh;
-	overflow-y: scroll;
-	background-color: #000000;
-}
-
-/* region */
-.sidenav .regionList {
-	display: none;
-	/* flex: 1.5; */
-	width: 170px;
-	height: 89.6vh;
-	overflow-y: scroll;
-	background-color: #000000;
-}
-
-.sidenav .filter {
-	padding: 20px 0;
-  /* margin: 20px 0; */
-}
-
-.sidenav .filter a {
-  font-size: 1.3rem;
-  margin: 20px 0;
-}
-
-.sidenav .filter,
-.sidenav .politician li,
-.sidenav .issueList li,
-.sidenav .partyList li,
-.sidenav .regionList li {
-	color: #FFFFFF;
-	letter-spacing: 3px;
-	text-indent: 3px;
-  display: block;
-	text-align: center;
-  font-size: 1rem;
-  padding: 20px 0;
-	cursor: pointer;
-}
-
-/* 人物、議題標題 */
-.sidenav .politician li.personTitle,
-.sidenav .issueList li.issueTitle {
-	padding-bottom: 10px;
-	font-size: 1.5rem;
-}
-
-/* .box{
-    width:100px;
-    height:100px;
-    background-color:#ccc
-  } */
-
-.politician .box-border {
-  position: relative;
-  left: 24.5px;
-  width: 70px;
-	margin-bottom: 10px;
-  border-bottom: 1.5px solid #FFFFFF;
-}
-
-.issueList .box-border {
-  position: relative;
-  left: 31px;
-  width: 88px;
-	margin-bottom: 10px;
-  border-bottom: 1.5px solid #FFFFFF;
-}
-
-/* content */
-.content {
-	/* flex: 2; */
-	width: 100%;
-	height: 85vh;
-	overflow-y: scroll;
-	padding: 0 30px;
-	/* margin-top: 20px; */
-	margin: 20px 10px 0;
-}
+/* title */
 
 .content .top {
-  display: flex;
-  justify-content: space-between;
+	height: 120px;
+	display: flex;
+	justify-content: space-around;
   align-items: center;
 }
 
@@ -250,27 +28,17 @@ main {
   border-radius: 1.2rem;
 }
 
-.content>.newslist {
-	display: flex;
-	flex-wrap: wrap;
+.content .titleName.point {
+	color: #808080;
 }
 
-/* news */
-.news {
-  max-width: 600px;
-  /* height: 100px; */
-	/* width: 760px; */
-	margin: 10px 0px 10px 0;
-	padding: 15px;
-	border: 1px solid #232323;
-	border-radius: 10px;
-	box-shadow: 0 1px 3px rgba(35,35,35, 0.7);
+.content .titleIssue.point {
+	background-color: #808080;
+	border: 1px solid #808080;
 }
 
-.ulNews .news {
-  flex: 7;
-}
 
+/* news content */
 
 .ulNews .news.rightnews {
   color: #000000;
@@ -278,7 +46,7 @@ main {
 }
 
 .ulNews .news.centernews {
-  max-width: 900px;
+  max-width: 100%;
   color: #FFFFFF;
   background-color: #232323;
 }
@@ -295,207 +63,51 @@ main {
 	-webkit-line-clamp: 3;
 }
 
-.newslist>ul>li.left {
+.newslist>ul>li {
+  display: block;
+}
+
+.newslist>ul>li .left {
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
 
-.newslist>ul>li.right {
+.newslist>ul>li .right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
-.newslist>ul>li.center {
+.newslist>ul>li .center {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
 }
 
-
-
-
-.newslist>ul {
-  width: 100%;
-  padding: 1em 2em 0;
-  margin: 0;
-  list-style: none;
-  position: relative;
+.click {
+	display: flex;
 }
 
-.newslist .timeline.leftTime {
-  flex: .5;
-  margin-right: 20px;
-}
-
-.newslist .timeline.rightTime {
-  text-align: right;
-  flex: .5;
-  margin-left: 20px;
-}
-
-.timeline .year {
-  color: #454545;
-  font-weight: bold;
-  font-size: 1.5rem;
-  margin-bottom: 5px;
-}
-
-.timeline .month {
-  color: #929292;
-  font-weight: 200;
-  font-size: 1.3rem;
-}
-
-.newslist .newsTags {
-  flex: 2;
+/* 預先隱藏 */
+.ulNews .news .news-content .publisher.hidden,
+.ulNews .news .news-content .desc.hidden {
   display: none;
-  margin-left: 50px;
 }
 
-.newslist .renderTags {
-  flex: 2;
-  margin-left: 50px;
+.news>.news-content .title.hidden {
+	margin-bottom: 0;
 }
 
-.newslist .newsTags>ul,
-.newslist .renderTags>ul {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+.news>.news-content .pubTime.hidden {
+	margin-bottom: 0;
 }
 
-.newslist .newsTags>ul>li,
-.newslist .renderTags>ul>li {
-  font-size: 1rem;
-  padding: 5px 10px;
-  border: 1px solid #000000;
-  border-radius: 15px;
-  margin: 5px;
+.ulNews a.disabled {
+  pointer-events: none;
 }
 
-.newslist .newsTags .polTag,
-.renderTags .polTag {
-	color: #FFFFFF;
-  background-color: #232323;
-	cursor: pointer;
-}
-
-.newslist .newsTags .polTag:hover,
-.renderTags .polTag:hover {
-	color: #3F3A3A;
-  background-color: #FFFFFF;
-}
-
-.newslist .newsTags .issueTag,
-.renderTags .issueTag {
-  background-color: #FFFFFF;
-}
-
-.newslist .newsTags .issueTag:hover,
-.renderTags .issueTag:hover {
-	color: #FFFFFF;
-  background-color: #232323;
-}
-
-.news>.news-content .title {
-	font-size: 1.3rem;
-	margin-bottom: 10px;
-
-}
-
-.news>.news-content .publisher {
-	display: inline-block;
-	margin-bottom: 10px;
-	margin-right: 10px;
-}
-
-.news>.news-content .pubTime {
-	display: inline-block;
-	margin-bottom: 10px;
-}
-
-.news>.news-content .desc {
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.news>.news-content p {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
-}
-
-
-.highlight {
-	background-color: #000000;
-}
-
-.innerHighlight {
-	background-color: #424242;
-}
-
-
-.scrollBar::-webkit-scrollbar {
-	width: 6px;
-  background-color: #000000;
-}
-
-.scrollBar::-webkit-scrollbar-thumb {
-	border-radius: 10px;
-  background-color: #2C2C2C;
-}
-
-.scrollBar::-webkit-scrollbar-track {
-	border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-  background-color: #000000;
-}
-
-.content.scrollBar::-webkit-scrollbar {
-	width: 6px;
-  background-color: #DCDCDC;
-}
-
-.content.scrollBar::-webkit-scrollbar-thumb {
-	border-radius: 10px;
-  background-color: #424242;
-}
-
-.content.scrollBar::-webkit-scrollbar-track {
-	border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-  background-color: #DCDCDC;
-}
-
-
-
-
-.button {
-  font-family: "Varela Round", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 500;
-  color: white;
-  background: #384047;
-  display: inline-block;
-  margin: 10px 15px;
-  padding: 4px 15px;
-  border: 1px solid #384047;
-  border-radius: 5px;
-  box-shadow: 0 2px 0 0 #384047;
-  cursor: pointer;
-  vertical-align: middle;
-  transition: 0.3s;
-}
-
-.button:hover {
-  background: #8d9aa5;
-  border-color: #8d9aa5;
-  box-shadow: 0 2px 0 0 #8d9aa5;
-}
-
+/* time divide */
 
 .timeDivide {
   height: 1px;
@@ -513,10 +125,14 @@ main {
   padding: 0 20px;
 }
 
+#appendNewsP {
+	display: flex;
+}
 
-
-
-
-
-
-/* End */
+#tips {
+	font-size: 1.5rem;
+	line-height: 1.5rem;
+	width: 100%;
+	text-align: center;
+	margin-top: 20px;
+}
