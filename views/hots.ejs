@@ -99,6 +99,7 @@
     var preSublistId;
 
     tabsTitle.forEach(tabTitle => tabTitle.addEventListener('click', function(event) {
+      preSublistId = "";
       removeData(oncomingLists); // 刪除預先載入的資料
       if(this.nextElementSibling.classList.contains("toggle")) {
         tabsTitle.forEach(r => r.nextElementSibling.classList.add("toggle"));
@@ -140,17 +141,17 @@
         method: "GET",
         success: function(resp) {
           if(preSublistId) {
-            if(preSublistId != tag_id) {
+            if(preSublistId != tag_id) { // 點擊展開外的
               let removeList = document.getElementById(preSublistId);
               removeData(removeList);
               subDataForm(tag_id, resp.data);
               preSublistId = tag_id;
-            } else {
+            } else { // 點擊原本展開的
               removeList = document.getElementById(tag_id);
               removeData(removeList);
               preSublistId = "";
             }
-          } else {
+          } else { // 什麼都沒展開
             subDataForm(tag_id, resp.data);
             preSublistId = tag_id;
           }
