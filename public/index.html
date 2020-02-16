@@ -92,7 +92,7 @@
         chart.draw();
         // add an event listener
         chart.listen("pointClick", function(e){
-          var url = "/politician?tag=" + e.point.get("x");
+          var url = "/politician?pol=" + e.point.get("x");
           window.open(url, "_self");
         });
       }

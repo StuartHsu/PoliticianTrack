@@ -46,21 +46,27 @@ app.use('/tagFilterCount', tagFilterCount);
 
 // filter page render data when 1st coming
 app.get('/politician', async function(req, res) {
-  let tagName;
+  let pol;
+  let issue;
   let results;
-  if(req.query.tag) {
-    tagName = req.query.tag;
-    results = await newData.getNoIssNews(tagName);
-  } else {
-    tagName = '總覽';
+  if(req.query.pol && req.query.issue) { // hot page's subList 過來
+    pol = req.query.pol;
+    issue = req.query.issue;
+    results = await newData.getPolIssNews(pol, issue);
+  } else if(req.query.pol && !req.query.issue) { // index 點擊過來
+    pol = req.query.pol;
+    issue = '';
+    results = await newData.getNoIssNews(pol);
+  } else { // 篩選進來預設
+    pol = '總覽';
+    issue = '';
     results = await newData.listTag('title', '');
   }
-  // let results = await newData.listTag('title', '');
   let polsResults = await polsData.get();
   let issuesResults = await issuesData.get();
   res.render('politician', {
-    title: tagName,
-    issue: '',
+    title: pol,
+    issue: issue,
     results: results,
     polsData: polsResults,
     issuesData: issuesResults
@@ -80,10 +86,8 @@ app.get('/compare', async function(req, res) {
 // hots page
 app.get('/hots', async function(req, res) {
   let results = await hotsData.getPol();
-  // let subIssues = await hotsData.getSubIssue();
   res.render('hots', {
     results: results
-    // subIssues: subIssues
   });
 });
 
