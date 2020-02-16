@@ -95,6 +95,14 @@
   display: none;
 }
 
+.news>.news-content .title.hidden {
+	margin-bottom: 0;
+}
+
+.news>.news-content .pubTime.hidden {
+	margin-bottom: 0;
+}
+
 .ulNews a.disabled {
   pointer-events: none;
 }

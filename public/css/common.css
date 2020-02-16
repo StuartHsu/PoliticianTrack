@@ -323,7 +323,6 @@ main {
 .news>.news-content .title {
 	font-size: 1.3rem;
 	margin-bottom: 10px;
-
 }
 
 .news>.news-content .publisher {
@@ -333,6 +332,7 @@ main {
 }
 
 .news>.news-content .pubTime {
+	font-size: .7rem;
 	display: inline-block;
 	margin-bottom: 10px;
 }

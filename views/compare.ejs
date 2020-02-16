@@ -346,11 +346,9 @@
         appendNews.appendChild(timeDivideDiv);
 
         var li = document.createElement("li");
-        // li.setAttribute("onclick", "readMore()");
 
         var clickDiv = document.createElement("div");
         clickDiv.setAttribute("onclick", "readMore()");
-        // clickDiv.className = "click";
 
         // news
         var link = document.createElement("a");
@@ -372,7 +370,7 @@
         newsContentDiv.className = "news-content";
 
         var titleDiv = document.createElement("div");
-        titleDiv.className = "title";
+        titleDiv.className = "title hidden";
         titleDiv.innerHTML = respData[i].title;
 
         var publisherDiv = document.createElement("div");
@@ -380,7 +378,7 @@
         publisherDiv.innerHTML = respData[i].publisher;
 
         var pubTimeDiv = document.createElement("div");
-        pubTimeDiv.className = "pubTime";
+        pubTimeDiv.className = "pubTime hidden";
         pubTimeDiv.innerHTML = respData[i].pubTime;
 
         var descDiv = document.createElement("div");
@@ -416,8 +414,10 @@
 
     function readMore() {
       event.target.removeAttribute("onclick");
-      event.target.childNodes[0].childNodes[0].childNodes[1].classList.remove("hidden");
-      event.target.childNodes[0].childNodes[0].childNodes[3].classList.remove("hidden");
+      let newsContent = event.target.childNodes[0].childNodes[0].childNodes;
+      for(let i = 0; i < newsContent.length; i++) {
+        newsContent[i].classList.remove("hidden");
+      }
       event.target.childNodes[0].classList.remove("disabled");
     }
 
