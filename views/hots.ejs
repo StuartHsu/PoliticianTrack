@@ -66,7 +66,7 @@
             <% let thisCount = results[i].count; %>
             <% let ratio = (thisCount / maxCount) * 100; %>
             <div class="list">
-              <div class="mainList">
+              <div class="mainList" onclick="subListCallIssue(<%= results[i].tag_id %>,'<%= results[i].name %>')">
                 <div class="polName"><%= results[i].name %></div>
                 <div class="bar">
                   <div class="process" style="width:<%=ratio%>%"></div>
@@ -99,6 +99,7 @@
     var preSublistId;
 
     tabsTitle.forEach(tabTitle => tabTitle.addEventListener('click', function(event) {
+      preSublistId = "";
       removeData(oncomingLists); // 刪除預先載入的資料
       if(this.nextElementSibling.classList.contains("toggle")) {
         tabsTitle.forEach(r => r.nextElementSibling.classList.add("toggle"));
@@ -107,18 +108,14 @@
       getData(event.target.id);
     }));
 
-    mainLists.forEach(mainList => mainList.addEventListener('click', function(event) {
-      getSubData("pol", this.nextElementSibling.id);
-    }));
-
     // get Pol sub Issue after click tabTitle
-    function subListCallIssue(pol_id) {
-      getSubData("pol", pol_id);
+    function subListCallIssue(pol_id, pol) {
+      getSubData("pol", pol_id, pol);
     }
 
     // get Issue sub Pol after click tabTitle
-    function subListCallPol(pol_id) {
-      getSubData("issue", pol_id);
+    function subListCallPol(issue_id, issue) {
+      getSubData("issue", issue_id, issue);
     }
 
     // DB 取資料
@@ -134,24 +131,24 @@
     }
 
     // DB 取資料 - subIssue
-    function getSubData(type, tag_id) {
+    function getSubData(type, tag_id, name) {
       $.ajax({
         url: `/api/gethots/sub/issue?${type}=${tag_id}`,
         method: "GET",
         success: function(resp) {
           if(preSublistId) {
-            if(preSublistId != tag_id) {
+            if(preSublistId != tag_id) { // 點擊展開外的
               let removeList = document.getElementById(preSublistId);
               removeData(removeList);
-              subDataForm(tag_id, resp.data);
+              subDataForm(tag_id, resp.data, type, name);
               preSublistId = tag_id;
-            } else {
+            } else { // 點擊原本展開的
               removeList = document.getElementById(tag_id);
               removeData(removeList);
               preSublistId = "";
             }
-          } else {
-            subDataForm(tag_id, resp.data);
+          } else { // 什麼都沒展開
+            subDataForm(tag_id, resp.data, type, name);
             preSublistId = tag_id;
           }
         }
@@ -171,9 +168,9 @@
         var mainListDiv = document.createElement("div");
         mainListDiv.className = "mainList";
         if(type === "pol") {
-          mainListDiv.setAttribute("onclick", `subListCallIssue(${data[i].tag_id})`);
+          mainListDiv.setAttribute("onclick", `subListCallIssue(${data[i].tag_id},'${data[i].name}')`);
         } else {
-          mainListDiv.setAttribute("onclick", `subListCallPol(${data[i].tag_id})`);
+          mainListDiv.setAttribute("onclick", `subListCallPol(${data[i].tag_id},'${data[i].name}')`);
         }
 
 
@@ -216,12 +213,17 @@
 
     }
 
-    function subDataForm(id, data) {
-      const subLists = document.getElementById(id);
+    function subDataForm(tag_id, data, type, name) {
+      const subLists = document.getElementById(tag_id);
 
       for(let i = 0; i < data.length; i++) {
-        var subListDiv = document.createElement("div");
-        subListDiv.className = "subList";
+        var subListA = document.createElement("a");
+        subListA.className = "subList";
+        if(type === "pol") {
+          subListA.setAttribute("href", `/politician?pol=${name}&issue=${data[i].name}`);
+        } else {
+          subListA.setAttribute("href", `/politician?pol=${data[i].name}&issue=${name}`);
+        }
 
         var nameDiv = document.createElement("div");
         nameDiv.className = "issueName";
@@ -231,10 +233,10 @@
         countDiv.className = "issueCount";
         countDiv.innerHTML = data[i].count;
 
-        subListDiv.appendChild(nameDiv);
-        subListDiv.appendChild(countDiv);
+        subListA.appendChild(nameDiv);
+        subListA.appendChild(countDiv);
 
-        subLists.appendChild(subListDiv);
+        subLists.appendChild(subListA);
       }
     }
 

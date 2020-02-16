@@ -166,6 +166,13 @@ main {
 	cursor: pointer;
 }
 
+.sidenav .politician li,
+.sidenav .issueList li,
+.sidenav .partyList li {
+	padding: 12.5px 0;
+	margin: 7.5px 0;
+}
+
 /* 人物、議題標題 */
 .sidenav .politician li.personTitle,
 .sidenav .issueList li.issueTitle {
@@ -356,6 +363,7 @@ main {
 
 .innerHighlight {
 	background-color: #424242;
+	border-left: 3px solid #FFD479;
 }
 
 .scrollBar::-webkit-scrollbar {
@@ -365,7 +373,7 @@ main {
 
 .scrollBar::-webkit-scrollbar-thumb {
 	border-radius: 10px;
-  background-color: #2C2C2C;
+  background-color: #5C5C5C;
 }
 
 .scrollBar::-webkit-scrollbar-track {
