@@ -13,7 +13,13 @@
 	display: inline-block;
 	font-weight: bold;
 	font-size: 3rem;
-	margin-bottom: 10px;
+	padding: 5px 10px;
+	border: 1.5px solid #232323;
+	border-radius: 15px;
+}
+
+.content .top .titleName.right{
+	background-color: rgba(23,23,23, .1);
 }
 
 .content .top .titleIssue {

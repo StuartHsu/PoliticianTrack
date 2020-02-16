@@ -221,8 +221,9 @@
       const subLists = document.getElementById(id);
 
       for(let i = 0; i < data.length; i++) {
-        var subListDiv = document.createElement("div");
-        subListDiv.className = "subList";
+        var subListA = document.createElement("a");
+        subListA.className = "subList";
+        subListA.setAttribute("href", `/politician?tag=${data[i].name}`)
 
         var nameDiv = document.createElement("div");
         nameDiv.className = "issueName";
@@ -232,10 +233,10 @@
         countDiv.className = "issueCount";
         countDiv.innerHTML = data[i].count;
 
-        subListDiv.appendChild(nameDiv);
-        subListDiv.appendChild(countDiv);
+        subListA.appendChild(nameDiv);
+        subListA.appendChild(countDiv);
 
-        subLists.appendChild(subListDiv);
+        subLists.appendChild(subListA);
       }
     }
 
