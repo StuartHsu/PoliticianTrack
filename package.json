@@ -21,6 +21,7 @@
     "nodejieba": "^2.4.0",
     "puppeteer": "^2.0.0",
     "request": "^2.88.0",
-    "superagent": "^5.2.1"
+    "superagent": "^5.2.1",
+    "xlsx": "^0.15.5"
   }
 }

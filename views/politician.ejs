@@ -45,48 +45,12 @@
         </div>
         <div class="partyList filterItems scrollBar">
           <ul>
-            <li class="party">中國國民黨</li>
-            <li class="party">民主進步黨</li>
-            <li class="party">台灣民眾黨</li>
-            <li class="party">時代力量</li>
-            <li class="party">台灣基進</li>
-            <li class="party">親民黨</li>
-            <li class="party">無黨團結聯盟</li>
-            <li class="party">台灣團結聯盟</li>
-            <li class="party">國會政黨聯盟</li>
-            <li class="party">綠黨</li>
-            <li class="party">勞動黨</li>
-            <li class="party">新黨</li>
-            <li class="party">中華民族致公黨</li>
-            <li class="party">社會民主黨</li>
+            <% for(let i = 1; i < partiesData.length; i++) { %>
+              <li class="party"><%= partiesData[i].party %></li>
+            <% } %>
+            <!-- <li class="party">中國國民黨</li> -->
           </ul>
         </div>
-        <!-- <div class="regionList filterItems scrollBar">
-          <ul>
-            <li class="region">臺北市</li>
-            <li class="region">新北市</li>
-            <li class="region">桃園市</li>
-            <li class="region">臺中市</li>
-            <li class="region">臺南市</li>
-            <li class="region">高雄市</li>
-            <li class="region">基隆市</li>
-            <li class="region">新竹市</li>
-            <li class="region">嘉義市</li>
-            <li class="region">新竹縣</li>
-            <li class="region">苗栗縣</li>
-            <li class="region">彰化縣</li>
-            <li class="region">南投縣</li>
-            <li class="region">雲林縣</li>
-            <li class="region">嘉義縣</li>
-            <li class="region">屏東縣</li>
-            <li class="region">宜蘭縣</li>
-            <li class="region">花蓮縣</li>
-            <li class="region">臺東縣</li>
-            <li class="region">澎湖縣</li>
-            <li class="region">金門縣</li>
-            <li class="region">連江縣</li>
-          </ul>
-        </div> -->
         <div class="mainFilter filterItems">
           <div class="politician">
             <ul id="appendPols">
@@ -199,18 +163,21 @@
 
     const filters = document.querySelectorAll('.filter');
     const mainFilter = document.querySelector('.mainFilter');
-    const partyList = document.querySelector('.partyList');
+    const partyFilter = document.querySelector('.partyList');
 
     const people = document.querySelectorAll('.person');
     const issues = document.querySelectorAll('.issue');
     const parties = document.querySelectorAll('.party');
 
     const appendNews = document.getElementById("appendNews");
+    const filPols = document.querySelector(".inner");
 
     // Pol, Issue record
     let param = {};
     let polList = [];
     let issueList = [];
+    let param_other = {};
+    let partyList = [];
 
     //------------ User click ------------
 
@@ -226,7 +193,7 @@
             mainFilter.style.display = "none";
             break;
           case "party":
-            partyList.style.display = "none";
+            partyFilter.style.display = "none";
             break;
           default:
         }
@@ -238,7 +205,7 @@
             mainFilter.style.display = "flex";
             break;
           case "party":
-            partyList.style.display = "block";
+            partyFilter.style.display = "block";
             break;
           default:
         }
@@ -288,7 +255,27 @@
       getNews(param);
     }));
 
-    childFilter(parties);
+    // 政黨選擇處理
+    parties.forEach(party => party.addEventListener('click', function(event) {
+      partyList = []; // 清空
+      if(this.classList.contains("innerHighlight")) {
+        this.classList.remove("innerHighlight");
+      } else {
+        this.classList.add("innerHighlight");
+      }
+
+      parties.forEach(function(party) {
+        if(party.classList.contains("innerHighlight")) {
+          partyList.push(party.innerText);
+        }
+      });
+
+      param_other.party = partyList;
+      partyPol(param_other);
+
+    }));
+
+    // childFilter(parties);
 
     // 子 filter 處理
     function childFilter(items) {
@@ -362,6 +349,21 @@
             dataForm(resp.data, param.pol);
             tagShow();
           }
+        }
+      });
+    }
+
+    // DB 取資料
+    function partyPol(param) {
+      $.ajax({
+        url: `api/getparty?party=${param}`,
+        type: "POST",
+        data: JSON.stringify(param),
+        contentType: "application/json; charset=utf-8",
+        success: function(resp) {
+          // console.log(resp);
+          removeData(filPols);
+          filPolsForm(resp.data);
         }
       });
     }
@@ -497,6 +499,19 @@
         li.appendChild(tagsDiv);
 
         appendNews.appendChild(li);
+      }
+    }
+
+    // filter-pols 組裝
+    function filPolsForm(respData) {
+
+      let dataLength = respData.length;
+      for(let i = 0; i < dataLength; i++) {
+        var filPolLi = document.createElement("li");
+        filPolLi.className = "person";
+        filPolLi.innerHTML = respData[i].name;
+
+        filPols.appendChild(filPolLi);
       }
     }
 

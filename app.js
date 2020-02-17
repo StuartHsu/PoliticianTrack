@@ -4,6 +4,7 @@ const newData = require('./model/news');
 const polsData = require('./model/politicians');
 const issuesData = require('./model/issues');
 const hotsData = require('./model/hots');
+const partiesData = require('./model/parties');
 
 const PORT = process.env.PORT || 3000;
 
@@ -30,6 +31,11 @@ app.use('/api/getpolitician', getPolitician);
 // filter page get politician
 const getHots = require('./route/hots');
 app.use('/api/gethots', getHots);
+
+// filter page get party
+const getParty = require('./route/parties');
+app.use('/api/getparty', getParty);
+
 
 // NLP
 const nlp = require('./route/nlp/nlpjs');
@@ -64,12 +70,14 @@ app.get('/politician', async function(req, res) {
   }
   let polsResults = await polsData.get();
   let issuesResults = await issuesData.get();
+  let partiesResults = await partiesData.get();  
   res.render('politician', {
     title: pol,
     issue: issue,
     results: results,
     polsData: polsResults,
-    issuesData: issuesResults
+    issuesData: issuesResults,
+    partiesData: partiesResults
   });
 });
 
@@ -131,7 +139,12 @@ app.get('/test', async function(req, res) {
 //   res.send(data);
 // });
 
-
+// 讀議員 excel
+const readExcel = require('./crawler/gov/parliament');
+app.get('/parliament', async function(req, res) {
+  let data = await readExcel.get();
+  res.send(data);
+});
 
 
 

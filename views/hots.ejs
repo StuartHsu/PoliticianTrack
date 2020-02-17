@@ -42,7 +42,7 @@
           </div>
         </div>
 
-        <div class="lists" id="oncomingHots">
+        <div class="lists scrollBar" id="oncomingHots">
 
           <!-- <div class="list">
             <div class="mainList">
@@ -78,7 +78,7 @@
           <% } %>
         </div>
 
-        <div class="lists" id="appendHots"></div>
+        <div class="lists scrollBar" id="appendHots"></div>
       </div>
 
     </main>
@@ -101,6 +101,7 @@
     tabsTitle.forEach(tabTitle => tabTitle.addEventListener('click', function(event) {
       preSublistId = "";
       removeData(oncomingLists); // 刪除預先載入的資料
+      appendHots.style.display = "flex";
       if(this.nextElementSibling.classList.contains("toggle")) {
         tabsTitle.forEach(r => r.nextElementSibling.classList.add("toggle"));
         this.nextElementSibling.classList.remove("toggle");
