@@ -45,8 +45,8 @@
         </div>
         <div class="partyList filterItems scrollBar">
           <ul>
-            <% for(let i = 1; i < partiesData.party.length; i++) { %>
-              <li class="party"><%= partiesData.party[i] %></li>
+            <% for(let i = 1; i < partiesData.length; i++) { %>
+              <li class="party"><%= partiesData[i].party %></li>
             <% } %>
             <!-- <li class="party">中國國民黨</li> -->
           </ul>
@@ -163,18 +163,21 @@
 
     const filters = document.querySelectorAll('.filter');
     const mainFilter = document.querySelector('.mainFilter');
-    const partyList = document.querySelector('.partyList');
+    const partyFilter = document.querySelector('.partyList');
 
     const people = document.querySelectorAll('.person');
     const issues = document.querySelectorAll('.issue');
     const parties = document.querySelectorAll('.party');
 
     const appendNews = document.getElementById("appendNews");
+    const filPols = document.querySelector(".inner");
 
     // Pol, Issue record
     let param = {};
     let polList = [];
     let issueList = [];
+    let param_other = {};
+    let partyList = [];
 
     //------------ User click ------------
 
@@ -190,7 +193,7 @@
             mainFilter.style.display = "none";
             break;
           case "party":
-            partyList.style.display = "none";
+            partyFilter.style.display = "none";
             break;
           default:
         }
@@ -202,7 +205,7 @@
             mainFilter.style.display = "flex";
             break;
           case "party":
-            partyList.style.display = "block";
+            partyFilter.style.display = "block";
             break;
           default:
         }
@@ -252,7 +255,27 @@
       getNews(param);
     }));
 
-    childFilter(parties);
+    // 政黨選擇處理
+    parties.forEach(party => party.addEventListener('click', function(event) {
+      partyList = []; // 清空
+      if(this.classList.contains("innerHighlight")) {
+        this.classList.remove("innerHighlight");
+      } else {
+        this.classList.add("innerHighlight");
+      }
+
+      parties.forEach(function(party) {
+        if(party.classList.contains("innerHighlight")) {
+          partyList.push(party.innerText);
+        }
+      });
+
+      param_other.party = partyList;
+      partyPol(param_other);
+
+    }));
+
+    // childFilter(parties);
 
     // 子 filter 處理
     function childFilter(items) {
@@ -326,6 +349,21 @@
             dataForm(resp.data, param.pol);
             tagShow();
           }
+        }
+      });
+    }
+
+    // DB 取資料
+    function partyPol(param) {
+      $.ajax({
+        url: `api/getparty?party=${param}`,
+        type: "POST",
+        data: JSON.stringify(param),
+        contentType: "application/json; charset=utf-8",
+        success: function(resp) {
+          // console.log(resp);
+          removeData(filPols);
+          filPolsForm(resp.data);
         }
       });
     }
@@ -461,6 +499,19 @@
         li.appendChild(tagsDiv);
 
         appendNews.appendChild(li);
+      }
+    }
+
+    // filter-pols 組裝
+    function filPolsForm(respData) {
+
+      let dataLength = respData.length;
+      for(let i = 0; i < dataLength; i++) {
+        var filPolLi = document.createElement("li");
+        filPolLi.className = "person";
+        filPolLi.innerHTML = respData[i].name;
+
+        filPols.appendChild(filPolLi);
       }
     }
 

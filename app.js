@@ -70,7 +70,7 @@ app.get('/politician', async function(req, res) {
   }
   let polsResults = await polsData.get();
   let issuesResults = await issuesData.get();
-  let partiesResults = await partiesData.get();
+  let partiesResults = await partiesData.get();  
   res.render('politician', {
     title: pol,
     issue: issue,

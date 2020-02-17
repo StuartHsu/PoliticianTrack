@@ -119,7 +119,7 @@ main {
 }
 
 .sidenav .politician .inner {
-	height: 79.8vh;
+	height: calc(100vh - 162px);
 	overflow-y: scroll;
 }
 
@@ -130,7 +130,7 @@ main {
 }
 
 .sidenav .issueList .inner {
-	height: 79.8vh;
+	height: calc(100vh - 162px);
 	overflow-y: scroll;
 }
 
