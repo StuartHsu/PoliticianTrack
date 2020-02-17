@@ -31,6 +31,11 @@ app.use('/api/getpolitician', getPolitician);
 const getHots = require('./route/hots');
 app.use('/api/gethots', getHots);
 
+// filter page get party
+const getParty = require('./route/parties');
+app.use('/api/getparty', getParty);
+
+
 // NLP
 const nlp = require('./route/nlp/nlpjs');
 app.use('/nlp', nlp);
@@ -131,7 +136,12 @@ app.get('/test', async function(req, res) {
 //   res.send(data);
 // });
 
-
+// 讀議員 excel
+const readExcel = require('./crawler/gov/parliament');
+app.get('/parliament', async function(req, res) {
+  let data = await readExcel.get();
+  res.send(data);
+});
 
 
 
