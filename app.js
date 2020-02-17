@@ -4,6 +4,7 @@ const newData = require('./model/news');
 const polsData = require('./model/politicians');
 const issuesData = require('./model/issues');
 const hotsData = require('./model/hots');
+const partiesData = require('./model/parties');
 
 const PORT = process.env.PORT || 3000;
 
@@ -69,12 +70,14 @@ app.get('/politician', async function(req, res) {
   }
   let polsResults = await polsData.get();
   let issuesResults = await issuesData.get();
+  let partiesResults = await partiesData.get();
   res.render('politician', {
     title: pol,
     issue: issue,
     results: results,
     polsData: polsResults,
-    issuesData: issuesResults
+    issuesData: issuesResults,
+    partiesData: partiesResults
   });
 });
 

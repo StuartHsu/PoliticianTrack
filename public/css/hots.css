@@ -44,10 +44,17 @@
 
 .lists {
   width: 90%;
+  height: 68vh;
+  padding: 15px 20px 0;
   margin: 0 auto;
   display: flex;
   flex-wrap: nowrap;
   flex-direction: column;
+  overflow-y: scroll;
+}
+
+#appendHots {
+  display: none;
 }
 
 .mainList {
@@ -106,4 +113,20 @@
   justify-content: space-between;
   padding: 10px 0;
   margin-bottom: 5px;
+}
+
+.lists.scrollBar::-webkit-scrollbar {
+	width: 6px;
+  background-color: #DCDCDC;
+}
+
+.lists.scrollBar::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+  background-color: #424242;
+}
+
+.lists.scrollBar::-webkit-scrollbar-track {
+	border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #DCDCDC;
 }

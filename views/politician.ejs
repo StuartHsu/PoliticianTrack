@@ -45,48 +45,12 @@
         </div>
         <div class="partyList filterItems scrollBar">
           <ul>
-            <li class="party">中國國民黨</li>
-            <li class="party">民主進步黨</li>
-            <li class="party">台灣民眾黨</li>
-            <li class="party">時代力量</li>
-            <li class="party">台灣基進</li>
-            <li class="party">親民黨</li>
-            <li class="party">無黨團結聯盟</li>
-            <li class="party">台灣團結聯盟</li>
-            <li class="party">國會政黨聯盟</li>
-            <li class="party">綠黨</li>
-            <li class="party">勞動黨</li>
-            <li class="party">新黨</li>
-            <li class="party">中華民族致公黨</li>
-            <li class="party">社會民主黨</li>
+            <% for(let i = 1; i < partiesData.party.length; i++) { %>
+              <li class="party"><%= partiesData.party[i] %></li>
+            <% } %>
+            <!-- <li class="party">中國國民黨</li> -->
           </ul>
         </div>
-        <!-- <div class="regionList filterItems scrollBar">
-          <ul>
-            <li class="region">臺北市</li>
-            <li class="region">新北市</li>
-            <li class="region">桃園市</li>
-            <li class="region">臺中市</li>
-            <li class="region">臺南市</li>
-            <li class="region">高雄市</li>
-            <li class="region">基隆市</li>
-            <li class="region">新竹市</li>
-            <li class="region">嘉義市</li>
-            <li class="region">新竹縣</li>
-            <li class="region">苗栗縣</li>
-            <li class="region">彰化縣</li>
-            <li class="region">南投縣</li>
-            <li class="region">雲林縣</li>
-            <li class="region">嘉義縣</li>
-            <li class="region">屏東縣</li>
-            <li class="region">宜蘭縣</li>
-            <li class="region">花蓮縣</li>
-            <li class="region">臺東縣</li>
-            <li class="region">澎湖縣</li>
-            <li class="region">金門縣</li>
-            <li class="region">連江縣</li>
-          </ul>
-        </div> -->
         <div class="mainFilter filterItems">
           <div class="politician">
             <ul id="appendPols">
