@@ -511,6 +511,26 @@
         filPolLi.className = "person";
         filPolLi.innerHTML = respData[i].name;
 
+        // 建立 child 監聽
+        filPolLi.addEventListener('click', function() {
+          polList = [];
+          appPols = document.querySelectorAll('.person');
+          if(this.classList.contains("innerHighlight")) {
+            this.classList.remove("innerHighlight");
+          } else {
+            appPols.forEach(r => r.classList.remove("innerHighlight"));
+            this.classList.add("innerHighlight");
+          }
+
+          appPols.forEach(function(person) {
+            if(person.classList.contains("innerHighlight")) {
+              polList.push(person.innerHTML);
+            }
+          });
+          param.pol = polList;
+          param.issue = issueList;
+          getNews(param);
+        })
         filPols.appendChild(filPolLi);
       }
     }
