@@ -28,13 +28,19 @@ app.use('/api/news', news);
 const getPolitician = require('./route/politician');
 app.use('/api/getpolitician', getPolitician);
 
-// filter page get politician
-const getHots = require('./route/hots');
-app.use('/api/gethots', getHots);
+// filter page pol get issue
+const polGetIssues = require('./route/issue');
+app.use('/api/polgetissues', polGetIssues);
 
 // filter page get party
 const getParty = require('./route/parties');
 app.use('/api/getparty', getParty);
+
+// hots
+const getHots = require('./route/hots');
+app.use('/api/gethots', getHots);
+
+
 
 
 // NLP
@@ -70,7 +76,7 @@ app.get('/politician', async function(req, res) {
   }
   let polsResults = await polsData.get();
   let issuesResults = await issuesData.get();
-  let partiesResults = await partiesData.get();  
+  let partiesResults = await partiesData.get();
   res.render('politician', {
     title: pol,
     issue: issue,

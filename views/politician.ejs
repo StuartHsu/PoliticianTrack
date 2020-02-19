@@ -64,7 +64,7 @@
               </div>
             </ul>
           </div>
-          <div class="issueList scrollBar">
+          <div class="issueList">
             <ul>
               <li class="issueTitle">議題</li>
               <div class="box-border"></div>
@@ -170,7 +170,8 @@
     const parties = document.querySelectorAll('.party');
 
     const appendNews = document.getElementById("appendNews");
-    const filPols = document.querySelector(".inner");
+    const filPols = document.querySelector(".politician .inner");
+    const filIssues = document.querySelector(".issueList .inner");
 
     // Pol, Issue record
     let param = {};
@@ -215,6 +216,7 @@
 
     // 人物選擇處理
     people.forEach(person => person.addEventListener('click', function(event) {
+      console.log(event);
       polList = []; // 清空
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
@@ -231,7 +233,10 @@
 
       param.pol = polList;
       param.issue = issueList;
+      // console.log("people: " + param.issue);
+      polIssue(param);
       getNews(param);
+      // addHLByTag(param.issue, "issue");
     }));
 
     // 議題選擇處理
@@ -332,7 +337,6 @@
       addHLByTag(issue, "issue");
     }
 
-
     //------------ Server ------------
 
     // DB 取資料
@@ -353,7 +357,7 @@
       });
     }
 
-    // DB 取資料
+    // DB 取資料 - 政黨影響人物
     function partyPol(param) {
       $.ajax({
         url: `api/getparty?party=${param}`,
@@ -364,6 +368,21 @@
           // console.log(resp);
           removeData(filPols);
           filPolsForm(resp.data);
+        }
+      });
+    }
+
+    // DB 取資料 - 人物影響議題
+    function polIssue(param) {
+      $.ajax({
+        url: `api/polgetissues`,
+        type: "POST",
+        data: JSON.stringify(param),
+        contentType: "application/json; charset=utf-8",
+        success: function(resp) {
+          // console.log(resp);
+          removeData(filIssues);
+          filIssuesForm(resp);
         }
       });
     }
@@ -511,9 +530,71 @@
         filPolLi.className = "person";
         filPolLi.innerHTML = respData[i].name;
 
+        // 建立 child-pols 監聽
+        filPolLi.addEventListener('click', function() {
+          polList = [];
+          appPols = document.querySelectorAll('.person');
+          if(this.classList.contains("innerHighlight")) {
+            this.classList.remove("innerHighlight");
+          } else {
+            appPols.forEach(r => r.classList.remove("innerHighlight"));
+            this.classList.add("innerHighlight");
+          }
+
+          appPols.forEach(function(person) {
+            if(person.classList.contains("innerHighlight")) {
+              polList.push(person.innerHTML);
+            }
+          });
+          param.pol = polList;
+          param.issue = issueList;
+          getNews(param);
+          polIssue(param);
+        });
         filPols.appendChild(filPolLi);
       }
     }
+
+    // filter-issue 組裝
+    function filIssuesForm(respData) {
+      // console.log(respData);
+      let dataLength = respData.length;
+
+      for(let i = 0; i < dataLength; i++) {
+        var polGetIssLi = document.createElement("li");
+        polGetIssLi.className = "issue";
+        polGetIssLi.innerHTML = respData[i].name;
+
+        // 建立 child 監聽
+        polGetIssLi.addEventListener('click', function() {
+          issueList = [];
+          appIssues = document.querySelectorAll('.issue');
+          if(this.classList.contains("innerHighlight")) {
+            this.classList.remove("innerHighlight");
+          } else {
+            appIssues.forEach(r => r.classList.remove("innerHighlight"));
+            this.classList.add("innerHighlight");
+          }
+
+          appIssues.forEach(function(issue) {
+            if(issue.classList.contains("innerHighlight")) {
+              issueList.push(issue.innerHTML);
+            }
+          });
+          param.pol = polList;
+          param.issue = issueList;
+          getNews(param);
+          // console.log(param)
+        });
+        filIssues.appendChild(polGetIssLi);
+
+        // console.log(param.issue);
+        // console.log(issue);
+        // addHLByTag(param.issue, "issue");
+      }
+
+    }
+
 
     // 移除子項目
     function removeData(item) {

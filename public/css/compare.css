@@ -1,5 +1,10 @@
 @import "common.css";
 
+/* filter */
+.sidenav .mainFilter {
+	display: flex;
+}
+
 /* title */
 
 .content .top {

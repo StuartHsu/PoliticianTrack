@@ -34,11 +34,12 @@ module.exports = {
   getSubIssue: function(pol_id) {
     return new Promise(function(resolve, reject) {
       let sql =
-      `SELECT b.tag_id, c.name, count(b.tag_id) AS count
+      `SELECT b.tag_id, d.name, count(b.tag_id) AS count
       FROM newsTag AS a
       LEFT JOIN newsTag AS b ON (a.news_id = b.news_id)
-      LEFT JOIN filterCount AS c ON (b.tag_id = c.id)
-      WHERE a.tag_id = ? AND c.type = "NI"
+      LEFT JOIN news AS c ON (a.news_id = c.id)
+      LEFT JOIN filterCount AS d ON (b.tag_id = d.id)
+      WHERE a.tag_id = ? AND d.type = "NI" AND c.intent = "politician_say"
       GROUP BY b.tag_id ORDER BY count DESC;`
       mysql.con.query(sql, pol_id,function(error, results, fields) {
         if(error) {
@@ -51,11 +52,12 @@ module.exports = {
   getSubPol: function(issue_id) {
     return new Promise(function(resolve, reject) {
       let sql =
-      `SELECT b.tag_id, c.name, count(b.tag_id) AS count
+      `SELECT b.tag_id, d.name, count(b.tag_id) AS count
       FROM newsTag AS a
       LEFT JOIN newsTag AS b ON (a.news_id = b.news_id)
-      LEFT JOIN filterCount AS c ON (b.tag_id = c.id)
-      WHERE a.tag_id = ? AND c.type = "NRP"
+      LEFT JOIN news AS c ON (a.news_id = c.id)
+      LEFT JOIN filterCount AS d ON (b.tag_id = d.id)
+      WHERE a.tag_id = ? AND d.type = "NRP" AND c.intent = "politician_say"
       GROUP BY b.tag_id ORDER BY count DESC;`
       mysql.con.query(sql, issue_id,function(error, results, fields) {
         if(error) {
