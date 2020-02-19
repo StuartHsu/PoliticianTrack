@@ -216,6 +216,7 @@
 
     // 人物選擇處理
     people.forEach(person => person.addEventListener('click', function(event) {
+      console.log(event);
       polList = []; // 清空
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
