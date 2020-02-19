@@ -119,7 +119,7 @@
               <% } %>
               </div>
 
-              <a class="news" href="<%= results[i].href %>" target="_blank">
+              <div class="news" onclick="oncomingReadMore()">
                 <div class="news-content">
                   <div class="title"><%= results[i].title %></div>
                   <div class="publisher"><%= results[i].publisher %></div>
@@ -127,8 +127,13 @@
                   <div class="desc">
                     <p><%= results[i].description %></p>
                   </div>
+                  <div class="mainContent hidden">
+                    <% let appendModContent = results[i].content.replace(/(\u3002\u300d)/g, '。」<br><br>').replace(/(\u3002)(?!\u300d)/g, '。<br><br>') %>
+                    <p><%- appendModContent %></p>
+                  </div>
+                  <a class="url hidden" href="<%= results[i].href %>" target="_blank"><%= results[i].href %></a>
                 </div> <!-- news-content End -->
-              </a> <!-- news End -->
+              </div> <!-- news End -->
 
               <div class="renderTags">
                 <ul>
@@ -174,11 +179,11 @@
     const filIssues = document.querySelector(".issueList .inner");
 
     // Pol, Issue record
-    let param = {};
-    let polList = [];
-    let issueList = [];
-    let param_other = {};
-    let partyList = [];
+    let param = {
+      pol: [],
+      issue: [],
+      party: []
+    }
 
     //------------ User click ------------
 
@@ -216,8 +221,7 @@
 
     // 人物選擇處理
     people.forEach(person => person.addEventListener('click', function(event) {
-      console.log(event);
-      polList = []; // 清空
+      param.pol = [];
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
       } else {
@@ -227,21 +231,16 @@
 
       people.forEach(function(person) {
         if(person.classList.contains("innerHighlight")) {
-          polList.push(person.innerText);
+          param.pol.push(person.innerText);
         }
       });
-
-      param.pol = polList;
-      param.issue = issueList;
-      // console.log("people: " + param.issue);
       polIssue(param);
       getNews(param);
-      // addHLByTag(param.issue, "issue");
     }));
 
     // 議題選擇處理
     issues.forEach(issue => issue.addEventListener('click', function(event) {
-      issueList = []; // 清空
+      param.issue = []; // 清空
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
       } else {
@@ -251,18 +250,15 @@
 
       issues.forEach(function(issue) {
         if(issue.classList.contains("innerHighlight")) {
-          issueList.push(issue.innerText);
+          param.issue.push(issue.innerText);
         }
       });
-
-      param.pol = polList;
-      param.issue = issueList;
       getNews(param);
     }));
 
     // 政黨選擇處理
     parties.forEach(party => party.addEventListener('click', function(event) {
-      partyList = []; // 清空
+      param.party = [];
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
       } else {
@@ -271,16 +267,11 @@
 
       parties.forEach(function(party) {
         if(party.classList.contains("innerHighlight")) {
-          partyList.push(party.innerText);
+          param.party.push(party.innerText);
         }
       });
-
-      param_other.party = partyList;
-      partyPol(param_other);
-
+      partyPol(param);
     }));
-
-    // childFilter(parties);
 
     // 子 filter 處理
     function childFilter(items) {
@@ -295,11 +286,10 @@
 
     // 新聞旁標籤點選切換
     function tagCallPol(pol) {
-      polList = [];
-      issueList = [];
-      polList.push(pol);
-      param.pol = polList;
-      param.issue = issueList;
+      param = {
+        pol: [pol],
+        issue: []
+      }
       getNews(param);
 
       people.forEach(function(person) {
@@ -317,11 +307,10 @@
     }
 
     function tagCallIssue(issue) {
-      polList = [];
-      issueList = [];
-      issueList.push(issue);
-      param.pol = polList;
-      param.issue = issueList;
+      param = {
+        pol: [],
+        issue: [issue]
+      }
       getNews(param);
 
       people.forEach(function(person) {
@@ -360,7 +349,7 @@
     // DB 取資料 - 政黨影響人物
     function partyPol(param) {
       $.ajax({
-        url: `api/getparty?party=${param}`,
+        url: `api/getparty`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -415,6 +404,7 @@
 
       for (let i = 0; i < respData.length; i ++) {
         var li = document.createElement("li");
+        // li.setAttribute("onclick", "readMore()");
 
         // timeline
         var timelineDiv = document.createElement("div");
@@ -454,10 +444,11 @@
         timelineDiv.appendChild(monthP);
 
         // news
-        var link = document.createElement("a");
-        link.className = "news";
-        link.setAttribute("href", `${respData[i].href}`);
-        link.setAttribute("target", "_blank");
+        var newsDiv = document.createElement("div");
+        newsDiv.className = "news";
+        newsDiv.setAttribute("onclick", "readMore()");
+        // link.setAttribute("href", `${respData[i].href}`);
+        // link.setAttribute("target", "_blank");
 
         var newsContentDiv = document.createElement("div");
         newsContentDiv.className = "news-content";
@@ -476,18 +467,32 @@
 
         var descDiv = document.createElement("div");
         descDiv.className = "desc";
-
         var descP = document.createElement("p");
         descP.innerHTML = respData[i].description;
 
+        var contentDiv = document.createElement("div");
+        contentDiv.className = "mainContent hidden";
+        var contentP = document.createElement("p");
+        let modContent = respData[i].content.replace(/(\u3002\u300d)/g, '。」<br><br>').replace(/(\u3002)(?!\u300d)/g, '。<br><br>')
+        contentP.innerHTML = modContent;
+        // contentP.className = "hidden";
+
+        var urlA = document.createElement("a");
+        urlA.className = "url hidden";
+        urlA.innerHTML = `新聞來源：${respData[i].href}`;
+        urlA.setAttribute("href", `${respData[i].href}`);
+        urlA.setAttribute("target", "_blank");
 
         descDiv.appendChild(descP);
+        contentDiv.appendChild(contentP);
         newsContentDiv.appendChild(titleDiv);
         newsContentDiv.appendChild(publisherDiv);
         newsContentDiv.appendChild(pubTimeDiv);
         newsContentDiv.appendChild(descDiv);
+        newsContentDiv.appendChild(contentDiv);
+        newsContentDiv.appendChild(urlA);
 
-        link.appendChild(newsContentDiv);
+        newsDiv.appendChild(newsContentDiv);
 
         // tags
         var tagsDiv = document.createElement("div");
@@ -514,7 +519,7 @@
 
         // 組合
         li.appendChild(timelineDiv);
-        li.appendChild(link);
+        li.appendChild(newsDiv);
         li.appendChild(tagsDiv);
 
         appendNews.appendChild(li);
@@ -532,7 +537,8 @@
 
         // 建立 child-pols 監聽
         filPolLi.addEventListener('click', function() {
-          polList = [];
+          // polList = [];
+          param.pol = [];
           appPols = document.querySelectorAll('.person');
           if(this.classList.contains("innerHighlight")) {
             this.classList.remove("innerHighlight");
@@ -543,11 +549,9 @@
 
           appPols.forEach(function(person) {
             if(person.classList.contains("innerHighlight")) {
-              polList.push(person.innerHTML);
+              param.pol.push(person.innerHTML);
             }
           });
-          param.pol = polList;
-          param.issue = issueList;
           getNews(param);
           polIssue(param);
         });
@@ -567,7 +571,7 @@
 
         // 建立 child 監聽
         polGetIssLi.addEventListener('click', function() {
-          issueList = [];
+          param.issue = [];
           appIssues = document.querySelectorAll('.issue');
           if(this.classList.contains("innerHighlight")) {
             this.classList.remove("innerHighlight");
@@ -578,19 +582,12 @@
 
           appIssues.forEach(function(issue) {
             if(issue.classList.contains("innerHighlight")) {
-              issueList.push(issue.innerHTML);
+              param.issue.push(issue.innerHTML);
             }
           });
-          param.pol = polList;
-          param.issue = issueList;
           getNews(param);
-          // console.log(param)
         });
         filIssues.appendChild(polGetIssLi);
-
-        // console.log(param.issue);
-        // console.log(issue);
-        // addHLByTag(param.issue, "issue");
       }
 
     }
@@ -637,6 +634,95 @@
       }
     }
 
+    // 展開
+    let openFlag = false;
+    function readMore(type) {
+      let parent = event.target.parentNode;
+      if(!openFlag) {
+        if(parent.className === "news-content") {
+          parent.childNodes[3].classList.add("hidden");
+          parent.childNodes[4].classList.remove("hidden");
+          parent.childNodes[5].classList.remove("hidden");
+        } else if(parent.className === "desc") {
+          parent.parentNode.childNodes[3].classList.add("hidden");
+          parent.parentNode.childNodes[4].classList.remove("hidden");
+          parent.parentNode.childNodes[5].classList.remove("hidden");
+        } else if(parent.className === "news") {
+          parent.childNodes[0].childNodes[3].classList.add("hidden");
+          parent.childNodes[0].childNodes[4].classList.remove("hidden");
+          parent.childNodes[0].childNodes[5].classList.remove("hidden");
+        } else {
+          event.target.childNodes[0].childNodes[3].classList.add("hidden");
+          event.target.childNodes[0].childNodes[4].classList.remove("hidden");
+          event.target.childNodes[0].childNodes[5].classList.remove("hidden");
+        }
+        openFlag = true;
+      } else {
+        if(parent.className === "news-content") {
+          parent.childNodes[3].classList.remove("hidden");
+          parent.childNodes[4].classList.add("hidden");
+          parent.childNodes[5].classList.add("hidden");
+        } else if(parent.className === "mainContent") {
+          parent.parentNode.childNodes[3].classList.remove("hidden");
+          parent.parentNode.childNodes[4].classList.add("hidden");
+          parent.parentNode.childNodes[5].classList.add("hidden");
+        } else if(parent.className === "news") {
+          parent.childNodes[0].childNodes[3].classList.remove("hidden");
+          parent.childNodes[0].childNodes[4].classList.add("hidden");
+          parent.childNodes[0].childNodes[5].classList.add("hidden");
+        } else {
+          event.target.childNodes[0].childNodes[3].classList.remove("hidden");
+          event.target.childNodes[0].childNodes[4].classList.add("hidden");
+          event.target.childNodes[0].childNodes[5].classList.add("hidden");
+        }
+        openFlag = false;
+      }
+    }
+
+    // 展開
+    let openOncomingFlag = false;
+    function oncomingReadMore() {
+      let parent = event.target.parentNode;
+      if(!openOncomingFlag) {
+        if(parent.className === "news-content") {
+          parent.childNodes[7].classList.add("hidden");
+          parent.childNodes[9].classList.remove("hidden");
+          parent.childNodes[11].classList.remove("hidden");
+        } else if(parent.className === "desc") {
+          parent.parentNode.childNodes[7].classList.add("hidden");
+          parent.parentNode.childNodes[9].classList.remove("hidden");
+          parent.parentNode.childNodes[11].classList.remove("hidden");
+        } else if(parent.className === "news") {
+          event.target.childNodes[7].classList.add("hidden");
+          event.target.childNodes[9].classList.remove("hidden");
+          event.target.childNodes[11].classList.remove("hidden");
+        } else {
+          event.target.childNodes[1].childNodes[7].classList.add("hidden");
+          event.target.childNodes[1].childNodes[9].classList.remove("hidden");
+          event.target.childNodes[1].childNodes[11].classList.remove("hidden");
+        }
+        openOncomingFlag = true;
+      } else {
+        if(parent.className === "news-content") {
+          parent.childNodes[7].classList.remove("hidden");
+          parent.childNodes[9].classList.add("hidden");
+          parent.childNodes[11].classList.add("hidden");
+        } else if(parent.className === "mainContent") {
+          parent.parentNode.childNodes[7].classList.remove("hidden");
+          parent.parentNode.childNodes[9].classList.add("hidden");
+          parent.parentNode.childNodes[11].classList.add("hidden");
+        } else if(parent.className === "news") {
+          event.target.childNodes[7].classList.remove("hidden");
+          event.target.childNodes[9].classList.add("hidden");
+          event.target.childNodes[11].classList.add("hidden");
+        } else {
+          event.target.childNodes[1].childNodes[7].classList.remove("hidden");
+          event.target.childNodes[1].childNodes[9].classList.add("hidden");
+          event.target.childNodes[1].childNodes[11].classList.add("hidden");
+        }
+        openOncomingFlag = false;
+      }
+    }
 
   </script>
 

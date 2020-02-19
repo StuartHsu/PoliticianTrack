@@ -344,17 +344,39 @@ main {
 	margin-bottom: 10px;
 }
 
-.news>.news-content .desc {
-	overflow: hidden;
-	text-overflow: ellipsis;
+.news>.news-content .url {
+	font-size: .7rem;
+	display: block;
 }
 
-.news>.news-content p {
+.news>.news-content .url.hidden {
+	display: none;
+}
+
+/* .news>.news-content .desc {
+	overflow: hidden;
+	text-overflow: ellipsis;
+} */
+
+.news>.news-content .desc p {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	display: -webkit-box;
 	-webkit-line-clamp: 3;
 	-webkit-box-orient: vertical;
+}
+
+.news>.news-content .desc.hidden {
+	display: none;
+}
+
+.news>.news-content .mainContent {
+	overflow: visible;
+	margin-bottom: 10px;
+}
+
+.news>.news-content .mainContent.hidden {
+	display: none;
 }
 
 .highlight {
