@@ -25,7 +25,7 @@
         </div>
       </nav>
       <div class="feature">
-        <a href="./about">About Us</a>
+        <a href="./about">關於</a>
       </div>
     </header>
 
@@ -71,7 +71,7 @@
                 <div class="bar">
                   <div class="process" style="width:<%=ratio%>%"></div>
                 </div>
-                <div class="count"><%= results[i].count %></div>
+                <!-- <div class="count"><%= results[i].count %></div> -->
               </div>
               <div class="subLists" id="<%= results[i].tag_id %>"></div>
             </div>
@@ -193,9 +193,9 @@
         barDiv.appendChild(processDiv);
 
         // news count
-        var countDiv = document.createElement("div");
-        countDiv.className = "count";
-        countDiv.innerHTML = data[i].count;
+        // var countDiv = document.createElement("div");
+        // countDiv.className = "count";
+        // countDiv.innerHTML = data[i].count;
 
         // subLists
         var subListsDiv = document.createElement("div");
@@ -204,7 +204,7 @@
 
         mainListDiv.appendChild(nameDiv);
         mainListDiv.appendChild(barDiv);
-        mainListDiv.appendChild(countDiv);
+        // mainListDiv.appendChild(countDiv);
 
         listDiv.appendChild(mainListDiv);
         listDiv.appendChild(subListsDiv);

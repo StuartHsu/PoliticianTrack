@@ -26,7 +26,7 @@
         </div>
       </nav>
       <div class="feature">
-        <a href="./about">About Us</a>
+        <a href="./about">關於</a>
       </div>
     </header>
 
@@ -83,9 +83,21 @@
       <div class="content">
 
         <div class="top" id="defaultTop">
+          <div class="top_core">
+            <div class="titleName" id="titleName"><%= title %></div>
+            <div class="switchBox">
+              <div class="switchTitle">Strict</div>
+              <div class="onoffswitch">
+                  <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">
+                  <label class="onoffswitch-label switch" for="myonoffswitch">
+                      <span class="onoffswitch-inner"></span>
+                      <span class="onoffswitch-switch"></span>
+                  </label>
+              </div>
+            </div>
 
-          <div class="titleName" id="titleName"><%= title %></div>
-          <br>
+            <!-- <div class="switch">hey</div> -->
+          </div>
           <div class="titleIssue" id="titleIssue"><%= issue %></div>
 
         </div>
@@ -169,6 +181,7 @@
     const filters = document.querySelectorAll('.filter');
     const mainFilter = document.querySelector('.mainFilter');
     const partyFilter = document.querySelector('.partyList');
+    const switchButton = document.querySelector('.switch');
 
     const people = document.querySelectorAll('.person');
     const issues = document.querySelectorAll('.issue');
@@ -184,6 +197,8 @@
       issue: [],
       party: []
     }
+
+    let strictMode = false;
 
     //------------ User click ------------
 
@@ -235,7 +250,11 @@
         }
       });
       polIssue(param);
-      getNews(param);
+      if(strictMode === false) {
+        getNews(param);
+      } else {
+        getNewsLess(param);
+      }
     }));
 
     // 議題選擇處理
@@ -253,7 +272,11 @@
           param.issue.push(issue.innerText);
         }
       });
-      getNews(param);
+      if(strictMode === false) {
+        getNews(param);
+      } else {
+        getNewsLess(param);
+      }
     }));
 
     // 政黨選擇處理
@@ -273,6 +296,16 @@
       partyPol(param);
     }));
 
+    switchButton.addEventListener('click', function(event) {
+      if(strictMode === false) {
+        getNewsLess(param);
+        strictMode = true;
+      } else {
+        getNews(param);
+        strictMode = false;
+      }
+    });
+
     // 子 filter 處理
     function childFilter(items) {
       items.forEach(item => item.addEventListener('click', function() {
@@ -290,7 +323,11 @@
         pol: [pol],
         issue: []
       }
-      getNews(param);
+      if(strictMode === false) {
+        getNews(param);
+      } else {
+        getNewsLess(param);
+      }
 
       people.forEach(function(person) {
         if(person.classList.contains("innerHighlight")) {
@@ -311,7 +348,11 @@
         pol: [],
         issue: [issue]
       }
-      getNews(param);
+      if(strictMode === false) {
+        getNews(param);
+      } else {
+        getNewsLess(param);
+      }
 
       people.forEach(function(person) {
         if(person.classList.contains("innerHighlight")) {
@@ -372,6 +413,24 @@
           // console.log(resp);
           removeData(filIssues);
           filIssuesForm(resp);
+        }
+      });
+    }
+
+    // DB 取資料 - 標題 mode
+    function getNewsLess(param) {
+      $.ajax({
+        url: "api/news/getNews/strict",
+        type: "POST",
+        data: JSON.stringify(param),
+        contentType: "application/json; charset=utf-8",
+        success: function(resp) {
+          removeData(appendNews);
+          changeTitle(param.pol, param.issue);
+          if(resp.data) {
+            dataForm(resp.data, param.pol);
+            tagShow();
+          }
         }
       });
     }
@@ -526,6 +585,111 @@
       }
     }
 
+    // Data 組裝 Less
+    function dataFormLess(respData, pol) {
+      document.getElementById('oncomingNews').style.display = "none";
+      document.getElementById('appendNewsP').style.display = "flex";
+
+      for (let i = 0; i < respData.length; i ++) {
+        var li = document.createElement("li");
+        // li.setAttribute("onclick", "readMore()");
+
+        // timeline
+        var timelineDiv = document.createElement("div");
+        timelineDiv.className = "timeline";
+
+        var time = new Date(respData[i].pubTime);
+
+        var yearP = document.createElement("p");
+        var monthP = document.createElement("p");
+        yearP.className = "year";
+        monthP.className = "month";
+
+        if(i > 0) {
+          var preTime = new Date(respData[i - 1].pubTime);
+
+          var preTimeY = preTime.getFullYear();
+          var preTimeM = preTime.getMonth();
+          var curTimeY = time.getFullYear();
+          var curTimeM = time.getMonth();
+
+          if(preTimeY !== curTimeY && preTimeM !== curTimeM) {
+            yearP.innerHTML = time.getFullYear();
+            monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+          } else if (preTimeY == curTimeY && preTimeM !== curTimeM) {
+            yearP.innerHTML = "";
+            monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+          } else {
+            yearP.innerHTML = "";
+            monthP.innerHTML = "";
+          }
+        } else {
+          yearP.innerHTML = time.getFullYear();
+          monthP.innerHTML = (time.getMonth() < 10 ? '0' : '') + (time.getMonth() + 1);
+        }
+
+        timelineDiv.appendChild(yearP);
+        timelineDiv.appendChild(monthP);
+
+        // news
+        var newsDiv = document.createElement("div");
+        newsDiv.className = "news";
+        newsDiv.setAttribute("onclick", "readMore()");
+        // link.setAttribute("href", `${respData[i].href}`);
+        // link.setAttribute("target", "_blank");
+
+        var newsContentDiv = document.createElement("div");
+        newsContentDiv.className = "news-content";
+
+        var titleDiv = document.createElement("div");
+        titleDiv.className = "title";
+        titleDiv.innerHTML = respData[i].title;
+
+        var publisherDiv = document.createElement("div");
+        publisherDiv.className = "publisher";
+        publisherDiv.innerHTML = respData[i].publisher;
+
+        var pubTimeDiv = document.createElement("div");
+        pubTimeDiv.className = "pubTime";
+        pubTimeDiv.innerHTML = respData[i].pubTime;
+
+        var descDiv = document.createElement("div");
+        descDiv.className = "desc";
+        var descP = document.createElement("p");
+        descP.innerHTML = respData[i].description;
+
+        var contentDiv = document.createElement("div");
+        contentDiv.className = "mainContent hidden";
+        var contentP = document.createElement("p");
+        let modContent = respData[i].content.replace(/(\u3002\u300d)/g, '。」<br><br>').replace(/(\u3002)(?!\u300d)/g, '。<br><br>')
+        contentP.innerHTML = modContent;
+        // contentP.className = "hidden";
+
+        var urlA = document.createElement("a");
+        urlA.className = "url hidden";
+        urlA.innerHTML = `新聞來源：${respData[i].href}`;
+        urlA.setAttribute("href", `${respData[i].href}`);
+        urlA.setAttribute("target", "_blank");
+
+        descDiv.appendChild(descP);
+        contentDiv.appendChild(contentP);
+        newsContentDiv.appendChild(titleDiv);
+        newsContentDiv.appendChild(publisherDiv);
+        newsContentDiv.appendChild(pubTimeDiv);
+        newsContentDiv.appendChild(descDiv);
+        newsContentDiv.appendChild(contentDiv);
+        newsContentDiv.appendChild(urlA);
+
+        newsDiv.appendChild(newsContentDiv);
+
+        // 組合
+        li.appendChild(timelineDiv);
+        li.appendChild(newsDiv);
+
+        appendNews.appendChild(li);
+      }
+    }
+
     // filter-pols 組裝
     function filPolsForm(respData) {
 
@@ -552,7 +716,11 @@
               param.pol.push(person.innerHTML);
             }
           });
-          getNews(param);
+          if(strictMode === false) {
+            getNews(param);
+          } else {
+            getNewsLess(param);
+          }
           polIssue(param);
         });
         filPols.appendChild(filPolLi);
@@ -585,7 +753,11 @@
               param.issue.push(issue.innerHTML);
             }
           });
-          getNews(param);
+          if(strictMode === false) {
+            getNews(param);
+          } else {
+            getNewsLess(param);
+          }
         });
         filIssues.appendChild(polGetIssLi);
       }

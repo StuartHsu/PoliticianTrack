@@ -26,7 +26,7 @@
         </div>
       </nav>
       <div class="feature">
-        <a href="./about">About Us</a>
+        <a href="./about">關於</a>
       </div>
     </header>
 
@@ -125,9 +125,14 @@
     const tips = document.getElementById("tips");
 
     // Pol, Issue record
-    let param = {};
-    let polList = [];
-    let issueList = [];
+    // let param = {};
+    // let polList = [];
+    // let issueList = [];
+    let param = {
+      pol: [],
+      issue: [],
+      party: []
+    }
 
     // people eventListener use
     let firstPolName;
@@ -171,7 +176,7 @@
 
     // 人物選擇處理
     people.forEach(person => person.addEventListener('click', function(event) {
-      polList = []; // 清空
+      param.pol = []; // 清空
       let compTitleName1 = document.getElementById("compTitleName1");
       let compTitleName2 = document.getElementById("compTitleName2");
       if(this.classList.contains("innerHighlight")) {
@@ -200,12 +205,12 @@
 
       people.forEach(function(person) {
         if(person.classList.contains("innerHighlight")) {
-          polList.push(person.innerText);
+          param.pol.push(person.innerText);
         }
       });
 
-      param.pol = polList;
-      param.issue = issueList;
+      // param.pol = polList;
+      // param.issue = issueList;
 
       if(param.pol[0] && param.pol[1]) {
         compTitleName1.innerHTML = param.pol[0];
@@ -235,7 +240,7 @@
 
     // 議題選擇處理
     issues.forEach(issue => issue.addEventListener('click', function(event) {
-      issueList = []; // 清空
+      param.issue = []; // 清空
       let compTitleIssue = document.getElementById("compTitleIssue");
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
@@ -250,12 +255,12 @@
 
       issues.forEach(function(issue) {
         if(issue.classList.contains("innerHighlight")) {
-          issueList.push(issue.innerText);
+          param.issue.push(issue.innerText);
         }
       });
 
-      param.pol = polList;
-      param.issue = issueList;
+      // param.pol = polList;
+      // param.issue = issueList;
 
       if(param.pol.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
