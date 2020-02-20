@@ -159,6 +159,114 @@ module.exports = {
         resolve(body);
       }
     });
+  },
+  getAllLess: function(pol) {
+    return new Promise(async function(resolve, reject) {
+
+      // 取得人物對應的 news_id
+      let newsId = await formPolIntent(pol);
+
+      let sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
+      if(newsId.length > 0) { // 判斷是否有此人此議題之新聞
+        mysql.con.query(sql, [newsId], async function(error, results, fields) {
+          if(error) {
+            reject(error);
+          }
+          let data = await formTagNews(results);
+          resolve(data);
+        });
+      } else {
+        resolve();
+      }
+    });
+  },
+  getNoIssNewsLess: function(pol) {
+    return new Promise(async function(resolve, reject) {
+
+      // 取得人物對應的 news_id
+      let newsId = await formPolIntent(pol);
+
+      let sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
+      if(newsId.length > 0) { // 判斷是否有此人此議題之新聞
+        mysql.con.query(sql, [newsId], async function(error, results, fields) {
+          if(error) {
+            reject(error);
+          }
+          // 新聞加上所含標籤
+          let data = await formTagNews(results);
+          resolve(data);
+        });
+      } else {
+        resolve();
+      }
+    });
+  },
+  getPolIssNewsLess: function(pol, issue) {
+    return new Promise(async function(resolve, reject) {
+
+      let tagName = [pol, issue];
+      // 取得人物及議題的 Tag Id
+      let tagId = await getTagId(tagName);
+      // 取得人物及議題 Tag Id 對應的 news_id
+      let rawNewsId = await getBothNewsId(tagId, 1);
+
+      // 取得人物對應的 news_id
+      let newsId = await formPolIntent2(pol, rawNewsId);
+
+      let sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
+      if(newsId.length > 0) { // 判斷是否有此人此議題之新聞
+        mysql.con.query(sql, [newsId], async function(error, results, fields) {
+          if(error) {
+            reject(error);
+          }
+          data = await formTagNews(results);
+          resolve(data);
+        });
+      } else {
+        resolve();
+      }
+    });
+  },
+  getCompareLess: function(pol, issue) {
+    return new Promise(async function(resolve, reject) {
+      let id1 = await getTagId([pol[0], issue]);
+      let id2 = await getTagId([pol[1], issue]);
+      let new1 = await getBothNewsId(id1, 1);
+      let new2 = await getBothNewsId(id2, 1);
+      let newsArray = new1.concat(new2);
+
+      // 取得人物對應的 news_id
+      let newsId = await formPolIntent2(pol, newsArray);
+
+      let body = [];
+      let sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
+
+      if(newsArray.length > 0) { // 判斷是否有此兩人同一議題之新聞
+        mysql.con.query(sql, [newsId], async function(error, results, fields) {
+          if(error) {
+            reject(error);
+          }
+          // 新聞加上所含標籤
+          let data = await formTagNews(results);
+
+          for(let i = 0; i < data.length; i++) {
+            if(new1.indexOf(data[i].id) > -1 && new2.indexOf(data[i].id) > -1) {
+              data[i].tag_id = "both";
+            } else if (new1.indexOf(data[i].id) > -1 && new2.indexOf(data[i].id) < 0) {
+              data[i].tag_id = pol[0];
+            } else if (new1.indexOf(data[i].id) < 0 && new2.indexOf(data[i].id) > -1) {
+              data[i].tag_id = pol[1];
+            } else {
+              console.log("none");
+            }
+            body.push(data[i]);
+          }
+          resolve(body);
+        });
+      } else {
+        resolve(body);
+      }
+    });
   }
 }
 
@@ -188,7 +296,6 @@ function getNews(title, titleKeyword, content, contentKeyword) {
     });
   });
 }
-
 
 
 function getTagId(tagName) {
@@ -282,5 +389,136 @@ function formTagNews(news) {
       data.push(newsData);
     }
     resolve(data);
+  });
+}
+
+function formPolIntent(pol) {
+  return new Promise(async function(resolve, reject) {
+    let intent = [
+      "表示",
+      "認為",
+      "說",
+      "覺得",
+      "痛批",
+      "批",
+      "嗆",
+      "嗆爆",
+      "一句話",
+      "呼籲",
+      "表態",
+      "自爆",
+      "稱",
+      "聲稱",
+      "反稱",
+      "估",
+      "籲",
+      "呼籲",
+      "轟",
+      "砲轟",
+      "酸",
+      "酸爆",
+      "回",
+      ":",
+      "：",
+      "喊話",
+      "感慨",
+      "重申",
+      "下令",
+      "令",
+      "拍板",
+      "駁斥"];
+
+    // 生成比對 model
+    let intentModel = [];
+    for(let i = 0; i < pol.length; i++) {
+      for(let j = 0; j < intent.length; j++) {
+        intentModel.push(pol[i]+intent[j])
+      }
+    }
+
+    let sql = "SELECT * FROM news";
+    let data = [];
+    mysql.con.query(sql, function(error, results, fields) {
+      if(error) {
+        console.log(error);
+      }
+      for(let i = 0; i < results.length; i++) {
+        for(let j = 0; j < intentModel.length; j++) {
+          if(results[i].title.indexOf(intentModel[j]) != -1) {
+            data.push(results[i].id);
+            j = intentModel.length;
+          }
+        }
+      }
+      resolve(data);
+    });
+  });
+}
+
+function formPolIntent2(pol, rawNewsId) {
+  return new Promise(async function(resolve, reject) {
+    let intent = [
+      "表示",
+      "認為",
+      "說",
+      "覺得",
+      "痛批",
+      "批",
+      "嗆",
+      "嗆爆",
+      "一句話",
+      "呼籲",
+      "表態",
+      "自爆",
+      "稱",
+      "聲稱",
+      "反稱",
+      "估",
+      "籲",
+      "呼籲",
+      "轟",
+      "砲轟",
+      "酸",
+      "酸爆",
+      "回",
+      ":",
+      "：",
+      "喊話",
+      "感慨",
+      "重申",
+      "下令",
+      "令",
+      "拍板",
+      "駁斥"];
+    let data = [];
+    if(rawNewsId.length > 0) {
+      // 生成比對 model
+      let intentModel = [];
+      for(let i = 0; i < pol.length; i++) {
+        for(let j = 0; j < intent.length; j++) {
+          intentModel.push(pol[i]+intent[j])
+        }
+      }
+
+      let sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
+      mysql.con.query(sql, [rawNewsId], function(error, results, fields) {
+        if(error) {
+          console.log(error);
+        }
+        if(results.length > 0) {
+          for(let i = 0; i < results.length; i++) {
+            for(let j = 0; j < intentModel.length; j++) {
+              if(results[i].title.indexOf(intentModel[j]) != -1) {
+                data.push(results[i].id);
+                j = intentModel.length;
+              }
+            }
+          }
+          resolve(data);
+        }
+      });
+    } else {
+      resolve(data);
+    }
   });
 }

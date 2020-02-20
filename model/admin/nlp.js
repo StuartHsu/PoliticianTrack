@@ -130,7 +130,7 @@ module.exports = {
     return new Promise(async function(resolve, reject) {
       manager.load('./util/nlp_trained_model/train.nlp');
 
-      const content = '影／Kolas籲「搭公車捷運不用戴口罩」　侯友宜：一切遵照中央命令'.replace('：', '表示').replace(/[A-Za-z]+/, '');
+      const content = '黨籍案引爭議  郝龍斌：支持傅崐萁回到黨內'.replace('：', '表示').replace(/[A-Za-z]+/, '');
       const response = await manager.process('zh', content);
       resolve (JSON.stringify(response));
     });

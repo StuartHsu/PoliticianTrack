@@ -57,7 +57,8 @@ router.get('/api/tagfreqall', async function(req, res) {
   // let period = {
   //   end: today + " 23:59"
   // }
-  let data = await tagFreq.getPeriodCountAll(today);
+  // let data = await tagFreq.getPeriodCountAll(today);
+  let data = await tagFreq.getPeriodCountAll2(today);
   res.send(data);
 });
 

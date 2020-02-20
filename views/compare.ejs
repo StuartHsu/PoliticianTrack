@@ -26,7 +26,7 @@
         </div>
       </nav>
       <div class="feature">
-        <a href="./about">About Us</a>
+        <a href="./about">關於</a>
       </div>
     </header>
 
@@ -38,12 +38,12 @@
         <div class="filters">
           <ul>
             <li class="filter highlight" id="main">主選</li>
-            <li class="filter" id="party">政黨</li>
+            <!-- <li class="filter" id="party">政黨</li> -->
             <!-- <li class="filter" id="region">地區</li> -->
             <!-- <li class="filter" id="time">時間</li> -->
           </ul>
         </div>
-        <div class="partyList filterItems scrollBar">
+        <!-- <div class="partyList filterItems scrollBar">
           <ul>
             <li class="party">中國國民黨</li>
             <li class="party">民主進步黨</li>
@@ -60,7 +60,7 @@
             <li class="party">中華民族致公黨</li>
             <li class="party">社會民主黨</li>
           </ul>
-        </div>
+        </div> -->
 
         <div class="mainFilter filterItems">
           <div class="politician">
@@ -83,7 +83,7 @@
                 <% issuesData.forEach(function(result){ %>
                   <li class="issue"><%= result.name %></li>
                 <% }); %>
-                <li class="issue">一個中國</li>
+                <!-- <li class="issue">一個中國</li> -->
               </div>
             </ul>
           </div>
@@ -95,7 +95,20 @@
 
         <div class="top" id="compareTop">
           <div class="titleName point" id="compTitleName1">人物一</div>
-          <div class="titleIssue point" id="compTitleIssue">比較議題</div>
+          <div class="centerBox">
+            <div class="titleIssue point" id="compTitleIssue">比較議題</div>
+            <div class="switchBox">
+              <div class="switchTitle">精準</div>
+              <div class="onoffswitch">
+                  <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">
+                  <label class="onoffswitch-label switch" for="myonoffswitch">
+                      <span class="onoffswitch-inner"></span>
+                      <span class="onoffswitch-switch"></span>
+                  </label>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="titleIssue point" id="compTitleIssue">比較議題</div> -->
           <div class="titleName point right" id="compTitleName2">人物二</div>
         </div>
 
@@ -116,6 +129,7 @@
     const filters = document.querySelectorAll('.filter');
     const mainFilter = document.querySelector('.mainFilter');
     const partyList = document.querySelector('.partyList');
+    const switchButton = document.querySelector('.switch');
 
     const people = document.querySelectorAll('.person');
     const issues = document.querySelectorAll('.issue');
@@ -125,9 +139,13 @@
     const tips = document.getElementById("tips");
 
     // Pol, Issue record
-    let param = {};
-    let polList = [];
-    let issueList = [];
+    let param = {
+      pol: [],
+      issue: [],
+      party: []
+    }
+
+    let strictMode = false;
 
     // people eventListener use
     let firstPolName;
@@ -171,7 +189,7 @@
 
     // 人物選擇處理
     people.forEach(person => person.addEventListener('click', function(event) {
-      polList = []; // 清空
+      param.pol = []; // 清空
       let compTitleName1 = document.getElementById("compTitleName1");
       let compTitleName2 = document.getElementById("compTitleName2");
       if(this.classList.contains("innerHighlight")) {
@@ -200,12 +218,9 @@
 
       people.forEach(function(person) {
         if(person.classList.contains("innerHighlight")) {
-          polList.push(person.innerText);
+          param.pol.push(person.innerText);
         }
       });
-
-      param.pol = polList;
-      param.issue = issueList;
 
       if(param.pol[0] && param.pol[1]) {
         compTitleName1.innerHTML = param.pol[0];
@@ -226,7 +241,12 @@
 
       if(param.pol.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
-        getCompare(param);
+        if(strictMode === false) {
+          getCompare(param);
+        } else {
+          getCompareLess(param);
+        }
+        // getCompare(param);
       } else {
         removeData(appendNews);
         tips.style.display = "block";
@@ -235,7 +255,7 @@
 
     // 議題選擇處理
     issues.forEach(issue => issue.addEventListener('click', function(event) {
-      issueList = []; // 清空
+      param.issue = []; // 清空
       let compTitleIssue = document.getElementById("compTitleIssue");
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
@@ -250,34 +270,46 @@
 
       issues.forEach(function(issue) {
         if(issue.classList.contains("innerHighlight")) {
-          issueList.push(issue.innerText);
+          param.issue.push(issue.innerText);
         }
       });
 
-      param.pol = polList;
-      param.issue = issueList;
-
       if(param.pol.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
-        getCompare(param);
+        if(strictMode === false) {
+          getCompare(param);
+        } else {
+          getCompareLess(param);
+        }
+        // getCompare(param);
       } else {
         removeData(appendNews);
         tips.style.display = "block";
       }
     }));
 
-    childFilter(parties);
+    switchButton.addEventListener('click', function(event) {
+      if(strictMode === false) {
+        getCompareLess(param);
+        strictMode = true;
+      } else {
+        getCompare(param);
+        strictMode = false;
+      }
+    });
+
+    // childFilter(parties);
 
     // 子 filter 處理
-    function childFilter(items) {
-      items.forEach(item => item.addEventListener('click', function() {
-        if(this.classList.contains("innerHighlight")) {
-          this.classList.remove("innerHighlight");
-        } else {
-          this.classList.add("innerHighlight");
-        }
-      }));
-    }
+    // function childFilter(items) {
+    //   items.forEach(item => item.addEventListener('click', function() {
+    //     if(this.classList.contains("innerHighlight")) {
+    //       this.classList.remove("innerHighlight");
+    //     } else {
+    //       this.classList.add("innerHighlight");
+    //     }
+    //   }));
+    // }
 
 
     //------------ Server ------------
@@ -286,6 +318,20 @@
     function getCompare(param) {
       $.ajax({
         url: "api/news/getNews",
+        type: "POST",
+        data: JSON.stringify(param),
+        contentType: "application/json; charset=utf-8",
+        success: function(resp) {
+          removeData(appendNews);
+          dataCompareForm(resp.data, param.pol);
+        }
+      });
+    }
+
+    // DB 取資料 - 標題 mode
+    function getCompareLess(param) {
+      $.ajax({
+        url: "api/news/getNews/strict",
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
