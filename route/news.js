@@ -77,6 +77,12 @@ router.post('/getNews/strict', async function(req, res) {
     }).catch(err => {
       res.status(400).send({error: err});
     });
+  } else if(issueCount > 0 && polCount === 2) { // compare
+    await news.getCompareLess(pol, issue).then(async resp => {
+      res.send({data: resp});
+    }).catch(err => {
+      res.status(400).send({error: err});
+    });
   } else {
     res.send({data: "Nothing"});
   }

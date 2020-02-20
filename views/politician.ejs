@@ -86,7 +86,7 @@
           <div class="top_core">
             <div class="titleName" id="titleName"><%= title %></div>
             <div class="switchBox">
-              <div class="switchTitle">Strict</div>
+              <div class="switchTitle">精準</div>
               <div class="onoffswitch">
                   <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">
                   <label class="onoffswitch-label switch" for="myonoffswitch">
@@ -307,15 +307,15 @@
     });
 
     // 子 filter 處理
-    function childFilter(items) {
-      items.forEach(item => item.addEventListener('click', function() {
-        if(this.classList.contains("innerHighlight")) {
-          this.classList.remove("innerHighlight");
-        } else {
-          this.classList.add("innerHighlight");
-        }
-      }));
-    }
+    // function childFilter(items) {
+    //   items.forEach(item => item.addEventListener('click', function() {
+    //     if(this.classList.contains("innerHighlight")) {
+    //       this.classList.remove("innerHighlight");
+    //     } else {
+    //       this.classList.add("innerHighlight");
+    //     }
+    //   }));
+    // }
 
     // 新聞旁標籤點選切換
     function tagCallPol(pol) {

@@ -226,6 +226,47 @@ module.exports = {
         resolve();
       }
     });
+  },
+  getCompareLess: function(pol, issue) {
+    return new Promise(async function(resolve, reject) {
+      let id1 = await getTagId([pol[0], issue]);
+      let id2 = await getTagId([pol[1], issue]);
+      let new1 = await getBothNewsId(id1, 1);
+      let new2 = await getBothNewsId(id2, 1);
+      let newsArray = new1.concat(new2);
+
+      // 取得人物對應的 news_id
+      let newsId = await formPolIntent2(pol, newsArray);
+
+      let body = [];
+      let sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
+
+      if(newsArray.length > 0) { // 判斷是否有此兩人同一議題之新聞
+        mysql.con.query(sql, [newsId], async function(error, results, fields) {
+          if(error) {
+            reject(error);
+          }
+          // 新聞加上所含標籤
+          let data = await formTagNews(results);
+
+          for(let i = 0; i < data.length; i++) {
+            if(new1.indexOf(data[i].id) > -1 && new2.indexOf(data[i].id) > -1) {
+              data[i].tag_id = "both";
+            } else if (new1.indexOf(data[i].id) > -1 && new2.indexOf(data[i].id) < 0) {
+              data[i].tag_id = pol[0];
+            } else if (new1.indexOf(data[i].id) < 0 && new2.indexOf(data[i].id) > -1) {
+              data[i].tag_id = pol[1];
+            } else {
+              console.log("none");
+            }
+            body.push(data[i]);
+          }
+          resolve(body);
+        });
+      } else {
+        resolve(body);
+      }
+    });
   }
 }
 
@@ -458,6 +499,7 @@ function formPolIntent2(pol, rawNewsId) {
           intentModel.push(pol[i]+intent[j])
         }
       }
+
       let sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
       mysql.con.query(sql, [rawNewsId], function(error, results, fields) {
         if(error) {
