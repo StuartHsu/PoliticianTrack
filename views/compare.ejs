@@ -112,7 +112,7 @@
           <div class="titleName point right" id="compTitleName2">人物二</div>
         </div>
 
-        <div class="newslist scrollBar" id="appendNewsP">
+        <div class="newslist scrollBar" id="appendNewsP" onscroll="paging('oncoming')">
           <div class="tips" id="tips">請選擇「兩位人物」與「一個議題」以進行比較</div>
           <ul class="ulNews" id="appendNews"></ul>
         </div>
@@ -324,6 +324,24 @@
         success: function(resp) {
           removeData(appendNews);
           dataCompareForm(resp.data.news, param.pol);
+          page = 0;
+          next_paging = resp.data.next_paging;
+        }
+      });
+    }
+
+    // Get compare DB data - paging
+    function getComparePage(param, page) {
+      scrollStatus = false;
+      $.ajax({
+        url: `api/news/getNews?paging=${page}`,
+        type: "POST",
+        data: JSON.stringify(param),
+        contentType: "application/json; charset=utf-8",
+        success: function(resp) {
+          dataCompareForm(resp.data.news, param.pol);
+          next_paging = resp.data.next_paging;
+          scrollStatus = true;
         }
       });
     }
@@ -337,7 +355,25 @@
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
           removeData(appendNews);
-          dataCompareForm(resp.data, param.pol);
+          dataCompareForm(resp.data.news, param.pol);
+          page = 0;
+          next_paging = resp.data.next_paging;
+        }
+      });
+    }
+
+    // DB 取資料 - 標題 mode - page
+    function getCompareLessPage(param, page) {
+      scrollStatus = false;
+      $.ajax({
+        url: `api/news/getNews/strict?paging=${page}`,
+        type: "POST",
+        data: JSON.stringify(param),
+        contentType: "application/json; charset=utf-8",
+        success: function(resp) {
+          dataCompareForm(resp.data.news, param.pol);
+          next_paging = resp.data.next_paging;
+          scrollStatus = true;
         }
       });
     }
@@ -463,6 +499,31 @@
         newsContent[i].classList.remove("hidden");
       }
       event.target.childNodes[0].classList.remove("disabled");
+    }
+
+
+    let page = 0;
+    let next_paging;
+    let scrollStatus = true;
+
+    let outSideApd = document.querySelector("#appendNewsP");
+    let inSideApd = document.querySelector("#appendNews");
+
+    function paging(type) {
+      let x = inSideApd.getBoundingClientRect().bottom - outSideApd.clientHeight;
+      if(scrollStatus === false) { // waiting for next page
+        return;
+      }
+      if(x < 300) {
+        if(next_paging !== undefined) {
+          page++;
+          if(strictMode === false) {
+            getComparePage(param, page);
+          } else {
+            getCompareLessPage(param, page);
+          }
+        }
+      }
     }
 
 

@@ -101,8 +101,8 @@
           <div class="titleIssue" id="titleIssue"><%= issue %></div>
 
         </div>
-        <div class="newslist scrollBar" id="oncomingNews" onscroll="test()">
-          <ul class="ulNews">
+        <div class="newslist scrollBar" id="oncomingNewsP" onscroll="paging('oncoming')">
+          <ul class="ulNews" id="oncomingNews">
             <% for(let i = 0; i < results.length; i++) { %>
             <li>
               <div class="timeline">
@@ -163,7 +163,7 @@
           </ul>
         </div> <!-- NewsList End -->
 
-        <div class="newslist scrollBar" id="appendNewsP">
+        <div class="newslist scrollBar" id="appendNewsP" onscroll="paging('append')">
           <ul class="ulNews" id="appendNews">
 
           </ul>
@@ -372,7 +372,7 @@
     // DB 取資料
     function getNews(param) {
       $.ajax({
-        url: "api/news/getNews",
+        url: `api/news/getNews`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -382,7 +382,28 @@
           if(resp.data) {
             dataForm(resp.data.news, param.pol);
             tagShow();
+            page = 0;
+            next_paging = resp.data.next_paging;
           }
+        }
+      });
+    }
+
+    // DB 取資料 - paging
+    function getNewsPage(param, page) {
+      scrollStatus = false;
+      $.ajax({
+        url: `api/news/getNews?paging=${page}`,
+        type: "POST",
+        data: JSON.stringify(param),
+        contentType: "application/json; charset=utf-8",
+        success: function(resp) {
+          if(resp.data) {
+            dataForm(resp.data.news, param.pol);
+            tagShow();
+            next_paging = resp.data.next_paging;
+          }
+          scrollStatus = true;
         }
       });
     }
@@ -428,9 +449,30 @@
           removeData(appendNews);
           changeTitle(param.pol, param.issue);
           if(resp.data) {
-            dataForm(resp.data, param.pol);
+            dataForm(resp.data.news, param.pol);
             tagShow();
+            page = 0;
+            next_paging = resp.data.next_paging;
           }
+        }
+      });
+    }
+
+    // DB 取資料 - 標題 mode - paging
+    function getNewsLessPage(param, page) {
+      scrollStatus = false;
+      $.ajax({
+        url: `api/news/getNews/strict?paging=${page}`,
+        type: "POST",
+        data: JSON.stringify(param),
+        contentType: "application/json; charset=utf-8",
+        success: function(resp) {
+          if(resp.data) {
+            dataForm(resp.data.news, param.pol);
+            tagShow();
+            next_paging = resp.data.next_paging;
+          }
+          scrollStatus = true;
         }
       });
     }
@@ -458,7 +500,7 @@
 
     // Data 組裝
     function dataForm(respData, pol) {
-      document.getElementById('oncomingNews').style.display = "none";
+      document.getElementById('oncomingNewsP').style.display = "none";
       document.getElementById('appendNewsP').style.display = "flex";
 
       for (let i = 0; i < respData.length; i ++) {
@@ -587,7 +629,7 @@
 
     // Data 組裝 Less
     function dataFormLess(respData, pol) {
-      document.getElementById('oncomingNews').style.display = "none";
+      document.getElementById('oncomingNewsP').style.display = "none";
       document.getElementById('appendNewsP').style.display = "flex";
 
       for (let i = 0; i < respData.length; i ++) {
@@ -896,23 +938,35 @@
       }
     }
 
-    // var html = document.documentElement;
-    // var totalHeight = html.scrollHeight;
-    // var currentHeight = `${html.clientHeight + html.scrollTop}`;
-    var aaa = document.querySelector("#oncomingNews .ulNews");
-    // var b = aaa.getBoundingClientRect().bottom
-    // var c = aaa.clientHeight
-    // console.log(aaa.scrollHeight);
-    // console.log(c);
-    // test = function() {
-    //   if (`${aaa.getBoundingClientRect().bottom}` < 800) {
-    //     console.log("here");
-    //   }
-    // }
-    function test() {
-      var aaa = document.querySelector("#oncomingNews .ulNews");
-      console.log(aaa.getBoundingClientRect().bottom);
+
+    let page = 0;
+    let next_paging;
+    let scrollStatus = true;
+
+    let outSideOn = document.querySelector("#oncomingNewsP");
+    let inSideOn = document.querySelector("#oncomingNews");
+    let outSideApd = document.querySelector("#appendNewsP");
+    let inSideApd = document.querySelector("#appendNews");
+
+    getNews(param);
+
+    function paging(type) {
+      let x = inSideApd.getBoundingClientRect().bottom - outSideApd.clientHeight;
+      if(scrollStatus === false) { // waiting for next page
+        return;
+      }
+      if(x < 600) {
+        if(next_paging !== undefined) {
+          page++;
+          if(strictMode === false) {
+            getNewsPage(param, page);
+          } else {
+            getNewsLessPage(param, page);
+          }
+        }
+      }
     }
+
 
   </script>
 
