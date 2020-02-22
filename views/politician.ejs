@@ -101,7 +101,7 @@
           <div class="titleIssue" id="titleIssue"><%= issue %></div>
 
         </div>
-        <div class="newslist scrollBar" id="oncomingNews">
+        <div class="newslist scrollBar" id="oncomingNews" onscroll="test()">
           <ul class="ulNews">
             <% for(let i = 0; i < results.length; i++) { %>
             <li>
@@ -380,7 +380,7 @@
           removeData(appendNews);
           changeTitle(param.pol, param.issue);
           if(resp.data) {
-            dataForm(resp.data, param.pol);
+            dataForm(resp.data.news, param.pol);
             tagShow();
           }
         }
@@ -894,6 +894,24 @@
         }
         openOncomingFlag = false;
       }
+    }
+
+    // var html = document.documentElement;
+    // var totalHeight = html.scrollHeight;
+    // var currentHeight = `${html.clientHeight + html.scrollTop}`;
+    var aaa = document.querySelector("#oncomingNews .ulNews");
+    // var b = aaa.getBoundingClientRect().bottom
+    // var c = aaa.clientHeight
+    // console.log(aaa.scrollHeight);
+    // console.log(c);
+    // test = function() {
+    //   if (`${aaa.getBoundingClientRect().bottom}` < 800) {
+    //     console.log("here");
+    //   }
+    // }
+    function test() {
+      var aaa = document.querySelector("#oncomingNews .ulNews");
+      console.log(aaa.getBoundingClientRect().bottom);
     }
 
   </script>

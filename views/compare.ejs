@@ -323,7 +323,7 @@
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
           removeData(appendNews);
-          dataCompareForm(resp.data, param.pol);
+          dataCompareForm(resp.data.news, param.pol);
         }
       });
     }
