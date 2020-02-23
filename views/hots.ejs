@@ -109,6 +109,8 @@
         this.nextElementSibling.classList.remove("toggle");
       }
       tabCond = event.target.id;
+      onSide.scrollTop = 0;
+      appSide.scrollTop = 0;
       getData(event.target.id);
     }));
 

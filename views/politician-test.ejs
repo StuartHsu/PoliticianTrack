@@ -103,8 +103,9 @@
           <!-- <div class="titleIssue" id="titleIssue"></div> -->
 
         </div>
-        <div class="newslist" id="oncomingNewsP">
-          <ul class="ulNews scrollBar" id="oncomingNews" onscroll="paging('oncoming')">
+        <!-- <div class="newslist" id="oncomingNewsP" onscroll="paging2('oncoming')"> -->
+          <!-- <ul class="ulNews scrollBar" id="oncomingNews"> -->
+          <ul class="ulNews newslist scrollBar" id="oncomingNews" onscroll="paging2('oncoming')">
             <% for(let i = 0; i < results.news.length; i++) { %>
             <li>
               <div class="timeline">
@@ -163,10 +164,10 @@
             </li>
             <% }; %>
           </ul>
-        </div> <!-- NewsList End -->
+        <!-- </div> -->
 
-        <div class="newslist" id="appendNewsP">
-          <ul class="ulNews scrollBar" id="appendNews" onscroll="paging('append')">
+        <div class="newslist scrollBar" id="appendNewsP" onscroll="paging('append')">
+          <ul class="ulNews" id="appendNews">
 
           </ul>
         </div>
@@ -251,8 +252,6 @@
           param.pol.push(person.innerText);
         }
       });
-      appSide.scrollTop = 0;
-
       polIssue(param);
       if(strictMode === false) {
         getNews(param);
@@ -276,8 +275,6 @@
           param.issue.push(issue.innerText);
         }
       });
-      appSide.scrollTop = 0;
-
       if(strictMode === false) {
         getNews(param);
       } else {
@@ -329,7 +326,6 @@
         pol: [pol],
         issue: []
       }
-      appSide.scrollTop = 0;
       if(strictMode === false) {
         getNews(param);
       } else {
@@ -355,7 +351,6 @@
         pol: [],
         issue: [issue]
       }
-      appSide.scrollTop = 0;
       if(strictMode === false) {
         getNews(param);
       } else {
@@ -633,7 +628,7 @@
         li.appendChild(tagsDiv);
 
         if(cond === "oncoming") {
-          onSide.appendChild(li);
+          inSideOn.appendChild(li);
         } else {
           appendNews.appendChild(li);
           document.getElementById('oncomingNewsP').style.display = "none";
@@ -774,7 +769,6 @@
               param.pol.push(person.innerHTML);
             }
           });
-          appSide.scrollTop = 0;
           if(strictMode === false) {
             getNews(param);
           } else {
@@ -812,7 +806,6 @@
               param.issue.push(issue.innerHTML);
             }
           });
-          appSide.scrollTop = 0;
           if(strictMode === false) {
             getNews(param);
           } else {
@@ -958,26 +951,48 @@
 
 
     let page = 0;
-    let next_paging = 0;
+    let next_paging;
     let scrollStatus = true;
 
-    let onSide = document.querySelector("#oncomingNews");
-    let appSide = document.querySelector("#appendNews");
+    let outSideOn = document.querySelector("#oncomingNewsP");
+    let inSideOn = document.querySelector("#oncomingNews");
+    let outSideApd = document.querySelector("#appendNewsP");
+    let inSideApd = document.querySelector("#appendNews");
 
-    function paging(cond) {
+    // getNews(param);
+
+    function paging(type) {
+      let x = inSideApd.getBoundingClientRect().bottom - outSideApd.clientHeight;
       if(scrollStatus === false) { // waiting for next page
         return;
       }
-      let x = appSide.scrollHeight - appSide.scrollTop;
-      if(cond === "oncoming") {
-        x = onSide.scrollHeight - onSide.scrollTop;
+      if(x < 600) {
+        if(next_paging !== undefined) {
+          page++;
+          if(strictMode === false) {
+            getNewsPage(param, page);
+          } else {
+            getNewsLessPage(param, page);
+          }
+        }
       }
-      if(x < 1100 && next_paging !== undefined) {
-        page++;
-        if(strictMode === false) {
-          getNewsPage(param, page, cond);
-        } else {
-          getNewsLessPage(param, page, cond);
+    }
+
+    function paging2(type) {
+      let x = inSideOn.getBoundingClientRect().bottom - outSideOn.clientHeight;
+      next_paging = 0;
+      if(scrollStatus === false) { // waiting for next page
+        return;
+      }
+      if(x < 600) {
+
+        if(next_paging !== undefined) {
+          page++;
+          if(strictMode === false) {
+            getNewsPage(param, page, type);
+          } else {
+            getNewsLessPage(param, page, type);
+          }
         }
       }
     }

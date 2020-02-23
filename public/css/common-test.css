@@ -232,11 +232,8 @@ main {
 .content .newslist {
 	display: flex;
 	flex-wrap: wrap;
-}
-
-.content .ulNews {
 	overflow-y: scroll;
-	height: calc(100vh - 260px);
+	height: calc(100vh - 240px);
 }
 
 /* switch */
@@ -346,12 +343,12 @@ main {
   flex: 7;
 }
 
-.newslist>ul li {
+.newslist li {
   display: flex;
   align-items: center;
 }
 
-.newslist>ul {
+.ulNews {
   width: 100%;
   padding: 1em 2em 0;
   margin: 0;
@@ -506,17 +503,17 @@ main {
   background-color: #000000;
 }
 
-.ulNews.scrollBar::-webkit-scrollbar {
+.newslist.scrollBar::-webkit-scrollbar {
 	width: 6px;
   background-color: #DCDCDC;
 }
 
-.ulNews.scrollBar::-webkit-scrollbar-thumb {
+.newslist.scrollBar::-webkit-scrollbar-thumb {
 	border-radius: 10px;
   background-color: #424242;
 }
 
-.ulNews.scrollBar::-webkit-scrollbar-track {
+.newslist.scrollBar::-webkit-scrollbar-track {
 	border-radius: 10px;
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   background-color: #DCDCDC;
