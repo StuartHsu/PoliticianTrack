@@ -85,6 +85,7 @@
         <div class="top" id="defaultTop">
           <div class="top_core">
             <div class="titleName" id="titleName"><%= title %></div>
+            <!-- <div class="titleName" id="titleName">總覽</div> -->
             <div class="switchBox">
               <div class="switchTitle">精準</div>
               <div class="onoffswitch">
@@ -99,16 +100,17 @@
             <!-- <div class="switch">hey</div> -->
           </div>
           <div class="titleIssue" id="titleIssue"><%= issue %></div>
+          <!-- <div class="titleIssue" id="titleIssue"></div> -->
 
         </div>
-        <div class="newslist scrollBar" id="oncomingNewsP" onscroll="paging('oncoming')">
+        <div class="newslist scrollBar" id="oncomingNewsP" onscroll="paging2('oncoming')">
           <ul class="ulNews" id="oncomingNews">
-            <% for(let i = 0; i < results.length; i++) { %>
+            <% for(let i = 0; i < results.news.length; i++) { %>
             <li>
               <div class="timeline">
-              <% var renderTime = new Date(results[i].pubTime); %>
+              <% var renderTime = new Date(results.news[i].pubTime); %>
               <% if(i > 0) { %>
-                <% var renderPreTime = new Date(results[i - 1].pubTime); %>
+                <% var renderPreTime = new Date(results.news[i - 1].pubTime); %>
 
                 <% var renderPreTimeY = renderPreTime.getFullYear(); %>
                 <% var renderPreTimeM = renderPreTime.getMonth(); %>
@@ -133,27 +135,27 @@
 
               <div class="news" onclick="oncomingReadMore()">
                 <div class="news-content">
-                  <div class="title"><%= results[i].title %></div>
-                  <div class="publisher"><%= results[i].publisher %></div>
-                  <div class="pubTime"><%= results[i].pubTime %></div>
+                  <div class="title"><%= results.news[i].title %></div>
+                  <div class="publisher"><%= results.news[i].publisher %></div>
+                  <div class="pubTime"><%= results.news[i].pubTime %></div>
                   <div class="desc">
-                    <p><%= results[i].description %></p>
+                    <p><%= results.news[i].description %></p>
                   </div>
                   <div class="mainContent hidden">
-                    <% let appendModContent = results[i].content.replace(/(\u3002\u300d)/g, '。」<br><br>').replace(/(\u3002)(?!\u300d)/g, '。<br><br>') %>
+                    <% let appendModContent = results.news[i].content.replace(/(\u3002\u300d)/g, '。」<br><br>').replace(/(\u3002)(?!\u300d)/g, '。<br><br>') %>
                     <p><%- appendModContent %></p>
                   </div>
-                  <a class="url hidden" href="<%= results[i].href %>" target="_blank"><%= results[i].href %></a>
+                  <a class="url hidden" href="<%= results.news[i].href %>" target="_blank"><%= results.news[i].href %></a>
                 </div> <!-- news-content End -->
               </div> <!-- news End -->
 
               <div class="renderTags">
                 <ul>
-                  <% for(let j = 0; j < results[i].tag.length && j < 5; j++) { %>
-                    <% if(results[i].tag[j].tagType === "NRP") { %>
-                      <li class="polTag" onclick="tagCallPol('<%=results[i].tag[j].tagName%>')"><%= results[i].tag[j].tagName %></li>
+                  <% for(let j = 0; j < results.news[i].tag.length && j < 5; j++) { %>
+                    <% if(results.news[i].tag[j].tagType === "NRP") { %>
+                      <li class="polTag" onclick="tagCallPol('<%=results.news[i].tag[j].tagName%>')"><%= results.news[i].tag[j].tagName %></li>
                     <% } else { %>
-                      <li class="issueTag" onclick="tagCallIssue('<%=results[i].tag[j].tagName%>')"><%= results[i].tag[j].tagName %></li>
+                      <li class="issueTag" onclick="tagCallIssue('<%=results.news[i].tag[j].tagName%>')"><%= results.news[i].tag[j].tagName %></li>
                     <% } %>
                   <% } %>
                 </ul>
@@ -380,6 +382,7 @@
           removeData(appendNews);
           changeTitle(param.pol, param.issue);
           if(resp.data) {
+            // document.getElementById('oncomingNewsP').style.display = "none";
             dataForm(resp.data.news, param.pol);
             tagShow();
             page = 0;
@@ -390,7 +393,7 @@
     }
 
     // DB 取資料 - paging
-    function getNewsPage(param, page) {
+    function getNewsPage(param, page, cond) {
       scrollStatus = false;
       $.ajax({
         url: `api/news/getNews?paging=${page}`,
@@ -399,7 +402,7 @@
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
           if(resp.data) {
-            dataForm(resp.data.news, param.pol);
+            dataForm(resp.data.news, param.pol, cond);
             tagShow();
             next_paging = resp.data.next_paging;
           }
@@ -459,7 +462,7 @@
     }
 
     // DB 取資料 - 標題 mode - paging
-    function getNewsLessPage(param, page) {
+    function getNewsLessPage(param, page, cond) {
       scrollStatus = false;
       $.ajax({
         url: `api/news/getNews/strict?paging=${page}`,
@@ -468,7 +471,7 @@
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
           if(resp.data) {
-            dataForm(resp.data.news, param.pol);
+            dataForm(resp.data.news, param.pol, cond);
             tagShow();
             next_paging = resp.data.next_paging;
           }
@@ -499,9 +502,9 @@
     }
 
     // Data 組裝
-    function dataForm(respData, pol) {
-      document.getElementById('oncomingNewsP').style.display = "none";
-      document.getElementById('appendNewsP').style.display = "flex";
+    function dataForm(respData, pol, cond) {
+      // document.getElementById('oncomingNewsP').style.display = "none";
+      // document.getElementById('appendNewsP').style.display = "flex";
 
       for (let i = 0; i < respData.length; i ++) {
         var li = document.createElement("li");
@@ -623,7 +626,14 @@
         li.appendChild(newsDiv);
         li.appendChild(tagsDiv);
 
-        appendNews.appendChild(li);
+        if(cond === "oncoming") {
+          inSideOn.appendChild(li);
+        } else {
+          appendNews.appendChild(li);
+          document.getElementById('oncomingNewsP').style.display = "none";
+          document.getElementById('appendNewsP').style.display = "flex";
+        }
+        // appendNews.appendChild(li);
       }
     }
 
@@ -948,7 +958,7 @@
     let outSideApd = document.querySelector("#appendNewsP");
     let inSideApd = document.querySelector("#appendNews");
 
-    getNews(param);
+    // getNews(param);
 
     function paging(type) {
       let x = inSideApd.getBoundingClientRect().bottom - outSideApd.clientHeight;
@@ -962,6 +972,25 @@
             getNewsPage(param, page);
           } else {
             getNewsLessPage(param, page);
+          }
+        }
+      }
+    }
+
+    function paging2(type) {
+      let x = inSideOn.getBoundingClientRect().bottom - outSideOn.clientHeight;
+      next_paging = 0;
+      if(scrollStatus === false) { // waiting for next page
+        return;
+      }
+      if(x < 600) {
+
+        if(next_paging !== undefined) {
+          page++;
+          if(strictMode === false) {
+            getNewsPage(param, page, type);
+          } else {
+            getNewsLessPage(param, page, type);
           }
         }
       }

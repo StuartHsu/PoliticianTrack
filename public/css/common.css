@@ -335,9 +335,9 @@ main {
 	box-shadow: 0 1px 3px rgba(35,35,35, 0.7);
 }
 
-#oncomingNewsP {
+/* #oncomingNewsP {
 	display: none;
-}
+} */
 
 .ulNews .news {
   flex: 7;
