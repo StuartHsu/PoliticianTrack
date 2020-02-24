@@ -399,7 +399,7 @@ main {
 .newslist .renderTags>ul>li {
   font-size: 1rem;
   padding: 5px 10px;
-  border: 1px solid #000000;
+  /* border: 1px solid #000000; */
   border-radius: 15px;
   margin: 5px;
 }
@@ -413,20 +413,21 @@ main {
 
 .newslist .newsTags .polTag:hover,
 .renderTags .polTag:hover {
-	color: #3F3A3A;
-  background-color: #FFFFFF;
+	color: #FFFFFF;
+  background-color: #C0C0C0;
 }
 
 .newslist .newsTags .issueTag,
 .renderTags .issueTag {
-  background-color: #FFFFFF;
+	color: #FFFFFF;
+  background-color: #FF9300;
 	cursor: pointer;
 }
 
 .newslist .newsTags .issueTag:hover,
 .renderTags .issueTag:hover {
 	color: #FFFFFF;
-  background-color: #232323;
+  background-color: #FFD090;
 }
 
 .news>.news-content .title {

@@ -87,7 +87,7 @@
             <div class="titleName" id="titleName"><%= title %></div>
             <!-- <div class="titleName" id="titleName">總覽</div> -->
             <div class="switchBox">
-              <div class="switchTitle">精準</div>
+              <div class="switchTitle"></div>
               <div class="onoffswitch">
                   <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">
                   <label class="onoffswitch-label switch" for="myonoffswitch">
@@ -152,10 +152,12 @@
               <div class="renderTags">
                 <ul>
                   <% for(let j = 0; j < results.news[i].tag.length && j < 5; j++) { %>
-                    <% if(results.news[i].tag[j].tagType === "NRP") { %>
-                      <li class="polTag" onclick="tagCallPol('<%=results.news[i].tag[j].tagName%>')"><%= results.news[i].tag[j].tagName %></li>
-                    <% } else { %>
-                      <li class="issueTag" onclick="tagCallIssue('<%=results.news[i].tag[j].tagName%>')"><%= results.news[i].tag[j].tagName %></li>
+                    <% if(title.indexOf(results.news[i].tag[j].tagName) == -1 && issue.indexOf(results.news[i].tag[j].tagName) == -1) { %>
+                      <% if(results.news[i].tag[j].tagType === "NRP") { %>
+                        <li class="polTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'pol')"><%= results.news[i].tag[j].tagName %></li>
+                      <% } else { %>
+                        <li class="issueTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'issue')"><%= results.news[i].tag[j].tagName %></li>
+                      <% } %>
                     <% } %>
                   <% } %>
                 </ul>
@@ -185,8 +187,8 @@
     const partyFilter = document.querySelector('.partyList');
     const switchButton = document.querySelector('.switch');
 
-    const people = document.querySelectorAll('.person');
-    const issues = document.querySelectorAll('.issue');
+    let people = document.querySelectorAll('.person');
+    let issues = document.querySelectorAll('.issue');
     const parties = document.querySelectorAll('.party');
 
     const appendNews = document.getElementById("appendNews");
@@ -259,6 +261,7 @@
       } else {
         getNewsLess(param);
       }
+      filterHL(param);
     }));
 
     // 議題選擇處理
@@ -283,6 +286,7 @@
       } else {
         getNewsLess(param);
       }
+      filterHL(param);
     }));
 
     // 政黨選擇處理
@@ -300,9 +304,18 @@
         }
       });
       partyPol(param);
+      filterHL(param);
     }));
 
     switchButton.addEventListener('click', function(event) {
+      // 判斷是否從 hots 過來
+      if(getQueryStringValue("pol") && getQueryStringValue("issue")) {
+        param = {
+          pol: [getQueryStringValue("pol")],
+          issue: [getQueryStringValue("issue")],
+          party: []
+        }
+      }
       if(strictMode === false) {
         getNewsLess(param);
         strictMode = true;
@@ -312,67 +325,27 @@
       }
     });
 
-    // 子 filter 處理
-    // function childFilter(items) {
-    //   items.forEach(item => item.addEventListener('click', function() {
-    //     if(this.classList.contains("innerHighlight")) {
-    //       this.classList.remove("innerHighlight");
-    //     } else {
-    //       this.classList.add("innerHighlight");
-    //     }
-    //   }));
-    // }
-
     // 新聞旁標籤點選切換
-    function tagCallPol(pol) {
-      param = {
-        pol: [pol],
-        issue: []
-      }
-      appSide.scrollTop = 0;
-      if(strictMode === false) {
-        getNews(param);
-      } else {
-        getNewsLess(param);
-      }
-
-      people.forEach(function(person) {
-        if(person.classList.contains("innerHighlight")) {
-          person.classList.remove("innerHighlight");
-        }
-      });
-      issues.forEach(function(issue) {
-        if(issue.classList.contains("innerHighlight")) {
-          issue.classList.remove("innerHighlight");
-        }
-      });
-
-      addHLByTag(pol, "person");
-    }
-
-    function tagCallIssue(issue) {
+    function tagCall(tagName, cond) {
       param = {
         pol: [],
-        issue: [issue]
+        issue: [],
+        party: []
       }
+      if(cond === "pol") {
+        param.pol = [tagName]
+      } else {
+        param.issue = [tagName]
+      }
+      partyPol(param);
+      polIssue(param);
       appSide.scrollTop = 0;
       if(strictMode === false) {
         getNews(param);
       } else {
         getNewsLess(param);
       }
-
-      people.forEach(function(person) {
-        if(person.classList.contains("innerHighlight")) {
-          person.classList.remove("innerHighlight");
-        }
-      });
-      issues.forEach(function(issue) {
-        if(issue.classList.contains("innerHighlight")) {
-          issue.classList.remove("innerHighlight");
-        }
-      });
-      addHLByTag(issue, "issue");
+      filterHL(param);
     }
 
     //------------ Server ------------
@@ -389,7 +362,7 @@
           changeTitle(param.pol, param.issue);
           if(resp.data) {
             // document.getElementById('oncomingNewsP').style.display = "none";
-            dataForm(resp.data.news, param.pol);
+            dataForm(resp.data.news, param);
             tagShow();
             page = 0;
             next_paging = resp.data.next_paging;
@@ -408,7 +381,7 @@
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
           if(resp.data) {
-            dataForm(resp.data.news, param.pol, cond);
+            dataForm(resp.data.news, param, cond);
             tagShow();
             next_paging = resp.data.next_paging;
           }
@@ -458,7 +431,7 @@
           removeData(appendNews);
           changeTitle(param.pol, param.issue);
           if(resp.data) {
-            dataForm(resp.data.news, param.pol);
+            dataForm(resp.data.news, param);
             tagShow();
             page = 0;
             next_paging = resp.data.next_paging;
@@ -477,7 +450,7 @@
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
           if(resp.data) {
-            dataForm(resp.data.news, param.pol, cond);
+            dataForm(resp.data.news, param, cond);
             tagShow();
             next_paging = resp.data.next_paging;
           }
@@ -508,7 +481,7 @@
     }
 
     // Data 組裝
-    function dataForm(respData, pol, cond) {
+    function dataForm(respData, param, cond) {
       // document.getElementById('oncomingNewsP').style.display = "none";
       // document.getElementById('appendNewsP').style.display = "flex";
 
@@ -613,14 +586,14 @@
         for(let j = 0; j < respData[i].tag.length && j < 5; j++) {
           var tagLi = document.createElement("li");
           // if(respData[i].tag[j].tagName != name) {
-          if(pol.indexOf(respData[i].tag[j].tagName) == -1) {
+          if(param.pol.indexOf(respData[i].tag[j].tagName) == -1 && param.issue.indexOf(respData[i].tag[j].tagName) == -1) {
             tagLi.innerHTML = respData[i].tag[j].tagName;
             if(respData[i].tag[j].tagType === "NRP") {
               tagLi.className = "polTag";
-              tagLi.setAttribute("onclick", `tagCallPol("${respData[i].tag[j].tagName}")`);
+              tagLi.setAttribute("onclick", `tagCall("${respData[i].tag[j].tagName}", "pol")`);
             } else {
               tagLi.className = "issueTag";
-              tagLi.setAttribute("onclick", `tagCallIssue("${respData[i].tag[j].tagName}")`);
+              tagLi.setAttribute("onclick", `tagCall("${respData[i].tag[j].tagName}", "issue")`);
             }
             tagUl.appendChild(tagLi);
           }
@@ -783,6 +756,7 @@
           polIssue(param);
         });
         filPols.appendChild(filPolLi);
+        filterHL(param);
       }
     }
 
@@ -820,6 +794,7 @@
           }
         });
         filIssues.appendChild(polGetIssLi);
+        filterHL(param);
       }
 
     }
@@ -836,6 +811,7 @@
 
     // 點擊 tag 更新 filter HL
     function addHLByTag(item, className) {
+      console.log(item);
       var polClasses = document.getElementsByClassName(className),
           results = [];
       for(var i = 0; i < polClasses.length; i++) {
@@ -843,6 +819,32 @@
         if (content.indexOf(item) != -1) {
           results.push(polClasses[i]);
           polClasses[i].classList.add("innerHighlight")
+        }
+      }
+    }
+
+    // filter tag refresh
+    function filterHL(param) {
+      // let polClasses = document.getElementsByClassName("person");
+      // let issueClasses = document.getElementsByClassName("issue");
+      let partyClasses = document.getElementsByClassName("party");
+
+      people = document.querySelectorAll('.person');
+      issues = document.querySelectorAll('.issue');
+
+      people.forEach(r => r.classList.remove("innerHighlight"));
+      issues.forEach(r => r.classList.remove("innerHighlight"));
+
+      for(let i = 0; i < people.length; i++) {
+        let polContent = people[i].innerText;
+        if (polContent.indexOf(param.pol[0]) != -1) {
+          people[i].classList.add("innerHighlight");
+        }
+      }
+      for(let i = 0; i < issues.length; i++) {
+        let issueContent = issues[i].innerText;
+        if (issueContent.indexOf(param.issue[0]) != -1) {
+          issues[i].classList.add("innerHighlight");
         }
       }
     }
@@ -956,7 +958,7 @@
       }
     }
 
-
+    // paging
     let page = 0;
     let next_paging = 0;
     let scrollStatus = true;
@@ -982,6 +984,10 @@
       }
     }
 
+    // get query string
+    function getQueryStringValue (key) {
+      return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    }
 
   </script>
 

@@ -98,7 +98,7 @@
           <div class="centerBox">
             <div class="titleIssue point" id="compTitleIssue">比較議題</div>
             <div class="switchBox">
-              <div class="switchTitle">精準</div>
+              <div class="switchTitle"></div>
               <div class="onoffswitch">
                   <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">
                   <label class="onoffswitch-label switch" for="myonoffswitch">
@@ -112,9 +112,9 @@
           <div class="titleName point right" id="compTitleName2">人物二</div>
         </div>
 
-        <div class="newslist scrollBar" id="appendNewsP" onscroll="paging('oncoming')">
+        <div class="newslist" id="appendNewsP">
           <div class="tips" id="tips">請選擇「兩位人物」與「一個議題」以進行比較</div>
-          <ul class="ulNews" id="appendNews"></ul>
+          <ul class="ulNews scrollBar" id="appendNews" onscroll="paging('oncoming')"></ul>
         </div>
       </div> <!-- Content End -->
 
@@ -241,6 +241,7 @@
 
       if(param.pol.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
+        appSide.scrollTop = 0;
         if(strictMode === false) {
           getCompare(param);
         } else {
@@ -250,6 +251,7 @@
       } else {
         removeData(appendNews);
         tips.style.display = "block";
+        appendNews.style.display = "none";
       }
     }));
 
@@ -276,6 +278,7 @@
 
       if(param.pol.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
+        appSide.scrollTop = 0;
         if(strictMode === false) {
           getCompare(param);
         } else {
@@ -285,32 +288,28 @@
       } else {
         removeData(appendNews);
         tips.style.display = "block";
+        appendNews.style.display = "none";
       }
     }));
 
     switchButton.addEventListener('click', function(event) {
-      if(strictMode === false) {
-        getCompareLess(param);
-        strictMode = true;
+
+      if(param.pol.length === 2 && param.issue.length === 1) {
+        tips.style.display = "none";
+        appSide.scrollTop = 0;
+        if(strictMode === false) {
+          getCompareLess(param);
+          strictMode = true;
+        } else {
+          getCompare(param);
+          strictMode = false;
+        }
       } else {
-        getCompare(param);
-        strictMode = false;
+        removeData(appendNews);
+        tips.style.display = "block";
+        appendNews.style.display = "none";
       }
     });
-
-    // childFilter(parties);
-
-    // 子 filter 處理
-    // function childFilter(items) {
-    //   items.forEach(item => item.addEventListener('click', function() {
-    //     if(this.classList.contains("innerHighlight")) {
-    //       this.classList.remove("innerHighlight");
-    //     } else {
-    //       this.classList.add("innerHighlight");
-    //     }
-    //   }));
-    // }
-
 
     //------------ Server ------------
 
@@ -480,6 +479,7 @@
         li.appendChild(clickDiv);
 
         appendNews.appendChild(li);
+        appendNews.style.display = "block";
       }
     }
 
@@ -503,25 +503,22 @@
 
 
     let page = 0;
-    let next_paging;
+    let next_paging = 0;
     let scrollStatus = true;
 
-    let outSideApd = document.querySelector("#appendNewsP");
-    let inSideApd = document.querySelector("#appendNews");
+    let appSide = document.querySelector("#appendNews");
 
-    function paging(type) {
-      let x = inSideApd.getBoundingClientRect().bottom - outSideApd.clientHeight;
+    function paging(cond) {
       if(scrollStatus === false) { // waiting for next page
         return;
       }
-      if(x < 300) {
-        if(next_paging !== undefined) {
-          page++;
-          if(strictMode === false) {
-            getComparePage(param, page);
-          } else {
-            getCompareLessPage(param, page);
-          }
+      let x = appSide.scrollHeight - appSide.scrollTop;
+      if(x < 1100 && next_paging !== undefined) {
+        page++;
+        if(strictMode === false) {
+          getComparePage(param, page);
+        } else {
+          getCompareLessPage(param, page);
         }
       }
     }

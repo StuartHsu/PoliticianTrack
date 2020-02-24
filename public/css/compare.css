@@ -24,7 +24,7 @@
 	border-radius: 15px;
 }
 
-.content .top .titleName.right{
+.content .top .titleName.right {
 	background-color: rgba(23,23,23, .1);
 }
 
@@ -139,6 +139,10 @@
 
 #appendNewsP {
 	display: flex;
+}
+
+#appendNews {
+	display: none;
 }
 
 #tips {
