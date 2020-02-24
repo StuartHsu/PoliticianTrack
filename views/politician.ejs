@@ -168,6 +168,7 @@
         </div> <!-- NewsList End -->
 
         <div class="newslist" id="appendNewsP">
+          <div class="noContent">無符合條件之新聞內容</div>
           <ul class="ulNews scrollBar" id="appendNews" onscroll="paging('append')">
 
           </ul>
@@ -194,6 +195,11 @@
     const appendNews = document.getElementById("appendNews");
     const filPols = document.querySelector(".politician .inner");
     const filIssues = document.querySelector(".issueList .inner");
+
+    const noContent = document.querySelector(".noContent");
+    const personTitle = document.querySelector(".personTitle");
+    const issueTitle = document.querySelector(".issueTitle");
+    const boxBorder = document.querySelector(".box-border");
 
     // Pol, Issue record
     let param = {
@@ -243,6 +249,7 @@
       param.pol = [];
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
+        param.pol = [];
       } else {
         people.forEach(r => r.classList.remove("innerHighlight"));
         this.classList.add("innerHighlight");
@@ -251,6 +258,9 @@
       people.forEach(function(person) {
         if(person.classList.contains("innerHighlight")) {
           param.pol.push(person.innerText);
+          // 置頂
+          // let polParent = document.querySelector(".inner.scrollBar");
+          // polParent.insertBefore(person, polParent.firstChild);
         }
       });
       appSide.scrollTop = 0;
@@ -262,6 +272,15 @@
         getNewsLess(param);
       }
       filterHL(param);
+
+      if(param.pol.length === 0) {
+        personTitle.innerHTML = "人物";
+        personTitle.style.color = "#FFFFFF"
+      } else {
+        personTitle.innerHTML = param.pol;
+        personTitle.style.color = "#FFD479"
+      }
+      // personTitle.innerHTML = person.innerText;
     }));
 
     // 議題選擇處理
@@ -287,6 +306,14 @@
         getNewsLess(param);
       }
       filterHL(param);
+
+      if(param.issue.length === 0) {
+        issueTitle.innerHTML = "議題";
+        issueTitle.style.color = "#FFFFFF"
+      } else {
+        issueTitle.innerHTML = param.issue;
+        issueTitle.style.color = "#FFD479"
+      }
     }));
 
     // 政黨選擇處理
@@ -295,6 +322,7 @@
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
       } else {
+        parties.forEach(r => r.classList.remove("innerHighlight"));
         this.classList.add("innerHighlight");
       }
 
@@ -307,6 +335,7 @@
       filterHL(param);
     }));
 
+    // mode switch
     switchButton.addEventListener('click', function(event) {
       // 判斷是否從 hots 過來
       if(getQueryStringValue("pol") && getQueryStringValue("issue")) {
@@ -322,6 +351,42 @@
       } else {
         getNews(param);
         strictMode = false;
+      }
+    });
+
+    // 人物標題處理
+    personTitle.addEventListener('click', function(event) {
+      appPols = document.querySelectorAll('.person');
+      if(param.pol.length !== 0) {
+        appPols.forEach(r => r.classList.remove("innerHighlight"));
+        personTitle.innerHTML = "人物";
+        personTitle.style.color = "#FFFFFF"
+        param.pol = [];
+        polIssue(param);
+        if(strictMode === false) {
+          getNews(param);
+        } else {
+          getNewsLess(param);
+        }
+        filterHL(param);
+      }
+    });
+
+    // 議題標題處理
+    issueTitle.addEventListener('click', function(event) {
+      appIssues = document.querySelectorAll('.issue');
+      if(param.issue.length !== 0) {
+        appIssues.forEach(r => r.classList.remove("innerHighlight"));
+        issueTitle.innerHTML = "議題";
+        issueTitle.style.color = "#FFFFFF"
+        param.issue = [];
+        polIssue(param);
+        if(strictMode === false) {
+          getNews(param);
+        } else {
+          getNewsLess(param);
+        }
+        filterHL(param);
       }
     });
 
@@ -346,6 +411,22 @@
         getNewsLess(param);
       }
       filterHL(param);
+
+      if(param.pol.length === 0) {
+        personTitle.innerHTML = "人物";
+        personTitle.style.color = "#FFFFFF"
+      } else {
+        personTitle.innerHTML = param.pol;
+        personTitle.style.color = "#FFD479"
+      }
+
+      if(param.issue.length === 0) {
+        issueTitle.innerHTML = "議題";
+        issueTitle.style.color = "#FFFFFF"
+      } else {
+        issueTitle.innerHTML = param.issue;
+        issueTitle.style.color = "#FFD479"
+      }
     }
 
     //------------ Server ------------
@@ -361,6 +442,13 @@
           removeData(appendNews);
           changeTitle(param.pol, param.issue);
           if(resp.data) {
+            if(resp.data.news.length < 1){ // 無資料
+              noContent.style.display = "block";
+              appendNews.style.display = "none";
+            } else {
+              noContent.style.display = "none";
+              appendNews.style.display = "block";
+            }
             // document.getElementById('oncomingNewsP').style.display = "none";
             dataForm(resp.data.news, param);
             tagShow();
@@ -431,6 +519,13 @@
           removeData(appendNews);
           changeTitle(param.pol, param.issue);
           if(resp.data) {
+            if(resp.data.news.length < 1){
+              noContent.style.display = "block";
+              appendNews.style.display = "none";
+            } else {
+              noContent.style.display = "none";
+              appendNews.style.display = "block";
+            }
             dataForm(resp.data.news, param);
             tagShow();
             page = 0;
@@ -737,6 +832,7 @@
           appPols = document.querySelectorAll('.person');
           if(this.classList.contains("innerHighlight")) {
             this.classList.remove("innerHighlight");
+            param.pol = [];
           } else {
             appPols.forEach(r => r.classList.remove("innerHighlight"));
             this.classList.add("innerHighlight");
@@ -747,6 +843,7 @@
               param.pol.push(person.innerHTML);
             }
           });
+
           appSide.scrollTop = 0;
           if(strictMode === false) {
             getNews(param);
@@ -754,6 +851,14 @@
             getNewsLess(param);
           }
           polIssue(param);
+          // pol filter 標題改
+          if(param.pol.length === 0) {
+            personTitle.innerHTML = "人物";
+            personTitle.style.color = "#FFFFFF"
+          } else {
+            personTitle.innerHTML = param.pol;
+            personTitle.style.color = "#FFD479"
+          }
         });
         filPols.appendChild(filPolLi);
         filterHL(param);
@@ -776,6 +881,7 @@
           appIssues = document.querySelectorAll('.issue');
           if(this.classList.contains("innerHighlight")) {
             this.classList.remove("innerHighlight");
+            param.issue = [];
           } else {
             appIssues.forEach(r => r.classList.remove("innerHighlight"));
             this.classList.add("innerHighlight");
@@ -791,6 +897,14 @@
             getNews(param);
           } else {
             getNewsLess(param);
+          }
+          // issue filter 標題改
+          if(param.issue.length === 0) {
+            issueTitle.innerHTML = "議題";
+            issueTitle.style.color = "#FFFFFF"
+          } else {
+            issueTitle.innerHTML = param.issue;
+            issueTitle.style.color = "#FFD479"
           }
         });
         filIssues.appendChild(polGetIssLi);
