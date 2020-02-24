@@ -6,6 +6,7 @@ const mysqlCon=mysql.createPool({
 	user: config.mysql.user,
 	password: config.mysql.password,
 	database: config.mysql.database,
+	// insecureAuth: true,
 	connectionLimit : 10,
   port: 3306
 });
