@@ -65,7 +65,7 @@ function saveTagInfo(data, checkResult) {
   return new Promise(async function(resolve, reject) {
     if(checkResult.length < 1) {
       mysql.con.query(`INSERT newsTag SET ?`, data, async function(error, result, fields) {
-        if(error){
+        if(error) {
           reject("Data Insert Error");
         }
         resolve("Insert ok");
