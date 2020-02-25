@@ -85,7 +85,8 @@ module.exports={
       await clearCountAll();
 
       // let sql = 'SELECT title FROM news WHERE pubTime < ? AND intent = "politician_say";';
-      let sql = 'SELECT title FROM news WHERE pubTime < ?;';
+      // let sql = 'SELECT title FROM news WHERE pubTime < ?;';
+      let sql = 'SELECT content FROM news WHERE pubTime < ?;';
       mysql.con.query(sql, end, async function(error, result1, fields) {
         if(error) {
           reject(error);
@@ -94,9 +95,10 @@ module.exports={
         // for(let j = 1927; j < 1929; j++) {
         for(let j = 0; j < totalCount; j++) {
           console.log("處理中2：" + j + "/" + totalCount);
-          let jieba = nodejieba.tag(result1[j].title);
+          let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
             if(jieba[i].tag === "NRP") {
+            // if(jieba[i].name === "張惇涵") {
               let data = {
                 name: jieba[i].word,
                 type: jieba[i].tag,
@@ -107,6 +109,7 @@ module.exports={
               // await db(data).then(async function(result){
               //   await db2(data, result);
               // });
+              // return data;
               await db3(data);
             }
           }
