@@ -23,12 +23,16 @@ module.exports={
                 news_id: result1[j].id,
                 tag_id: tagId
               }
-              console.log(data);
-              let crspNewsId = await checkNewsId(data);
-              await saveTagInfo(data, crspNewsId);
-              // await checkNewsId(data).then(async function(result) {
-              //   await saveTagInfo(data, result);
-              // });
+              // console.log(data);
+              await checkNewsId(data).then(async function(result) {
+                await saveTagInfo(data, result).then(function(result) {
+                  // nothing
+                }).catch(err => {
+                  console.log("saveTagInfo: " + err);
+                });
+              }).catch(err => {
+                console.log("checkNewsId: " + err);
+              });
             }
           }
         }
@@ -41,13 +45,13 @@ module.exports={
 
 
 function getTagId(tagName) {
-  console.log(tagName);
+  // console.log(tagName);
   return new Promise(async function(resolve, reject) {
     mysql.con.query(`SELECT id FROM filterCount WHERE name = ?`, tagName, async function(error, checkResult, fields) {
       if(error){
         reject("Database Query Error");
       }
-      console.log(checkResult);
+      // console.log(checkResult);
       resolve(checkResult[0].id);
     });
   });
