@@ -78,6 +78,7 @@ module.exports={
           reject(error);
         }
         let totalCount = result1.length
+        // for(let j = 1927; j < 1929; j++) {
         for(let j = 0; j < totalCount; j++) {
           console.log("處理中2：" + j + "/" + totalCount);
           let jieba = nodejieba.tag(result1[j].title);
@@ -88,8 +89,10 @@ module.exports={
                 type: jieba[i].tag,
                 count: 1
               }
-              await dbAll(data).then(async function(result){
-                await db2All(data, result);
+              // await dbAll(data).then(async function(result){
+              //   await db2All(data, result);
+              await db(data).then(async function(result){
+                await db2(data, result);
               });
             }
           }
@@ -170,6 +173,7 @@ function dbAll(data) {
       if(error){
         reject("Database Insert Error");
       }
+      console.log(checkResult);
       resolve(checkResult);
     });
   });
