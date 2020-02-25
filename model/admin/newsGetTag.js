@@ -13,7 +13,7 @@ module.exports={
           reject(error);
         }
         let totalCount = result1.length
-        for(let j = 53; j < 54; j++) { // news error: 960
+        for(let j = 0; j < totalCount; j++) { // news error: 960
           console.log("處理中：" + j + "/" + totalCount + " New_id：" + result1[j].id);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
@@ -59,7 +59,7 @@ function getTagId(tagName) {
 
 function checkNewsId(data) {
   return new Promise(async function(resolve, reject) {
-    mysql.con.query(`SELECT * FROM newsTag WHERE news_id = ? AND tag_id = ?;`, [data.news_id, data.tag_id], async function(error, checkResult, fields) {    
+    mysql.con.query(`SELECT * FROM newsTag WHERE news_id = ? AND tag_id = ?;`, [data.news_id, data.tag_id], async function(error, checkResult, fields) {
       if(error){
         reject("Database Query Error");
       }
