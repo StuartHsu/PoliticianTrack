@@ -59,8 +59,7 @@ function getTagId(tagName) {
 
 function checkNewsId(data) {
   return new Promise(async function(resolve, reject) {
-    // mysql.con.query(`SELECT * FROM newsTag WHERE news_id = ? AND tag_id = ?;`, [data.news_id, data.tag_id], async function(error, checkResult, fields) {
-    mysql.con.query(`SELECT * FROM newsTag WHERE news_id = 416 AND tag_id = 533;`, [data.news_id, data.tag_id], async function(error, checkResult, fields) {
+    mysql.con.query(`SELECT * FROM newsTag WHERE news_id = ? AND tag_id = ?;`, [data.news_id, data.tag_id], async function(error, checkResult, fields) {    
       if(error){
         reject("Database Query Error");
       }
