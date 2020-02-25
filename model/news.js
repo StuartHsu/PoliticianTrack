@@ -517,7 +517,7 @@ function getTagId(tagName) {
       tagNameArr.push(tagName.issue[0]);
     }
     let data = [];
-    let sql = `SELECT id FROM filterCount WHERE name IN (?);`;
+    let sql = `SELECT id FROM filtercount WHERE name IN (?);`;
     if(tagNameArr.length > 0) { // 人 or 題至少有其一
       mysql.con.query(sql, [tagNameArr], function(error, results, fields) {
         if(error) {
@@ -539,9 +539,9 @@ function getNewsId(tagId) {
   return new Promise(function(resolve, reject) {
     let sql;
     if(tagId.length < 2) {
-      sql = `SELECT news_id FROM newsTag WHERE tag_id IN (?);`;
+      sql = `SELECT news_id FROM newstag WHERE tag_id IN (?);`;
     } else {
-      sql = `SELECT news_id FROM newsTag WHERE tag_id IN (?) GROUP BY news_id HAVING count(*) > 1;`;
+      sql = `SELECT news_id FROM newstag WHERE tag_id IN (?) GROUP BY news_id HAVING count(*) > 1;`;
     }
 
     let data = [];
@@ -569,7 +569,7 @@ function getNewsId(tagId) {
 function getBothNewsId(param, limit) {
   return new Promise(function(resolve, reject) {
 
-    let sql = `SELECT news_id FROM newsTag WHERE tag_id IN (?) GROUP BY news_id HAVING count(*) > ?;`;
+    let sql = `SELECT news_id FROM newstag WHERE tag_id IN (?) GROUP BY news_id HAVING count(*) > ?;`;
     // let sql = `SELECT news_id FROM newsTag WHERE tag_id IN (${param[0].id},${param[1].id}) GROUP BY news_id HAVING count(*) > ${limit};`;
 
     mysql.con.query(sql, [param, limit],function(error, results, fields) {
@@ -587,7 +587,7 @@ function getBothNewsId(param, limit) {
 
 function getTags(news_id) {
   return new Promise(function(resolve, reject) {
-    let sql = `SELECT a.news_id, a.tag_id, b.name, b.type FROM newsTag as a LEFT JOIN filterCount as b ON a.tag_id = b.id WHERE a.news_id = ${news_id};`;
+    let sql = `SELECT a.news_id, a.tag_id, b.name, b.type FROM newstag as a LEFT JOIN filtercount as b ON a.tag_id = b.id WHERE a.news_id = ${news_id};`;
     mysql.con.query(sql, function(error, results, fields) {
       if(error) {
         reject(error);

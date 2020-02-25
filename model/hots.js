@@ -14,9 +14,9 @@ module.exports = {
       }
       let sql = `
       SELECT count(*) AS total from (
-        SELECT newsTag.tag_id, filterCount.name,count(newsTag.tag_id) AS count
-        FROM newsTag LEFT JOIN filterCount ON (newsTag.tag_id = filterCount.id)
-        WHERE filterCount.type = ?
+        SELECT newstag.tag_id, filtercount.name,count(newstag.tag_id) AS count
+        FROM newstag LEFT JOIN filtercount ON (newstag.tag_id = filtercount.id)
+        WHERE filtercount.type = ?
         GROUP BY tag_id ORDER BY count DESC)
       AS a;`;
       mysql.con.query(sql, [tagType], async function(error, results, fields) {
@@ -28,9 +28,9 @@ module.exports = {
 						body.next_paging = paging + 1;
 					}
           sql =
-          `SELECT newsTag.tag_id, filterCount.name,count(newsTag.tag_id) AS count
-          FROM newsTag LEFT JOIN filterCount ON (newsTag.tag_id = filterCount.id)
-          WHERE filterCount.type = ?
+          `SELECT newstag.tag_id, filtercount.name,count(newstag.tag_id) AS count
+          FROM newstag LEFT JOIN filtercount ON (newstag.tag_id = filtercount.id)
+          WHERE filtercount.type = ?
           GROUP BY tag_id ORDER BY count DESC LIMIT ?,?;`;
           mysql.con.query(sql, [tagType, offset, size], async function(error, results, fields) {
             if(error) {
@@ -81,10 +81,10 @@ module.exports = {
   //   return new Promise(function(resolve, reject) {
   //     let sql =
   //     `SELECT b.tag_id, d.name, count(b.tag_id) AS count
-  //     FROM newsTag AS a
-  //     LEFT JOIN newsTag AS b ON (a.news_id = b.news_id)
+  //     FROM newstag AS a
+  //     LEFT JOIN newstag AS b ON (a.news_id = b.news_id)
   //     LEFT JOIN news AS c ON (a.news_id = c.id)
-  //     LEFT JOIN filterCount AS d ON (b.tag_id = d.id)
+  //     LEFT JOIN filtercount AS d ON (b.tag_id = d.id)
   //     WHERE a.tag_id = ? AND d.type = "NRP" AND c.intent = "politician_say"
   //     GROUP BY b.tag_id ORDER BY count DESC;`
   //     mysql.con.query(sql, issue_id,function(error, results, fields) {
@@ -104,10 +104,10 @@ module.exports = {
       }
       let sql =
       `SELECT b.tag_id, d.name, count(b.tag_id) AS count
-      FROM newsTag AS a
-      LEFT JOIN newsTag AS b ON (a.news_id = b.news_id)
+      FROM newstag AS a
+      LEFT JOIN newstag AS b ON (a.news_id = b.news_id)
       LEFT JOIN news AS c ON (a.news_id = c.id)
-      LEFT JOIN filterCount AS d ON (b.tag_id = d.id)
+      LEFT JOIN filtercount AS d ON (b.tag_id = d.id)
       WHERE a.tag_id = ? AND d.type = ? AND c.intent = "politician_say"
       GROUP BY b.tag_id ORDER BY count DESC;`
       mysql.con.query(sql, [tagId, tagType], function(error, results, fields) {
