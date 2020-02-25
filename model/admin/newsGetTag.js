@@ -13,11 +13,12 @@ module.exports={
           reject(error);
         }
         let totalCount = result1.length
-        for(let j = 0; j < totalCount; j++) { // news error: 960
+        for(let j = 2785; j < totalCount; j++) { // news error: 960
           console.log("處理中：" + j + "/" + totalCount + " New_id：" + result1[j].id);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
             if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") {
+              // console.log(jieba[i].word);
               let tagId = await getTagId(jieba[i].word);
               let data = {
                 news_id: result1[j].id,
@@ -45,14 +46,14 @@ module.exports={
 
 
 function getTagId(tagName) {
-  // console.log(tagName);
+  console.log(tagName);
   return new Promise(async function(resolve, reject) {
     mysql.con.query(`SELECT id FROM filterCount WHERE name = ?`, tagName, async function(error, checkResult, fields) {
       if(error){
         reject("Database Query Error");
       }
-      // console.log(checkResult);
-      // console.log(checkResult[0].id);
+      console.log(checkResult);
+      console.log(checkResult[0].id);
       resolve(checkResult[0].id);
     });
   });
@@ -64,6 +65,7 @@ function checkNewsId(data) {
       if(error){
         reject("Database Query Error");
       }
+      console.log(checkResult);
       resolve(checkResult);
     });
   });
@@ -73,7 +75,7 @@ function saveTagInfo(data, checkResult) {
 
   return new Promise(async function(resolve, reject) {
     if(checkResult.length < 1) {
-      mysql.con.query(`INSERT newsTag SET ?`, data, async function(error, result, fields) {
+      mysql.con.query(`INSERT newsTag SET ?`, [data], async function(error, result, fields) {
         if(error) {
           // console.log(data);
           reject("Data Insert Error");
@@ -82,7 +84,7 @@ function saveTagInfo(data, checkResult) {
         resolve("Insert ok");
       });
     } else {
-      mysql.con.query(`UPDATE newsTag SET ? WHERE news_id = ${data.news_id} AND tag_id = ${data.tag_id}`, data, async function(error, result, fields) {
+      mysql.con.query(`UPDATE newsTag SET ? WHERE news_id = ${data.news_id} AND tag_id = ${data.tag_id}`, [data], async function(error, result, fields) {
         if(error){
           reject("Data Update Error");
         }
