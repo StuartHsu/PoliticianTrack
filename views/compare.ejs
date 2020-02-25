@@ -46,19 +46,6 @@
         <!-- <div class="partyList filterItems scrollBar">
           <ul>
             <li class="party">中國國民黨</li>
-            <li class="party">民主進步黨</li>
-            <li class="party">台灣民眾黨</li>
-            <li class="party">時代力量</li>
-            <li class="party">台灣基進</li>
-            <li class="party">親民黨</li>
-            <li class="party">無黨團結聯盟</li>
-            <li class="party">台灣團結聯盟</li>
-            <li class="party">國會政黨聯盟</li>
-            <li class="party">綠黨</li>
-            <li class="party">勞動黨</li>
-            <li class="party">新黨</li>
-            <li class="party">中華民族致公黨</li>
-            <li class="party">社會民主黨</li>
           </ul>
         </div> -->
 
@@ -114,6 +101,7 @@
 
         <div class="newslist" id="appendNewsP">
           <div class="tips" id="tips">請選擇「兩位人物」與「一個議題」以進行比較</div>
+          <div class="noContent">無符合條件之新聞內容</div>
           <ul class="ulNews scrollBar" id="appendNews" onscroll="paging('oncoming')"></ul>
         </div>
       </div> <!-- Content End -->
@@ -136,7 +124,11 @@
     const parties = document.querySelectorAll('.party');
 
     const appendNews = document.getElementById("appendNews");
+
     const tips = document.getElementById("tips");
+    const noContent = document.querySelector(".noContent");
+    const personTitle = document.querySelector(".personTitle");
+    const issueTitle = document.querySelector(".issueTitle");
 
     // Pol, Issue record
     let param = {
@@ -251,6 +243,7 @@
       } else {
         removeData(appendNews);
         tips.style.display = "block";
+        noContent.style.display = "none";
         appendNews.style.display = "none";
       }
     }));
@@ -288,6 +281,7 @@
       } else {
         removeData(appendNews);
         tips.style.display = "block";
+        noContent.style.display = "none";
         appendNews.style.display = "none";
       }
     }));
@@ -311,6 +305,58 @@
       }
     });
 
+    // filter - 人物標題處理
+    personTitle.addEventListener('click', function(event) {
+      people.forEach(r => r.classList.remove("innerHighlight"));
+      param.pol = [];
+      firstPolName = "";
+      oldFirstPolName = "";
+      compTitleName1.innerHTML = "人物一";
+      compTitleName2.innerHTML = "人物二";
+      compTitleName1.classList.add("point");
+      compTitleName2.classList.add("point");
+
+      if(param.pol.length === 2 && param.issue.length === 1) {
+        tips.style.display = "none";
+        appSide.scrollTop = 0;
+        if(strictMode === false) {
+          getCompare(param);
+        } else {
+          getCompareLess(param);
+        }
+        // getCompare(param);
+      } else {
+        removeData(appendNews);
+        tips.style.display = "block";
+        noContent.style.display = "none";
+        appendNews.style.display = "none";
+      }
+    });
+
+    // filter - 議題標題處理
+    issueTitle.addEventListener('click', function(event) {
+      issues.forEach(r => r.classList.remove("innerHighlight"));
+      param.issue = [];
+      compTitleIssue.innerHTML = "比較議題";
+      compTitleIssue.classList.add("point");
+
+      if(param.pol.length === 2 && param.issue.length === 1) {
+        tips.style.display = "none";
+        appSide.scrollTop = 0;
+        if(strictMode === false) {
+          getCompare(param);
+        } else {
+          getCompareLess(param);
+        }
+        // getCompare(param);
+      } else {
+        removeData(appendNews);
+        tips.style.display = "block";
+        noContent.style.display = "none";
+        appendNews.style.display = "none";
+      }
+    });
+
     //------------ Server ------------
 
     // Get compare DB data
@@ -322,9 +368,18 @@
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
           removeData(appendNews);
-          dataCompareForm(resp.data.news, param.pol);
-          page = 0;
-          next_paging = resp.data.next_paging;
+          if(resp.data) {
+            if(resp.data.news.length < 1){ // 無資料
+              noContent.style.display = "block";
+              appendNews.style.display = "none";
+            } else {
+              noContent.style.display = "none";
+              appendNews.style.display = "block";
+            }
+            dataCompareForm(resp.data.news, param.pol);
+            page = 0;
+            next_paging = resp.data.next_paging;
+          }
         }
       });
     }
@@ -338,9 +393,18 @@
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
-          dataCompareForm(resp.data.news, param.pol);
-          next_paging = resp.data.next_paging;
-          scrollStatus = true;
+          if(resp.data) {
+            if(resp.data.news.length < 1){ // 無資料
+              noContent.style.display = "block";
+              appendNews.style.display = "none";
+            } else {
+              noContent.style.display = "none";
+              appendNews.style.display = "block";
+            }
+            dataCompareForm(resp.data.news, param.pol);
+            next_paging = resp.data.next_paging;
+            scrollStatus = true;
+          }          
         }
       });
     }
