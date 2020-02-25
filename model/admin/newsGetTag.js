@@ -24,7 +24,8 @@ module.exports={
                 news_id: result1[j].id,
                 tag_id: tagId
               }
-              // console.log(data);
+              console.log("outside: " + data.news_id);
+              console.log("outside: " + data.tag_id);
               await checkNewsId(data).then(async function(result) {
                 await saveTagInfo(data, result).then(function(result) {
                   // nothing
@@ -60,6 +61,8 @@ function getTagId(tagName) {
 }
 
 function checkNewsId(data) {
+  console.log("inside: " + data.news_id);
+  console.log("inside: " + data.tag_id);
   return new Promise(async function(resolve, reject) {
     mysql.con.query(`SELECT * FROM newsTag WHERE news_id = ? AND tag_id = ?;`, [data.news_id, data.tag_id], async function(error, checkResult, fields) {
       if(error){
