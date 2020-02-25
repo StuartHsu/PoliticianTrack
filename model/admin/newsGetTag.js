@@ -18,14 +18,11 @@ module.exports={
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
             if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") {
-              // console.log(jieba[i].word);
               let tagId = await getTagId(jieba[i].word);
               let data = {
                 news_id: result1[j].id,
                 tag_id: tagId
               }
-              console.log("outside: " + data.news_id);
-              console.log("outside: " + data.tag_id);
               await checkNewsId(data).then(async function(result) {
                 await saveTagInfo(data, result).then(function(result) {
                   // nothing
@@ -49,11 +46,10 @@ module.exports={
 function getTagId(tagName) {
   console.log(tagName);
   return new Promise(async function(resolve, reject) {
-    mysql.con.query(`SELECT id FROM filterCount WHERE name = ?`, tagName, async function(error, checkResult, fields) {
+    mysql.con.query(`SELECT id FROM filtercount WHERE name = ?`, tagName, async function(error, checkResult, fields) {
       if(error){
         reject("Database Query Error");
       }
-      console.log(checkResult);
       console.log(checkResult[0].id);
       resolve(checkResult[0].id);
     });
@@ -61,10 +57,8 @@ function getTagId(tagName) {
 }
 
 function checkNewsId(data) {
-  console.log("inside: " + data.news_id);
-  console.log("inside: " + data.tag_id);
   return new Promise(async function(resolve, reject) {
-    mysql.con.query(`SELECT * FROM newsTag WHERE news_id = ? AND tag_id = ?;`, [data.news_id, data.tag_id], async function(error, checkResult, fields) {
+    mysql.con.query(`SELECT * FROM newstag WHERE news_id = ? AND tag_id = ?;`, [data.news_id, data.tag_id], async function(error, checkResult, fields) {
       if(error){
         reject("Database Query Error");
       }
@@ -75,10 +69,11 @@ function checkNewsId(data) {
 }
 
 function saveTagInfo(data, checkResult) {
-
+  console.log(data);
+  console.log(checkResult);
   return new Promise(async function(resolve, reject) {
     if(checkResult.length < 1) {
-      mysql.con.query(`INSERT newsTag SET ?`, [data], async function(error, result, fields) {
+      mysql.con.query(`INSERT newstag SET ?`, [data], async function(error, result, fields) {
         if(error) {
           // console.log(data);
           reject("Data Insert Error");
@@ -87,7 +82,7 @@ function saveTagInfo(data, checkResult) {
         resolve("Insert ok");
       });
     } else {
-      mysql.con.query(`UPDATE newsTag SET ? WHERE news_id = ${data.news_id} AND tag_id = ${data.tag_id}`, [data], async function(error, result, fields) {
+      mysql.con.query(`UPDATE newstag SET ? WHERE news_id = ${data.news_id} AND tag_id = ${data.tag_id}`, [data], async function(error, result, fields) {
         if(error){
           reject("Data Update Error");
         }

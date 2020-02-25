@@ -123,7 +123,7 @@ module.exports={
 
 function clearCount() {
   return new Promise(function(resolve, reject) {
-    let sql = 'UPDATE filterCount SET count = 0;';
+    let sql = 'UPDATE filtercount SET count = 0;';
     mysql.con.query(sql, function(error, results, fields) {
       if(error) {
         reject(error);
@@ -138,7 +138,7 @@ function db(data) {
 
   return new Promise(async function(resolve, reject) {
 
-    mysql.con.query(`select * from filterCount where name = "${data.name}"`, async function(error, checkResult, fields) {
+    mysql.con.query(`select * from filtercount where name = "${data.name}"`, async function(error, checkResult, fields) {
       if(error){
         reject("Database Insert Error");
       }
@@ -151,14 +151,14 @@ function db2(data, checkResult) {
 
   return new Promise(async function(resolve, reject) {
     if(checkResult.length < 1) {
-      mysql.con.query('insert into filterCount set ?', data, function(error, results, fields) {
+      mysql.con.query('insert into filtercount set ?', data, function(error, results, fields) {
         if(error){
           reject("Database Insert Error");
         }
         resolve("ok");
       });
     } else {
-      let query = `update filterCount set count = count + 1 where name = "${data.name}"`;
+      let query = `update filtercount set count = count + 1 where name = "${data.name}"`;
       mysql.con.query(query, function(error, results, fields){
         if(error){
           reject("Database Query Error");
@@ -173,22 +173,22 @@ function db3(data) {
 
   return new Promise(async function(resolve, reject) {
 
-    mysql.con.query(`select * from filterCount where name = "${data.name}"`, async function(error, checkResult, fields) {
+    mysql.con.query(`select * from filtercount where name = "${data.name}"`, async function(error, checkResult, fields) {
       if(error){
-        reject("Database 'filterCount' Query Error");
+        reject("Database 'filtercount' Query Error");
       } else {
         if(checkResult.length < 1) {
-          mysql.con.query('insert into filterCount set ?', data, function(error, results, fields) {
+          mysql.con.query('insert into filtercount set ?', data, function(error, results, fields) {
             if(error){
-              reject("Database 'filterCount' Insert Error");
+              reject("Database 'filtercount' Insert Error");
             }
             resolve("ok");
           });
         } else {
-          let query = `update filterCount set count = count + 1 where name = "${data.name}"`;
+          let query = `update filtercount set count = count + 1 where name = "${data.name}"`;
           mysql.con.query(query, function(error, results, fields){
             if(error){
-              reject("Database 'filterCount' Update Error");
+              reject("Database 'filtercount' Update Error");
             }
             resolve("ok");
           });
@@ -200,7 +200,7 @@ function db3(data) {
 
 function clearCountAll() {
   return new Promise(function(resolve, reject) {
-    let sql = 'UPDATE filterCountAll SET count = 0;';
+    let sql = 'UPDATE filtercountall SET count = 0;';
     mysql.con.query(sql, function(error, results, fields) {
       if(error) {
         reject(error);
@@ -215,7 +215,7 @@ function dbAll(data) {
 
   return new Promise(async function(resolve, reject) {
 
-    mysql.con.query(`select * from filterCountAll where name = "${data.name}"`, async function(error, checkResult, fields) {
+    mysql.con.query(`select * from filtercountall where name = "${data.name}"`, async function(error, checkResult, fields) {
       if(error){
         reject("Database Insert Error");
       }
@@ -229,14 +229,14 @@ function db2All(data, checkResult) {
 
   return new Promise(async function(resolve, reject) {
     if(checkResult.length < 1) {
-      mysql.con.query('insert into filterCountAll set ?', data, function(error, results, fields) {
+      mysql.con.query('insert into filtercountall set ?', data, function(error, results, fields) {
         if(error){
           reject("Database Insert Error");
         }
         resolve("ok");
       });
     } else {
-      let query = `update filterCountAll set count = count + 1 where name = "${data.name}"`;
+      let query = `update filtercountall set count = count + 1 where name = "${data.name}"`;
       mysql.con.query(query, function(error, results, fields){
         if(error){
           reject("Database Query Error");

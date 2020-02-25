@@ -15,9 +15,9 @@ module.exports = {
   filter: function(party) {
     return new Promise(function(resolve, reject) {
       let sql =
-      `SELECT filterCount.name, politician.party
-      FROM filterCount LEFT JOIN politician ON (filterCount.name = politician.name)
-      WHERE filterCount.type = "NRP"`
+      `SELECT filtercount.name, politician.party
+      FROM filtercount LEFT JOIN politician ON (filtercount.name = politician.name)
+      WHERE filtercount.type = "NRP"`
       let addSql;
       if(party.length > 0) {
         addSql = ` AND politician.party IN (?) ORDER BY count DESC;`

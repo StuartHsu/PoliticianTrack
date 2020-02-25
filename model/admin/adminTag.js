@@ -35,7 +35,7 @@ module.exports={
   },
   get: function() {
     return new Promise(function(resolve, reject) {
-      mysql.con.query('SELECT * FROM tagVerify WHERE status is null AND count > 20 ORDER BY count DESC;', async function(error, results, fields) {
+      mysql.con.query('SELECT * FROM tagverify WHERE status is null AND count > 20 ORDER BY count DESC;', async function(error, results, fields) {
         if(error) {
           reject(error);
         }
@@ -91,7 +91,7 @@ function db(data) {
 
   return new Promise(async function(resolve, reject) {
 
-    mysql.con.query(`select * from tagVerify where name = "${data.name}"`, async function(error, checkResult, fields) {
+    mysql.con.query(`select * from tagverify where name = "${data.name}"`, async function(error, checkResult, fields) {
       if(error){
         reject("Database Insert Error");
       }
@@ -104,14 +104,14 @@ function db2(data, checkResult) {
 
   return new Promise(async function(resolve, reject) {
     if(checkResult.length < 1) {
-      mysql.con.query('insert into tagVerify set ?', data, function(error, results, fields) {
+      mysql.con.query('insert into tagverify set ?', data, function(error, results, fields) {
         if(error){
           reject("Database Insert Error");
         }
         resolve("ok");
       });
     } else {
-      let query = `update tagVerify set count = count + 1 where name = "${data.name}"`;
+      let query = `update tagverify set count = count + 1 where name = "${data.name}"`;
       mysql.con.query(query, function(error, results, fields){
         if(error){
           reject("Database Query Error");
@@ -126,7 +126,7 @@ function updateTagStatus(data) {
 
   return new Promise(async function(resolve, reject) {
 
-    let query = `update tagVerify set type = "${data.type}", status = "${data.status}" where name = "${data.name}";`;
+    let query = `update tagverify set type = "${data.type}", status = "${data.status}" where name = "${data.name}";`;
     mysql.con.query(query, function(error, results, fields) {
       if(error) {
         reject("Database Update Error");
