@@ -8,7 +8,8 @@ module.exports={
     return new Promise(async function(resolve, reject) {
       await clearCount();
 
-      let sql = 'SELECT content FROM news WHERE pubTime > ? AND pubTime < ? AND intent = "politician_say";';
+      // let sql = 'SELECT content FROM news WHERE pubTime > ? AND pubTime < ? AND intent = "politician_say";';
+      let sql = 'SELECT content FROM news WHERE pubTime > ? AND pubTime < ?;';
       mysql.con.query(sql, [start, end], async function(error, result1, fields) {
         if(error) {
           reject(error);
@@ -70,7 +71,8 @@ module.exports={
     return new Promise(async function(resolve, reject) {
       await clearCountAll();
 
-      let sql = 'SELECT title FROM news WHERE pubTime < ? AND intent = "politician_say";';
+      // let sql = 'SELECT title FROM news WHERE pubTime < ? AND intent = "politician_say";';
+      let sql = 'SELECT title FROM news WHERE pubTime < ?;';
       mysql.con.query(sql, end, async function(error, result1, fields) {
         if(error) {
           reject(error);
