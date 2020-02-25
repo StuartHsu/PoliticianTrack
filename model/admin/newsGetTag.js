@@ -13,7 +13,7 @@ module.exports={
           reject(error);
         }
         let totalCount = result1.length
-        for(let j = 0; j < result1.length; j++) { // news error: 960
+        for(let j = 0; j < totalCount; j++) { // news error: 960
           console.log("處理中：" + j + "/" + totalCount + " New_id：" + result1[j].id);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
@@ -38,12 +38,13 @@ module.exports={
 
 
 function getTagId(tagName) {
-
+  console.log(tagName);
   return new Promise(async function(resolve, reject) {
     mysql.con.query(`SELECT id FROM filterCount WHERE name = ?`, tagName, async function(error, checkResult, fields) {
       if(error){
         reject("Database Query Error");
       }
+      console.log(checkResult);
       resolve(checkResult[0].id);
     });
   });
@@ -66,7 +67,9 @@ function saveTagInfo(data, checkResult) {
     if(checkResult.length < 1) {
       mysql.con.query(`INSERT newsTag SET ?`, data, async function(error, result, fields) {
         if(error){
+          // console.log(data);
           reject("Data Insert Error");
+          // resolve("Data Insert Error");
         }
         resolve("Insert ok");
       });
