@@ -52,6 +52,10 @@
 
 /* news content */
 
+.news {
+	min-height: 0;
+}
+
 .ulNews .news.rightnews {
   color: #000000;
   background-color: rgba(23,23,23, .1)

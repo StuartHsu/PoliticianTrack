@@ -330,12 +330,32 @@ main {
 /* news */
 .news {
   max-width: 800px;
+	min-height: 133px;
 	/* width: 760px; */
 	margin: 10px 20px 10px 0;
 	padding: 15px;
 	border: 1px solid #232323;
 	border-radius: 10px;
 	box-shadow: 0 1px 3px rgba(35,35,35, 0.7);
+	-webkit-transition: all 250ms cubic-bezier(0.02, 0.01, 0.47, 1);
+  transition: all 250ms cubic-bezier(.02, .01, .47, 1);
+}
+
+.news:hover {
+	animation: fly .1s linear;
+	animation-fill-mode: both;
+}
+
+@keyframes fly {
+	0% {
+		border: 1px solid rgba(35,35,35, .8)
+    box-shadow: 0 0 3px rgba(35,35,35, 0.7);
+  }
+  100% {
+		background-color: #F0F0F0;
+		border: 1px solid rgba(35,35,35, .6);
+    box-shadow: 0 0 8px rgba(35,35,35, .9);
+  }
 }
 
 /* #oncomingNewsP {
