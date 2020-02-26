@@ -104,69 +104,46 @@
 
         </div>
         <div class="newslist" id="oncomingNewsP">
+          <div class="noContent">無符合條件之新聞內容</div>
           <ul class="ulNews scrollBar" id="oncomingNews" onscroll="paging('oncoming')">
-            <% for(let i = 0; i < results.news.length; i++) { %>
-            <li>
-              <div class="timeline">
-              <% var renderTime = new Date(results.news[i].pubTime); %>
-              <% if(i > 0) { %>
-                <% var renderPreTime = new Date(results.news[i - 1].pubTime); %>
-
-                <% var renderPreTimeY = renderPreTime.getFullYear(); %>
-                <% var renderPreTimeM = renderPreTime.getMonth(); %>
-                <% var renderCurTimeY = renderTime.getFullYear(); %>
-                <% var renderCurTimeM = renderTime.getMonth(); %>
-
-                <% if(renderPreTimeY !== renderCurTimeY && renderPreTimeM !== renderCurTimeM) { %>
+            <%_ for(let i = 0; i < results.news.length; i++) { _%><li><div class="timeline">
+              <%_ var renderTime = new Date(results.news[i].pubTime); _%>
+              <%_ if(i > 0) { _%>
+                <%_ var renderPreTime = new Date(results.news[i - 1].pubTime); _%>
+                <%_ var renderPreTimeY = renderPreTime.getFullYear(); _%>
+                <%_ var renderPreTimeM = renderPreTime.getMonth(); _%>
+                <%_ var renderCurTimeY = renderTime.getFullYear(); _%>
+                <%_ var renderCurTimeM = renderTime.getMonth(); _%>
+                <%_ if(renderPreTimeY !== renderCurTimeY && renderPreTimeM !== renderCurTimeM) { _%>
                   <p class="year"><%= renderTime.getFullYear() %></p>
                   <p class="month"><%= (renderTime.getMonth() < 10 ? '0' : '') + (renderTime.getMonth() + 1) %></p>
-                <% } else if (renderPreTimeY == renderCurTimeY && renderPreTimeM !== renderCurTimeM) { %>
+                <%_ } else if (renderPreTimeY == renderCurTimeY && renderPreTimeM !== renderCurTimeM) { _%>
                   <p class="year"><%= "" %></p>
                   <p class="month"><%= (renderTime.getMonth() < 10 ? '0' : '') + (renderTime.getMonth() + 1) %></p>
-                <% } else { %>
+                <%_ } else { _%>
                   <p class="year"><%= "" %></p>
                   <p class="month"><%= "" %></p>
-                <% } %>
-              <% } else { %>
+                <%_ } _%>
+              <%_ } else { _%>
                 <p class="year"><%= renderTime.getFullYear() %></p>
                 <p class="month"><%= (renderTime.getMonth() < 10 ? '0' : '') + (renderTime.getMonth() + 1) %></p>
-              <% } %>
-              </div>
-
-              <div class="news" onclick="oncomingReadMore()">
-                <div class="news-content">
-                  <div class="title"><%= results.news[i].title %></div>
-                  <div class="publisher"><%= results.news[i].publisher %></div>
-                  <div class="pubTime"><%= results.news[i].pubTime %></div>
-                  <div class="desc">
-                    <p><%= results.news[i].description %></p>
-                  </div>
-                  <div class="mainContent hidden">
-                    <% let appendModContent = results.news[i].content.replace(/(\u3002\u300d)/g, '。」<br><br>').replace(/(\u3002)(?!\u300d)/g, '。<br><br>') %>
+              <%_ } _%>
+              </div><div class="news" onclick="readMore()"><div class="news-content"><div class="title"><%= results.news[i].title %></div><div class="publisher"><%= results.news[i].publisher %></div><div class="pubTime"><%= results.news[i].pubTime %></div><div class="desc"><p><%= results.news[i].content %></p></div><div class="mainContent hidden">
+                    <%_ let appendModContent = results.news[i].content.replace(/(\u3002\u300d)/g, '。」<br><br>').replace(/(\u3002)(?!\u300d)/g, '。<br><br>') _%>
                     <p><%- appendModContent %></p>
-                  </div>
-                  <a class="url hidden" href="<%= results.news[i].href %>" target="_blank"><%= results.news[i].href %></a>
-                </div> <!-- news-content End -->
-              </div> <!-- news End -->
-
-              <div class="renderTags">
-                <ul>
-                  <% for(let j = 0; j < results.news[i].tag.length && j < 5; j++) { %>
-                    <% if(title.indexOf(results.news[i].tag[j].tagName) == -1 && issue.indexOf(results.news[i].tag[j].tagName) == -1) { %>
-                      <% if(results.news[i].tag[j].tagType === "NRP") { %>
+                  </div><a class="url hidden" href="<%= results.news[i].href %>" target="_blank"><%= results.news[i].href %></a></div></div><div class="renderTags">
+                <ul><%_ for(let j = 0; j < results.news[i].tag.length && j < 5; j++) { _%>
+                    <%_ if(title.indexOf(results.news[i].tag[j].tagName) == -1 && issue.indexOf(results.news[i].tag[j].tagName) == -1) { _%>
+                      <%_ if(results.news[i].tag[j].tagType === "NRP") { _%>
                         <li class="polTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'pol')"><%= results.news[i].tag[j].tagName %></li>
-                      <% } else { %>
+                      <%_ } else { _%>
                         <li class="issueTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'issue')"><%= results.news[i].tag[j].tagName %></li>
-                      <% } %>
-                    <% } %>
-                  <% } %>
+                      <%_ } _%>
+                    <%_ } _%>
+                  <%_ } _%>
                 </ul>
-              </div>
-            </li>
-            <% }; %>
-          </ul>
-        </div> <!-- NewsList End -->
-
+              </div></li><%_ }; _%></ul>
+        </div>
         <div class="newslist" id="appendNewsP">
           <div class="noContent">無符合條件之新聞內容</div>
           <ul class="ulNews scrollBar" id="appendNews" onscroll="paging('append')">
@@ -258,9 +235,6 @@
       people.forEach(function(person) {
         if(person.classList.contains("innerHighlight")) {
           param.pol.push(person.innerText);
-          // 置頂
-          // let polParent = document.querySelector(".inner.scrollBar");
-          // polParent.insertBefore(person, polParent.firstChild);
         }
       });
       appSide.scrollTop = 0;
@@ -449,7 +423,6 @@
               noContent.style.display = "none";
               appendNews.style.display = "block";
             }
-            // document.getElementById('oncomingNewsP').style.display = "none";
             dataForm(resp.data.news, param);
             tagShow();
             page = 0;
@@ -582,7 +555,6 @@
 
       for (let i = 0; i < respData.length; i ++) {
         var li = document.createElement("li");
-        // li.setAttribute("onclick", "readMore()");
 
         // timeline
         var timelineDiv = document.createElement("div");
@@ -624,7 +596,7 @@
         // news
         var newsDiv = document.createElement("div");
         newsDiv.className = "news";
-        newsDiv.setAttribute("onclick", "readMore()");
+        newsDiv.setAttribute("onclick", `readMore()`);
         // link.setAttribute("href", `${respData[i].href}`);
         // link.setAttribute("target", "_blank");
 
@@ -646,7 +618,7 @@
         var descDiv = document.createElement("div");
         descDiv.className = "desc";
         var descP = document.createElement("p");
-        descP.innerHTML = respData[i].description;
+        descP.innerHTML = respData[i].content;
 
         var contentDiv = document.createElement("div");
         contentDiv.className = "mainContent hidden";
@@ -718,7 +690,6 @@
 
       for (let i = 0; i < respData.length; i ++) {
         var li = document.createElement("li");
-        // li.setAttribute("onclick", "readMore()");
 
         // timeline
         var timelineDiv = document.createElement("div");
@@ -761,8 +732,6 @@
         var newsDiv = document.createElement("div");
         newsDiv.className = "news";
         newsDiv.setAttribute("onclick", "readMore()");
-        // link.setAttribute("href", `${respData[i].href}`);
-        // link.setAttribute("target", "_blank");
 
         var newsContentDiv = document.createElement("div");
         newsContentDiv.className = "news-content";
@@ -983,94 +952,39 @@
     }
 
     // 展開
-    let openFlag = false;
-    function readMore(type) {
-      let parent = event.target.parentNode;
-      if(!openFlag) {
-        if(parent.className === "news-content") {
-          parent.childNodes[3].classList.add("hidden");
-          parent.childNodes[4].classList.remove("hidden");
-          parent.childNodes[5].classList.remove("hidden");
-        } else if(parent.className === "desc") {
-          parent.parentNode.childNodes[3].classList.add("hidden");
-          parent.parentNode.childNodes[4].classList.remove("hidden");
-          parent.parentNode.childNodes[5].classList.remove("hidden");
-        } else if(parent.className === "news") {
-          parent.childNodes[0].childNodes[3].classList.add("hidden");
-          parent.childNodes[0].childNodes[4].classList.remove("hidden");
-          parent.childNodes[0].childNodes[5].classList.remove("hidden");
-        } else {
-          event.target.childNodes[0].childNodes[3].classList.add("hidden");
-          event.target.childNodes[0].childNodes[4].classList.remove("hidden");
-          event.target.childNodes[0].childNodes[5].classList.remove("hidden");
-        }
-        openFlag = true;
+    function readMore() {
+      let parentTarget = event.currentTarget.childNodes[0];
+      if(parentTarget.classList.contains("openFlag")) {
+        parentTarget.classList.remove("openFlag");
+        parentTarget.childNodes[3].classList.remove("hidden");
+        parentTarget.childNodes[4].classList.add("hidden");
+        parentTarget.childNodes[5].classList.add("hidden");
       } else {
-        if(parent.className === "news-content") {
-          parent.childNodes[3].classList.remove("hidden");
-          parent.childNodes[4].classList.add("hidden");
-          parent.childNodes[5].classList.add("hidden");
-        } else if(parent.className === "mainContent") {
-          parent.parentNode.childNodes[3].classList.remove("hidden");
-          parent.parentNode.childNodes[4].classList.add("hidden");
-          parent.parentNode.childNodes[5].classList.add("hidden");
-        } else if(parent.className === "news") {
-          parent.childNodes[0].childNodes[3].classList.remove("hidden");
-          parent.childNodes[0].childNodes[4].classList.add("hidden");
-          parent.childNodes[0].childNodes[5].classList.add("hidden");
-        } else {
-          event.target.childNodes[0].childNodes[3].classList.remove("hidden");
-          event.target.childNodes[0].childNodes[4].classList.add("hidden");
-          event.target.childNodes[0].childNodes[5].classList.add("hidden");
-        }
-        openFlag = false;
+        parentTarget.classList.add("openFlag");
+        parentTarget.childNodes[3].classList.add("hidden");
+        parentTarget.childNodes[4].classList.remove("hidden");
+        parentTarget.childNodes[5].classList.remove("hidden");
       }
+      // 取得當下點開的是第幾子元素
+      var child = event.currentTarget.parentNode
+      var h = 0; // 第幾個子元素
+      var k = 0; // 前面有幾個展開
+      let height = 0;
+      while((child = child.previousSibling) != null) {
+        h++;
+      }
+      for(let i = 1; i < h; i++) {
+        if(event.currentTarget.parentNode.parentNode.childNodes[i].childNodes[1].childNodes[0].classList.contains("openFlag")) { // 有展開的項目
+          height += event.currentTarget.parentNode.parentNode.childNodes[i].childNodes[1].offsetHeight + 20 // 20(margin)
+        } else { // 無展開的項目
+          k++;
+        }
+      }
+      // for appendNews & oncomingNews
+      appSide.scrollTop = height + (k * 185) + 16; // 16(頂端 padding)
+      onSide.scrollTop = height + (k * 185) + 16; // 16(頂端 padding)
     }
 
-    // 展開
-    let openOncomingFlag = false;
-    function oncomingReadMore() {
-      let parent = event.target.parentNode;
-      if(!openOncomingFlag) {
-        if(parent.className === "news-content") {
-          parent.childNodes[7].classList.add("hidden");
-          parent.childNodes[9].classList.remove("hidden");
-          parent.childNodes[11].classList.remove("hidden");
-        } else if(parent.className === "desc") {
-          parent.parentNode.childNodes[7].classList.add("hidden");
-          parent.parentNode.childNodes[9].classList.remove("hidden");
-          parent.parentNode.childNodes[11].classList.remove("hidden");
-        } else if(parent.className === "news") {
-          event.target.childNodes[7].classList.add("hidden");
-          event.target.childNodes[9].classList.remove("hidden");
-          event.target.childNodes[11].classList.remove("hidden");
-        } else {
-          event.target.childNodes[1].childNodes[7].classList.add("hidden");
-          event.target.childNodes[1].childNodes[9].classList.remove("hidden");
-          event.target.childNodes[1].childNodes[11].classList.remove("hidden");
-        }
-        openOncomingFlag = true;
-      } else {
-        if(parent.className === "news-content") {
-          parent.childNodes[7].classList.remove("hidden");
-          parent.childNodes[9].classList.add("hidden");
-          parent.childNodes[11].classList.add("hidden");
-        } else if(parent.className === "mainContent") {
-          parent.parentNode.childNodes[7].classList.remove("hidden");
-          parent.parentNode.childNodes[9].classList.add("hidden");
-          parent.parentNode.childNodes[11].classList.add("hidden");
-        } else if(parent.className === "news") {
-          event.target.childNodes[7].classList.remove("hidden");
-          event.target.childNodes[9].classList.add("hidden");
-          event.target.childNodes[11].classList.add("hidden");
-        } else {
-          event.target.childNodes[1].childNodes[7].classList.remove("hidden");
-          event.target.childNodes[1].childNodes[9].classList.add("hidden");
-          event.target.childNodes[1].childNodes[11].classList.add("hidden");
-        }
-        openOncomingFlag = false;
-      }
-    }
 
     // paging
     let page = 0;
@@ -1079,8 +993,8 @@
 
     let onSide = document.querySelector("#oncomingNews");
     let appSide = document.querySelector("#appendNews");
-
     function paging(cond) {
+      // console.log(appSide.scrollTop);
       if(scrollStatus === false) { // waiting for next page
         return;
       }

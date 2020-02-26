@@ -119,11 +119,12 @@
     const partyList = document.querySelector('.partyList');
     const switchButton = document.querySelector('.switch');
 
-    const people = document.querySelectorAll('.person');
-    const issues = document.querySelectorAll('.issue');
-    const parties = document.querySelectorAll('.party');
+    let people = document.querySelectorAll('.person');
+    let issues = document.querySelectorAll('.issue');
+    // const parties = document.querySelectorAll('.party');
 
     const appendNews = document.getElementById("appendNews");
+    const filIssues = document.querySelector(".issueList .inner");
 
     const tips = document.getElementById("tips");
     const noContent = document.querySelector(".noContent");
@@ -230,6 +231,7 @@
         compTitleName1.classList.add("point");
         compTitleName2.classList.add("point");
       }
+      polIssue(param);
 
       if(param.pol.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
@@ -335,6 +337,7 @@
 
     // filter - 議題標題處理
     issueTitle.addEventListener('click', function(event) {
+      issues = document.querySelectorAll('.issue');
       issues.forEach(r => r.classList.remove("innerHighlight"));
       param.issue = [];
       compTitleIssue.innerHTML = "比較議題";
@@ -348,7 +351,6 @@
         } else {
           getCompareLess(param);
         }
-        // getCompare(param);
       } else {
         removeData(appendNews);
         tips.style.display = "block";
@@ -404,7 +406,7 @@
             dataCompareForm(resp.data.news, param.pol);
             next_paging = resp.data.next_paging;
             scrollStatus = true;
-          }          
+          }
         }
       });
     }
@@ -437,6 +439,21 @@
           dataCompareForm(resp.data.news, param.pol);
           next_paging = resp.data.next_paging;
           scrollStatus = true;
+        }
+      });
+    }
+
+    // DB 取資料 - 人物影響議題
+    function polIssue(param) {
+      $.ajax({
+        url: `api/polgetissues`,
+        type: "POST",
+        data: JSON.stringify(param),
+        contentType: "application/json; charset=utf-8",
+        success: function(resp) {
+          // console.log(resp);
+          removeData(filIssues);
+          filIssuesForm(resp);
         }
       });
     }
@@ -547,12 +564,79 @@
       }
     }
 
+    // filter-issue 組裝
+    function filIssuesForm(respData) {
+      // console.log(respData);
+      let dataLength = respData.length;
+
+      for(let i = 0; i < dataLength; i++) {
+        var polGetIssLi = document.createElement("li");
+        polGetIssLi.className = "issue";
+        polGetIssLi.innerHTML = respData[i].name;
+
+        // 建立 child 監聽
+        polGetIssLi.addEventListener('click', function() {
+          param.issue = [];
+          appIssues = document.querySelectorAll('.issue');
+          if(this.classList.contains("innerHighlight")) {
+            this.classList.remove("innerHighlight");
+            param.issue = [];
+            compTitleIssue.innerHTML = "比較議題";
+            compTitleIssue.classList.add("point");
+          } else {
+            appIssues.forEach(r => r.classList.remove("innerHighlight"));
+            this.classList.add("innerHighlight");
+            compTitleIssue.innerHTML = this.innerHTML;
+            compTitleIssue.classList.remove("point");
+          }
+
+          appIssues.forEach(function(issue) {
+            if(issue.classList.contains("innerHighlight")) {
+              param.issue.push(issue.innerHTML);
+            }
+          });
+
+          if(param.pol.length === 2 && param.issue.length === 1) {
+            tips.style.display = "none";
+            appSide.scrollTop = 0;
+            if(strictMode === false) {
+              getCompare(param);
+            } else {
+              getCompareLess(param);
+            }
+          } else {
+            removeData(appendNews);
+            tips.style.display = "block";
+            noContent.style.display = "none";
+            appendNews.style.display = "none";
+          }
+        });
+        filIssues.appendChild(polGetIssLi);
+        filterHL(param);
+      }
+
+    }
+
     // 移除子項目
     function removeData(item) {
       var child = item.lastElementChild;
       while(child) {
         item.removeChild(child);
         child = item.lastElementChild;
+      }
+    }
+
+    // filter tag refresh
+    function filterHL(param) {
+      issues = document.querySelectorAll('.issue');
+
+      issues.forEach(r => r.classList.remove("innerHighlight"));
+
+      for(let i = 0; i < issues.length; i++) {
+        let issueContent = issues[i].innerText;
+        if (issueContent.indexOf(param.issue[0]) != -1) {
+          issues[i].classList.add("innerHighlight");
+        }
       }
     }
 
