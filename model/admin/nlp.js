@@ -9,7 +9,8 @@ const polsData = require('../politicians');
 const issuesData = require('../issues');
 
 
-fs.readFile('./util/nlp_trained_model/politician.json', async (err, data) => {
+// fs.readFile('./util/nlp_trained_model/politician.json', async (err, data) => {
+fs.readFile('../PolsTrackCrawler/util/nlp_trained_model/politician.json', async (err, data) => {
   if(err) throw err;
   // let politician = JSON.parse(data).politician;
   let country = JSON.parse(data).country;
@@ -95,7 +96,7 @@ module.exports = {
   train: async function(start, end) {
     return new Promise(async function(resolve, reject) {
       await manager.train();
-      manager.save('./util/nlp_trained_model/train.nlp');
+      manager.save('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
 
       let data = await news.getPeriod(start, end);
       console.log("需處理筆數：" + data.length);
@@ -110,7 +111,7 @@ module.exports = {
   },
   process: async function(start, end) {
     return new Promise(async function(resolve, reject) {
-      manager.load('./util/nlp_trained_model/train.nlp');
+      manager.load('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
 
       let data = await news.getPeriod(start, end);
       console.log("需處理筆數：" + data.length);
@@ -128,7 +129,7 @@ module.exports = {
   },
   test: async function() {
     return new Promise(async function(resolve, reject) {
-      manager.load('./util/nlp_trained_model/train.nlp');
+      manager.load('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
 
       const content = '黨籍案引爭議  郝龍斌：支持傅崐萁回到黨內'.replace('：', '表示').replace(/[A-Za-z]+/, '');
       const response = await manager.process('zh', content);

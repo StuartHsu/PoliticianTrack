@@ -2,7 +2,8 @@ const mysql = require("../../util/mysqlcon.js");
 const nodejieba = require('nodejieba');
 const fs = require("fs");
 
-nodejieba.load({userDict: './util/dict.txt'});
+// nodejieba.load({userDict: './util/dict.txt'});
+nodejieba.load({userDict: '../PolsTrackCrawler/util/dict.txt'});
 
 module.exports={
   seg: function(start, end) {

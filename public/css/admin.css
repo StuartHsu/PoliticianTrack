@@ -6,19 +6,20 @@
   width: 40%;
 }
 
-.period {
+.container {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
 }
 
-.dateGroup {
+.dateGroup,
+.inputGroup {
   display: flex;
   align-items: center;
 }
 
-.period .date {
+.container .date {
   margin-right: 20px;
 }
 
@@ -36,6 +37,7 @@
 .listTitle {
   display: flex;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .listTitle>.button {

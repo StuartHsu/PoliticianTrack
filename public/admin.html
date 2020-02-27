@@ -30,7 +30,7 @@
         <div class="heading">
           <h3>斷詞時間範圍</h3>
 
-          <div class="period">
+          <div class="container">
             <div class="dateGroup">
               <div class="dateTitle">開始：</div>
               <input class="date" type="date" id="date_start">
@@ -82,7 +82,7 @@
           </div>
 
           <h3>NLP Training</h3>
-          <div class="period">
+          <div class="container">
             <div class="dateGroup">
               <div class="dateTitle">開始：</div>
               <input class="date" type="date" id="date_start_nlpT">
@@ -98,7 +98,7 @@
           </div>
 
           <h3>NLP Process</h3>
-          <div class="period">
+          <div class="container">
             <div class="dateGroup">
               <div class="dateTitle">開始：</div>
               <input class="date" type="date" id="date_start_nlpP">
@@ -121,6 +121,23 @@
             </div>
           </div>
 
+          <h3>Add tag manually</h3>
+          <div class="container">
+            <div class="inputGroup">
+              <div class="inputTitle">標籤名稱：</div>
+              <input type="text" id="inputTagName">
+            </div>
+            <div class="inputGroup">
+              <div class="inputTitle">標籤屬性：</div>
+              <input type="text" id="inputTagType">
+            </div>
+            <button class="button" id="manAddTagBtn">送出</button>
+          </div>
+          <div class="manAddTagResult">
+            <div class="resultText" id="resultManAddTag"></div>
+          </div>
+
+
         </div>
       </div>
 
@@ -140,6 +157,7 @@
       const nlpTrainBtn = document.getElementById("nlpTrainBtn");
       const nlpProcessBtn = document.getElementById("nlpProcessBtn");
       const getTagBtn = document.getElementById("getTagBtn");
+      const manAddTagBtn = document.getElementById("manAddTagBtn");
 
       const date_start = document.getElementById("date_start");
       const date_end = document.getElementById("date_end");
@@ -147,6 +165,8 @@
       const date_end_nlpT = document.getElementById("date_end_nlpT");
       const date_start_nlpP = document.getElementById("date_start_nlpP");
       const date_end_nlpP = document.getElementById("date_end_nlpP");
+      const valueOfinputTagName = document.getElementById("inputTagName");
+      const valueOfinputTagType = document.getElementById("inputTagType");
 
       const resultSeg = document.getElementById("resultSeg");
       const resultTag = document.getElementById("resultTag");
@@ -243,6 +263,16 @@
         getTag();
       });
 
+      // 8. Save tag to DB/Dict by manually
+      manAddTagBtn.addEventListener('click', function(event) {
+        let inputTagName = valueOfinputTagName.value;
+        let inputTagType = valueOfinputTagType.value;
+        console.log(inputTagName);
+        console.log(inputTagType);
+        valueOfinputTagName.value = "";
+        valueOfinputTagType.value = "";
+
+      });
 
 
       // 1. 執行新聞斷詞

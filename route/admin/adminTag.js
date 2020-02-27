@@ -7,7 +7,7 @@ const tagFreq = require('../../model/admin/tagFreq');
 const nlp = require('../../model/admin/nlp');
 const newsGetTag = require('../../model/admin/newsGetTag');
 
-// run segmentation
+// 1. 執行新聞斷詞
 router.post('/api/seg', async function(req, res) {
   let period = {
     start: req.body.start.replace(/-/g, "/") + " 00:00",
@@ -17,7 +17,7 @@ router.post('/api/seg', async function(req, res) {
   res.send({data: data});
 });
 
-// get raw segmentation results
+// 2. 撈出未處理標籤
 router.get('/api/list', async function(req, res) {
   let data = await adminTag.get();
   res.send({data: data});
@@ -29,7 +29,7 @@ router.get('/api/updateDict', async function(req, res) {
   res.send({data: data});
 });
 
-// update tag status & tag type & add new tag in dict
+// 3. 更新標籤 & 字典
 router.post('/api/updateDB', async function(req, res) {
   let updateData = req.body
   let data = await adminTag.updateDB(updateData); // 更新 DB
@@ -37,7 +37,7 @@ router.post('/api/updateDB', async function(req, res) {
   res.send({data: data});
 });
 
-// NRP & NI 頻率統計
+// 4-1. Tag count refresh (DB: filterCount)
 router.get('/api/tagfreq', async function(req, res) {
   let today = dateForm(new Date()); // YYYY/MM/DD
   let beginDay = startDayForm(today, 14);
@@ -50,7 +50,7 @@ router.get('/api/tagfreq', async function(req, res) {
   res.send(data);
 });
 
-// NRP & NI 頻率統計 ALL
+// 4-2. Tag count refresh (DB: filterCount) All
 router.get('/api/tagfreqall', async function(req, res) {
   let today = dateForm(new Date()) + " 23:59"; // YYYY/MM/DD
 
@@ -62,7 +62,7 @@ router.get('/api/tagfreqall', async function(req, res) {
   res.send(data);
 });
 
-// NLP training mode
+// 5. NLP training
 router.post('/api/nlp/train', async function(req, res) {
   let period = {};
   let today = dateForm(new Date()); // YYYY/MM/DD
@@ -80,7 +80,7 @@ router.post('/api/nlp/train', async function(req, res) {
   res.send(results);
 });
 
-// NLP process mode, update news intent
+// 6. NLP process
 router.post('/api/nlp/process', async function(req, res) {
   let period = {};
   let today = dateForm(new Date()); // YYYY/MM/DD
@@ -104,7 +104,7 @@ router.get('/api/nlp/test', async function(req, res) {
   res.send(results);
 });
 
-//  News get tag
+// 7. News get tag
 router.get('/api/gettag', async function(req, res) {
   let results = await newsGetTag.getTag();
   res.send(results);
