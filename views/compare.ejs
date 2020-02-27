@@ -6,6 +6,7 @@
       <link rel="shortcut icon" href="#"/>
       <link rel="stylesheet" type="text/css" href="./css/compare.css">
       <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+      <script src="https://kit.fontawesome.com/5497cadb8e.js" crossorigin="anonymous"></script>
   </head>
 
   <body>
@@ -18,7 +19,7 @@
         <div class="item">
           <a href="./politician">新聞</a>
         </div>
-        <div class="item">
+        <div class="item current">
           <a href="./compare">比較</a>
         </div>
         <div class="item">
@@ -26,7 +27,7 @@
         </div>
       </nav>
       <div class="feature">
-        <a href="./about">關於</a>
+        <a href="./compare">關於</a>
       </div>
     </header>
 
@@ -85,7 +86,6 @@
           <div class="centerBox">
             <div class="titleIssue point" id="compTitleIssue">比較議題</div>
             <div class="switchBox">
-              <div class="switchTitle"></div>
               <div class="onoffswitch">
                   <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">
                   <label class="onoffswitch-label switch" for="myonoffswitch">
@@ -93,6 +93,10 @@
                       <span class="onoffswitch-switch"></span>
                   </label>
               </div>
+              <div class="switchTitle">精準</div>
+              <i class="fa fa-question-circle tooltip">
+                <span class="tooltiptext">精準模式：<br>提高「新聞」與「人物」的相關性，更著重在「人物」所表達的意見。</span>
+              </i>
             </div>
           </div>
           <!-- <div class="titleIssue point" id="compTitleIssue">比較議題</div> -->
@@ -296,9 +300,11 @@
         if(strictMode === false) {
           getCompareLess(param);
           strictMode = true;
+          document.querySelector('.switchTitle').style.color = "#424242";
         } else {
           getCompare(param);
           strictMode = false;
+          document.querySelector('.switchTitle').style.color = "#CDCDCD";
         }
       } else {
         removeData(appendNews);

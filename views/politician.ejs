@@ -6,6 +6,7 @@
       <link rel="shortcut icon" href="#"/>
       <link rel="stylesheet" type="text/css" href="./css/common.css">
       <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+      <script src="https://kit.fontawesome.com/5497cadb8e.js" crossorigin="anonymous"></script>
   </head>
 
   <body>
@@ -15,7 +16,7 @@
         <a href="./">PolsTrack</a>
       </div>
       <nav>
-        <div class="item">
+        <div class="item current">
           <a href="./politician">新聞</a>
         </div>
         <div class="item">
@@ -26,7 +27,7 @@
         </div>
       </nav>
       <div class="feature">
-        <a href="./about">關於</a>
+        <a href="./politician">關於</a>
       </div>
     </header>
 
@@ -87,7 +88,6 @@
             <div class="titleName" id="titleName"><%= title %></div>
             <!-- <div class="titleName" id="titleName">總覽</div> -->
             <div class="switchBox">
-              <div class="switchTitle"></div>
               <div class="onoffswitch">
                   <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">
                   <label class="onoffswitch-label switch" for="myonoffswitch">
@@ -95,7 +95,12 @@
                       <span class="onoffswitch-switch"></span>
                   </label>
               </div>
+              <div class="switchTitle">精準</div>
+              <i class="fa fa-question-circle tooltip">
+                <span class="tooltiptext">精準模式：<br>提高「新聞」與「人物」的相關性，更著重在「人物」所表達的意見。</span>
+              </i>
             </div>
+
 
             <!-- <div class="switch">hey</div> -->
           </div>
@@ -322,9 +327,11 @@
       if(strictMode === false) {
         getNewsLess(param);
         strictMode = true;
+        document.querySelector('.switchTitle').style.color = "#424242";
       } else {
         getNews(param);
         strictMode = false;
+        document.querySelector('.switchTitle').style.color = "#CDCDCD";
       }
     });
 
@@ -993,13 +1000,17 @@
 
     let onSide = document.querySelector("#oncomingNews");
     let appSide = document.querySelector("#appendNews");
-    function paging(cond) {
-      // console.log(appSide.scrollTop);
+    function paging(cond) {      
       if(scrollStatus === false) { // waiting for next page
         return;
       }
       let x = appSide.scrollHeight - appSide.scrollTop;
       if(cond === "oncoming") {
+        if(getQueryStringValue("pol")) { // 從 index 點標籤過來
+          param.pol = [getQueryStringValue("pol")];
+        } else {
+          param.issue = [getQueryStringValue("issue")];
+        }
         x = onSide.scrollHeight - onSide.scrollTop;
       }
       if(x < 1100 && next_paging !== undefined) {
@@ -1013,7 +1024,7 @@
     }
 
     // get query string
-    function getQueryStringValue (key) {
+    function getQueryStringValue(key) {
       return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
     }
 

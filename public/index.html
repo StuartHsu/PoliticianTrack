@@ -46,7 +46,6 @@
 
       function dataForm(data) {
         let cloudData = [];
-
         let dataLength = data.length;
         let max = data[0].count;
         let min = 1;
@@ -55,7 +54,8 @@
           if(data[i].count > min) {
             let body = {
               x: data[i].name,
-              value: data[i].count * justfyRatio
+              value: data[i].count * justfyRatio,
+              tag: data[i].type
             }
             cloudData.push(body);
           }
@@ -63,7 +63,7 @@
         return cloudData;
       }
 
-      function drawCloud(data) {
+      function drawCloud(data) {    
         // create a tag (word) cloud chart
         var chart = anychart.tagCloud(data);
         // set an array of angles at which the words will be laid out
@@ -85,16 +85,30 @@
         customColorScale.colors(["#707070", "#606060", "#505050", "#404040", "#383838", "#303030", "#282828", "#181818", "#000000"]);
         chart.colorScale(customColorScale);
         // 去除滑鼠移到標籤上的資訊
-        chart.tooltip(false);
+        chart.tooltip().format("{%yPercentOfTotal}%");
+        chart.hovered().fill("#FF9300");
 
         // set the chart container
         chart.container("wordCloud");
         chart.draw();
+
         // add an event listener
         chart.listen("pointClick", function(e){
-          var url = "/politician?pol=" + e.point.get("x");
+            // console.log(e.point.get("x"));
+            let apiUrl;
+            let clickTag = e.point.get("tag");
+            if(clickTag === "NRP") {
+              apiUrl = "/politician?pol="
+            } else {
+              apiUrl = "/politician?issue="
+            }
+          let url = apiUrl + e.point.get("x");
           window.open(url, "_self");
         });
+        // let texts = document.querySelectorAll("text");
+        // texts.forEach(text => text.addEventListener('mouseover', function(event) {
+        //   console.log(text.innerHTML);
+        // }));
       }
 
     </script>
