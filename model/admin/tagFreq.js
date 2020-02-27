@@ -98,7 +98,7 @@ module.exports={
           console.log("處理中2：" + j + "/" + totalCount);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
-            if(jieba[i].tag === "NRP") {
+            if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") {
             // if(jieba[i].name === "張惇涵") {
               let data = {
                 name: jieba[i].word,
