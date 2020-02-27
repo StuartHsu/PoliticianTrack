@@ -267,11 +267,15 @@
       manAddTagBtn.addEventListener('click', function(event) {
         let inputTagName = valueOfinputTagName.value;
         let inputTagType = valueOfinputTagType.value;
-        console.log(inputTagName);
-        console.log(inputTagType);
+        let data = [];
+        let body = {
+          tagName: inputTagName,
+          inputTag: inputTagType
+        }
+        data.push(body);
+        updateTagStatus(data);
         valueOfinputTagName.value = "";
         valueOfinputTagType.value = "";
-
       });
 
 
