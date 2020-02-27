@@ -59,7 +59,7 @@ module.exports={
       for(let i = 0; i < updateData.length; i++) {
         if(updateData[i].inputTag) {
           data = `${updateData[i].tagName} 1 ${updateData[i].inputTag}\n`
-          fs.appendFile('./util/dict.txt', data, (err) => {
+          fs.appendFile('../PolsTrackCrawler/util/dict.txt', data, (err) => {
             if (err) throw err;
             resolve("Update dict.txt ok");
           });
