@@ -1,8 +1,9 @@
 # Jieba & NLP
 dict.txt
 */dict.txt
-.nlp
-*/.nlp
+*.nlp
+*/*.nlp
+
 
 .DS_Store
 */.DS_Store

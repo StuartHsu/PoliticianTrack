@@ -49,6 +49,35 @@
 	border: 1px solid #808080;
 }
 
+.centerBox {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.switchBox {
+	margin: 0;
+}
+
+/* Tooltip 內容 */
+.tooltip .tooltiptext {
+	/* 定位 */
+  position: absolute;
+  z-index: 1;
+	top: -29px;
+  left: 1050%;
+}
+
+.tooltip .tooltiptext::after {
+	content: " ";
+  position: absolute;
+  top: 50%;
+  left: -3.6%; /* 提示框右側 */
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+}
 
 /* news content */
 

@@ -47,120 +47,6 @@ module.exports = {
       resolve(data);
     });
   },
-  // getAll: function() {
-  //   return new Promise(function(resolve, reject) {
-  //     let sql = `SELECT * FROM news WHERE intent = "politician_say" ORDER BY pubTime DESC;`
-  //     mysql.con.query(sql, async function(error, results, fields) {
-  //       if(error) {
-  //         reject(error);
-  //       }
-  //       // 新聞加上所含標籤
-  //       let data = await formTagNews(results);
-  //       resolve(data);
-  //     });
-  //   });
-  // },
-  // getNoIssNews: function(pol) {
-  //   return new Promise(async function(resolve, reject) {
-  //
-  //     // 取得人物的 Tag Id
-  //     let polTagId = await getTagId(pol);
-  //     // 取得人物 Tag Id 對應的 news_id
-  //     let newsId = await getNewsId(polTagId);
-  //
-  //     let sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC;`
-  //     mysql.con.query(sql, [newsId], async function(error, results, fields) {
-  //       if(error) {
-  //         reject(error);
-  //       }
-  //       // 新聞加上所含標籤
-  //       let data = await formTagNews(results);
-  //       resolve(data);
-  //     });
-  //   });
-  // },
-  // getNoPolNews: function(issue) {
-  //   return new Promise(async function(resolve, reject) {
-  //
-  //     // 取得議題的 Tag Id
-  //     let issueTagId = await getTagId(issue);
-  //     // 取得議題 Tag Id 對應的 news_id
-  //     let newsId = await getNewsId(issueTagId);
-  //     console.log(newsId);
-  //     let sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC;`
-  //     mysql.con.query(sql, [newsId], async function(error, results, fields) {
-  //       if(error) {
-  //         reject(error);
-  //       }
-  //       // 新聞加上所含標籤
-  //       let data = await formTagNews(results);
-  //       resolve(data);
-  //     });
-  //   });
-  // },
-  // getPolIssNews: function(pol, issue) {
-  //   return new Promise(async function(resolve, reject) {
-  //
-  //     let tagName = [pol, issue];
-  //     console.log(tagName);
-  //     // 取得人物及議題的 Tag Id
-  //     let tagId = await getTagId(tagName);
-  //     // 取得人物及議題 Tag Id 對應的 news_id
-  //     let newsId = await getBothNewsId(tagId, 1);
-  //     let data;
-  //
-  //     let sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC;`
-  //     if(newsId.length > 0) { // 判斷是否有此人此議題之新聞
-  //       mysql.con.query(sql, [newsId], async function(error, results, fields) {
-  //         if(error) {
-  //           reject(error);
-  //         }
-  //         // 新聞加上所含標籤
-  //         data = await formTagNews(results);
-  //         resolve(data);
-  //       });
-  //     } else {
-  //       resolve(data);
-  //     }
-  //   });
-  // },
-  // getCompare: function(pol, issue) {
-  //   return new Promise(async function(resolve, reject) {
-  //     let id1 = await getTagId([pol[0], issue]);
-  //     let id2 = await getTagId([pol[1], issue]);
-  //     let new1 = await getBothNewsId(id1, 1);
-  //     let new2 = await getBothNewsId(id2, 1);
-  //     let newsArray = new1.concat(new2);
-  //     let body = [];
-  //     let sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC;`
-  //
-  //     if(newsArray.length > 0) { // 判斷是否有此兩人同一議題之新聞
-  //       mysql.con.query(sql, [newsArray], async function(error, results, fields) {
-  //         if(error) {
-  //           reject(error);
-  //         }
-  //         // 新聞加上所含標籤
-  //         let data = await formTagNews(results);
-  //
-  //         for(let i = 0; i < data.length; i++) {
-  //           if(new1.indexOf(data[i].id) > -1 && new2.indexOf(data[i].id) > -1) {
-  //             data[i].tag_id = "both";
-  //           } else if (new1.indexOf(data[i].id) > -1 && new2.indexOf(data[i].id) < 0) {
-  //             data[i].tag_id = pol[0];
-  //           } else if (new1.indexOf(data[i].id) < 0 && new2.indexOf(data[i].id) > -1) {
-  //             data[i].tag_id = pol[1];
-  //           } else {
-  //             console.log("none");
-  //           }
-  //           body.push(data[i]);
-  //         }
-  //         resolve(body);
-  //       });
-  //     } else {
-  //       resolve(body);
-  //     }
-  //   });
-  // },
   getAllLess: function(pol) {
     return new Promise(async function(resolve, reject) {
 
@@ -543,7 +429,6 @@ function getNewsId(tagId) {
     } else {
       sql = `SELECT news_id FROM newstag WHERE tag_id IN (?) GROUP BY news_id HAVING count(*) > 1;`;
     }
-
     let data = [];
     if(tagId.length > 0) { // 人 or 題至少有其一
       mysql.con.query(sql, [tagId], function(error, results, fields) {

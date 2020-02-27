@@ -63,20 +63,20 @@ app.get('/politician', async function(req, res) {
   let param;
   let results;
   if(req.query.pol && req.query.issue) { // hot page's subList 過來
-    pol = req.query.pol;
-    issue = req.query.issue;
+    // pol = req.query.pol;
+    // issue = req.query.issue;
     param = {
       pol: [req.query.pol],
       issue: [req.query.issue]
     }
     results = await newData.get(param, 10, 0);
-  } else if(req.query.pol && !req.query.issue) { // index 點擊過來
+  } else if(req.query.pol || req.query.issue) { // index 點擊過來
     param = {
       pol: [req.query.pol],
-      issue: []
+      issue: [req.query.issue]
     }
     results = await newData.get(param, 10, 0);
-    pol = req.query.pol;
+    pol = req.query.pol || req.query.issue;
     issue = '';
   } else { // 篩選進來預設
     let paging = parseInt(req.query.paging);

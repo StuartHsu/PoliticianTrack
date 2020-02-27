@@ -47,13 +47,17 @@ header>.logo {
   font-size: 1.5rem;
   line-height: 1.5rem;
 	letter-spacing: 4px;
-  width: 250px;
+  width: 180px;
   margin-left: 30px;
 }
 
 header>nav {
 	flex: auto;
   display: flex;
+}
+
+header>nav .current {
+	color: #FFD479;
 }
 
 header>nav>.item {
@@ -244,11 +248,67 @@ main {
 .switchBox {
 	display: flex;
 	align-items: center;
+	margin-right: 20px;
 }
 
 .switchTitle {
+	color: #CDCDCD;
 	font-size: 1.2rem;
-	margin-right: 10px;
+	margin: 0 12px;
+}
+
+.fa.fa-question-circle {
+	color: #424242;
+}
+
+/* Tooltip 容器 */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip 內容 */
+.tooltip .tooltiptext {
+	font-size: .5rem;
+	line-height: 1rem;
+	letter-spacing: .5px;
+  visibility: hidden;
+  width: 140px;
+  background-color: #000000;
+  color: #fff;
+  text-align: left;
+  padding: 5px 8px;
+  border-radius: 6px;
+
+  /* 定位 */
+  position: absolute;
+  z-index: 1;
+	top: 200%;
+	left: 50%;
+	margin-left: -140px;
+
+	/* 淡入淡出 */
+	opacity: 0;
+	transition: opacity .5s;
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  bottom: 100%;  /* 提示框頭部 */
+  left: 90%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+	border-color: transparent transparent black transparent;
+}
+
+/* 滑鼠移上去後顯示 */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+
+	/* 淡入淡出 */
+	opacity: .7;
 }
 
 .onoffswitch {
