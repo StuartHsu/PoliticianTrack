@@ -640,7 +640,9 @@ main {
 	display: none;
 }
 
-.noContent {
+.noContent,
+.oncNoContent,
+.appNoContent {
 	display: none;
 	font-size: 1.5rem;
 }

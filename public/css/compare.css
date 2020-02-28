@@ -8,17 +8,46 @@
 /* title */
 
 .content .top {
+	width: 80%;
 	height: 120px;
 	display: flex;
 	flex-direction: row;
-	justify-content: space-around;
+	justify-content: space-between;
   align-items: center;
+	margin: 0 auto;
+}
+
+.content .top .titlePolBox {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.content .top .titlePolBox .newsCount {
+	font-size: 1.8rem;
+}
+
+.content .top .titlePolBox .newsCount.right {
+	display: none;
+	width: 50px;
+	font-weight: bold;
+	text-align: center;
+	margin-left: 30px;
+}
+
+.content .top .titlePolBox .newsCount.left {
+	display: none;
+	width: 50px;
+	font-weight: bold;
+	text-align: center;
+	margin-right: 30px;
 }
 
 .content .top .titleName {
 	display: inline-block;
 	font-weight: bold;
 	font-size: 3rem;
+	letter-spacing: 2px;
 	padding: 5px 10px;
 	border: 1.5px solid #232323;
 	border-radius: 15px;
@@ -83,6 +112,17 @@
 
 .news {
 	min-height: 0;
+}
+
+@keyframes fly {
+	0% {
+		border: 1px solid rgba(35,35,35, .8)
+    box-shadow: 0 0 3px rgba(35,35,35, 0.7);
+  }
+  100% {
+		border: 1px solid rgba(35,35,35, .6);
+    box-shadow: 0 0 13px rgba(35,35,35, .8);
+  }
 }
 
 .ulNews .news.rightnews {
