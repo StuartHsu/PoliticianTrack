@@ -85,6 +85,17 @@
 	min-height: 0;
 }
 
+@keyframes fly {
+	0% {
+		border: 1px solid rgba(35,35,35, .8)
+    box-shadow: 0 0 3px rgba(35,35,35, 0.7);
+  }
+  100% {
+		border: 1px solid rgba(35,35,35, .6);
+    box-shadow: 0 0 13px rgba(35,35,35, .8);
+  }
+}
+
 .ulNews .news.rightnews {
   color: #000000;
   background-color: rgba(23,23,23, .1)

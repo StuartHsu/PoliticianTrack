@@ -323,6 +323,7 @@
       compTitleName2.innerHTML = "人物二";
       compTitleName1.classList.add("point");
       compTitleName2.classList.add("point");
+      polIssue(param);
 
       if(param.pol.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
@@ -332,7 +333,6 @@
         } else {
           getCompareLess(param);
         }
-        // getCompare(param);
       } else {
         removeData(appendNews);
         tips.style.display = "block";
@@ -513,24 +513,25 @@
 
         var li = document.createElement("li");
 
-        var clickDiv = document.createElement("div");
-        clickDiv.setAttribute("onclick", "readMore()");
+        var positionDiv = document.createElement("div");
+        // positionDiv.setAttribute("onclick", "readMore()");
 
         // news
-        var link = document.createElement("a");
-        link.setAttribute("href", `${respData[i].href}`);
-        link.setAttribute("target", "_blank");
+        var newsDiv = document.createElement("div");
+        // link.setAttribute("href", `${respData[i].href}`);
+        // link.setAttribute("target", "_blank");
 
         if(respData[i].tag_id === pol[0]) {
-          clickDiv.className = "left click";
-          link.className = "news leftnews disabled";
+          positionDiv.className = "left click";
+          newsDiv.className = "news leftnews";
         } else if (respData[i].tag_id === pol[1]) {
-          clickDiv.className = "right click";
-          link.className = "news rightnews disabled";
+          positionDiv.className = "right click";
+          newsDiv.className = "news rightnews";
         } else {
-          clickDiv.className = "center click";
-          link.className = "news centernews disabled";
+          positionDiv.className = "center click";
+          newsDiv.className = "news centernews";
         }
+        newsDiv.setAttribute("onclick", "readMore()");
 
         var newsContentDiv = document.createElement("div");
         newsContentDiv.className = "news-content";
@@ -547,23 +548,37 @@
         pubTimeDiv.className = "pubTime hidden";
         pubTimeDiv.innerHTML = respData[i].pubTime;
 
-        var descDiv = document.createElement("div");
-        descDiv.className = "desc hidden";
+        var contentDiv = document.createElement("div");
+        contentDiv.className = "mainContent hidden";
+        var contentP = document.createElement("p");
+        let modContent = respData[i].content.replace(/(\u3002\u300d)/g, '。」<br><br>').replace(/(\u3002)(?!\u300d)/g, '。<br><br>')
+        contentP.innerHTML = modContent;
 
-        var descP = document.createElement("p");
-        descP.innerHTML = respData[i].content;
+        var urlA = document.createElement("a");
+        urlA.className = "url hidden";
+        urlA.innerHTML = `新聞來源：${respData[i].href}`;
+        urlA.setAttribute("href", `${respData[i].href}`);
+        urlA.setAttribute("target", "_blank");
 
-        descDiv.appendChild(descP);
+        // var descDiv = document.createElement("div");
+        // descDiv.className = "mainContent hidden";
+        //
+        // var descP = document.createElement("p");
+        // descP.innerHTML = respData[i].content;
+
+        // descDiv.appendChild(descP);
+        contentDiv.appendChild(contentP);
         newsContentDiv.appendChild(titleDiv);
         newsContentDiv.appendChild(publisherDiv);
         newsContentDiv.appendChild(pubTimeDiv);
-        newsContentDiv.appendChild(descDiv);
+        newsContentDiv.appendChild(contentDiv);
+        newsContentDiv.appendChild(urlA);
 
-        link.appendChild(newsContentDiv);
+        newsDiv.appendChild(newsContentDiv);
 
         // 組合
-        clickDiv.appendChild(link);
-        li.appendChild(clickDiv);
+        positionDiv.appendChild(newsDiv);
+        li.appendChild(positionDiv);
 
         appendNews.appendChild(li);
         appendNews.style.display = "block";
@@ -647,14 +662,43 @@
     }
 
     function readMore() {
-      event.target.removeAttribute("onclick");
-      let newsContent = event.target.childNodes[0].childNodes[0].childNodes;
-      for(let i = 0; i < newsContent.length; i++) {
-        newsContent[i].classList.remove("hidden");
+      let parentTarget = event.currentTarget.childNodes[0];
+      if(parentTarget.classList.contains("openFlag")) {
+        parentTarget.classList.remove("openFlag");
+        parentTarget.childNodes.forEach(child => child.classList.add("hidden"));
+      } else {
+        parentTarget.classList.add("openFlag");
+        parentTarget.childNodes.forEach(child => child.classList.remove("hidden"));
       }
-      event.target.childNodes[0].classList.remove("disabled");
+      // 取得當下點開的是第幾子元素
+      var child = event.currentTarget.parentNode.parentNode
+      var h = 0; // 第幾個子元素
+      var k = 0; // 前面有幾個展開
+      var l = 0; // 前面有幾個展開的日期
+      var hl = 0; // 前面有幾個共同項目
+      let height = 0;
+      while((child = child.previousSibling) != null) {
+        h++;
+      }
+      for(let i = 1; i < h; i = i + 2) {
+        if(event.currentTarget.parentNode.parentNode.parentNode.childNodes[i].childNodes[0].childNodes[0].childNodes[0].classList.contains("openFlag")) { // 有展開的項目
+          height += event.currentTarget.parentNode.parentNode.parentNode.childNodes[i].childNodes[0].childNodes[0].offsetHeight + 20 // 20(margin)
+        } else { // 無展開的項目
+          if(event.currentTarget.parentNode.parentNode.parentNode.childNodes[i].childNodes[0].childNodes[0].classList.contains("centernews")) {
+            hl++;
+          } else {
+            k++;
+          }
+        }
+      }
+      for(let i = 0; i < h; i = i + 2) {
+        if(event.currentTarget.parentNode.parentNode.parentNode.childNodes[i].childNodes.length === 1) { // 有展開的項目
+          l++;
+        }
+      }
+      // for appendNews & oncomingNews
+      appSide.scrollTop = height + (k * 99) + (l * 51) + (hl * 103) + 16; // 16(頂端 padding)
     }
-
 
     let page = 0;
     let next_paging = 0;
