@@ -55,56 +55,52 @@ app.use('/admin', adminTag);
 const tagFilterCount = require('./route/tagFilterCount');
 app.use('/tagFilterCount', tagFilterCount);
 
+let param = {
+  pol: [],
+  issue: [],
+  party: [],
+  from: ""
+}
 
 // filter page render data when 1st coming
 app.get('/politician', async function(req, res) {
-  let pol;
-  let issue;
-  let param;
   let results;
+
   if(req.query.pol && req.query.issue) { // hot page's subList 過來
-    // pol = req.query.pol;
-    // issue = req.query.issue;
-    param = {
-      pol: [req.query.pol],
-      issue: [req.query.issue]
-    }
+    param.pol = [req.query.pol];
+    param.issue = [req.query.issue];
+    param.from = "hots";
     results = await newData.get(param, 10, 0);
   } else if(req.query.pol || req.query.issue) { // index 點擊過來
-    param = {
-      pol: [req.query.pol],
-      issue: [req.query.issue]
-    }
+    param.pol = req.query.pol ? [req.query.pol] : [];
+    param.issue = req.query.issue ? [req.query.issue] : [];
+    param.from = "index";
     results = await newData.get(param, 10, 0);
-    pol = req.query.pol || req.query.issue;
-    issue = '';
   } else { // 篩選進來預設
     let paging = parseInt(req.query.paging);
   	if(!Number.isInteger(paging)){
   		paging = 0;
   	}
   	let size = 10;
-
-    param = {
-      pol: [],
-      issue: []
-    }
+    param.pol = [];
+    param.issue = [];
+    param.from = "oncoming";
     results = await newData.get(param, size, paging);
-    pol = '總覽';
-    issue = '';
   }
   let polsResults = await polsData.get();
   let issuesResults = await issuesData.get();
   let partiesResults = await partiesData.get();
   res.render('politician', {
-    title: pol,
-    issue: issue,
+    title: param.pol,
+    issue: param.issue,
     results: results,
     polsData: polsResults,
     issuesData: issuesResults,
-    partiesData: partiesResults
+    partiesData: partiesResults,
+    from: param.from
   });
 });
+
 
 // Compare page
 app.get('/compare', async function(req, res) {

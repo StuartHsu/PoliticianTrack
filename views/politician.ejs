@@ -85,8 +85,17 @@
 
         <div class="top" id="defaultTop">
           <div class="top_core">
-            <div class="titleName" id="titleName"><%= title %></div>
-            <!-- <div class="titleName" id="titleName">總覽</div> -->
+            <%_ if(title.length === 0 && issue.length === 0) { _%> <!-- oncoming -->
+              <%_ title = "總覽"; _%>
+              <%_ issue = ""; _%>
+            <%_ } else if(title.length === 0 || issue.length === 0) { _%> <!-- index -->
+              <%_ title = title.length === 0 ? issue : title; _%>
+              <%_ issue = "" _%>
+            <%_ } else { _%> <!-- hots -->
+              <%_ title = title _%>
+              <%_ issue = issue _%>
+            <%_ } _%>
+            <div class="titleName" id="titleName"><%- title %></div>
             <div class="switchBox">
               <div class="onoffswitch">
                   <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">
@@ -100,17 +109,13 @@
                 <span class="tooltiptext">精準模式：<br>提高「新聞」與「人物」的相關性，更著重在「人物」所表達的意見。</span>
               </i>
             </div>
-
-
-            <!-- <div class="switch">hey</div> -->
           </div>
-          <div class="titleIssue" id="titleIssue"><%= issue %></div>
-          <!-- <div class="titleIssue" id="titleIssue"></div> -->
+          <div class="titleIssue" id="titleIssue"><%- issue %></div>
 
         </div>
         <div class="newslist" id="oncomingNewsP">
-          <div class="noContent">無符合條件之新聞內容</div>
-          <ul class="ulNews scrollBar" id="oncomingNews" onscroll="paging('oncoming')">
+          <div class="oncNoContent">無符合條件之新聞內容</div>
+          <ul class="ulNews scrollBar" id="oncomingNews" onscroll="paging('<%= from %>')">
             <%_ for(let i = 0; i < results.news.length; i++) { _%><li><div class="timeline">
               <%_ var renderTime = new Date(results.news[i].pubTime); _%>
               <%_ if(i > 0) { _%>
@@ -150,7 +155,7 @@
               </div></li><%_ }; _%></ul>
         </div>
         <div class="newslist" id="appendNewsP">
-          <div class="noContent">無符合條件之新聞內容</div>
+          <div class="appNoContent">無符合條件之新聞內容</div>
           <ul class="ulNews scrollBar" id="appendNews" onscroll="paging('append')">
 
           </ul>
@@ -164,7 +169,6 @@
     </footer>
 
   <script>
-
     const filters = document.querySelectorAll('.filter');
     const mainFilter = document.querySelector('.mainFilter');
     const partyFilter = document.querySelector('.partyList');
@@ -178,7 +182,8 @@
     const filPols = document.querySelector(".politician .inner");
     const filIssues = document.querySelector(".issueList .inner");
 
-    const noContent = document.querySelector(".noContent");
+    const oncNoContent = document.querySelector(".appNoContent");
+    const appNoContent = document.querySelector(".appNoContent");
     const personTitle = document.querySelector(".personTitle");
     const issueTitle = document.querySelector(".issueTitle");
     const boxBorder = document.querySelector(".box-border");
@@ -188,6 +193,14 @@
       pol: [],
       issue: [],
       party: []
+    }
+
+    // 檢查是否來自 index/hots
+    if(getQueryStringValue("pol")) {
+      param.pol = [getQueryStringValue("pol")];
+    }
+    if(getQueryStringValue("issue")) {
+      param.issue = [getQueryStringValue("issue")];
     }
 
     let strictMode = false;
@@ -316,14 +329,6 @@
 
     // mode switch
     switchButton.addEventListener('click', function(event) {
-      // 判斷是否從 hots 過來
-      if(getQueryStringValue("pol") && getQueryStringValue("issue")) {
-        param = {
-          pol: [getQueryStringValue("pol")],
-          issue: [getQueryStringValue("issue")],
-          party: []
-        }
-      }
       if(strictMode === false) {
         getNewsLess(param);
         strictMode = true;
@@ -424,10 +429,10 @@
           changeTitle(param.pol, param.issue);
           if(resp.data) {
             if(resp.data.news.length < 1){ // 無資料
-              noContent.style.display = "block";
+              appNoContent.style.display = "block";
               appendNews.style.display = "none";
             } else {
-              noContent.style.display = "none";
+              appNoContent.style.display = "none";
               appendNews.style.display = "block";
             }
             dataForm(resp.data.news, param);
@@ -499,11 +504,11 @@
           removeData(appendNews);
           changeTitle(param.pol, param.issue);
           if(resp.data) {
-            if(resp.data.news.length < 1){
-              noContent.style.display = "block";
+            if(resp.data.news.length < 1) {
+              appNoContent.style.display = "block";
               appendNews.style.display = "none";
             } else {
-              noContent.style.display = "none";
+              appNoContent.style.display = "none";
               appendNews.style.display = "block";
             }
             dataForm(resp.data.news, param);
@@ -679,14 +684,13 @@
         li.appendChild(newsDiv);
         li.appendChild(tagsDiv);
 
-        if(cond === "oncoming") {
+        if(cond === "oncoming" || cond === "index" || cond === "hots") {
           onSide.appendChild(li);
         } else {
           appendNews.appendChild(li);
           document.getElementById('oncomingNewsP').style.display = "none";
           document.getElementById('appendNewsP').style.display = "flex";
         }
-        // appendNews.appendChild(li);
       }
     }
 
@@ -992,7 +996,6 @@
       onSide.scrollTop = height + (k * 185) + 16; // 16(頂端 padding)
     }
 
-
     // paging
     let page = 0;
     let next_paging = 0;
@@ -1000,17 +1003,16 @@
 
     let onSide = document.querySelector("#oncomingNews");
     let appSide = document.querySelector("#appendNews");
-    function paging(cond) {      
+    function paging(cond) {
       if(scrollStatus === false) { // waiting for next page
         return;
       }
       let x = appSide.scrollHeight - appSide.scrollTop;
-      if(cond === "oncoming") {
-        if(getQueryStringValue("pol")) { // 從 index 點標籤過來
-          param.pol = [getQueryStringValue("pol")];
-        } else {
-          param.issue = [getQueryStringValue("issue")];
-        }
+      if(cond === "index" || cond === "hots") {
+        param.pol = getQueryStringValue("pol") ? [getQueryStringValue("pol")] : [];
+        param.issue = getQueryStringValue("issue") ? [getQueryStringValue("issue")] : [];
+      }
+      if(cond === "oncoming" || cond === "index" || cond === "hots") {
         x = onSide.scrollHeight - onSide.scrollTop;
       }
       if(x < 1100 && next_paging !== undefined) {

@@ -63,7 +63,7 @@
         return cloudData;
       }
 
-      function drawCloud(data) {    
+      function drawCloud(data) {
         // create a tag (word) cloud chart
         var chart = anychart.tagCloud(data);
         // set an array of angles at which the words will be laid out
@@ -92,6 +92,10 @@
         chart.container("wordCloud");
         chart.draw();
 
+        let param = {
+          pol: [],
+          issue: []
+        }
         // add an event listener
         chart.listen("pointClick", function(e){
             // console.log(e.point.get("x"));
@@ -105,10 +109,6 @@
           let url = apiUrl + e.point.get("x");
           window.open(url, "_self");
         });
-        // let texts = document.querySelectorAll("text");
-        // texts.forEach(text => text.addEventListener('mouseover', function(event) {
-        //   console.log(text.innerHTML);
-        // }));
       }
 
     </script>
