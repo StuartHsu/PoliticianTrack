@@ -82,7 +82,11 @@
       <div class="content">
 
         <div class="top" id="compareTop">
-          <div class="titleName point" id="compTitleName1">人物一</div>
+          <div class="titlePolBox">
+            <div class="titleName point" id="compTitleName1">人物一</div>
+            <div class="newsCount right">70</div>
+          </div>
+
           <div class="centerBox">
             <div class="titleIssue point" id="compTitleIssue">比較議題</div>
             <div class="switchBox">
@@ -100,7 +104,10 @@
             </div>
           </div>
           <!-- <div class="titleIssue point" id="compTitleIssue">比較議題</div> -->
-          <div class="titleName point right" id="compTitleName2">人物二</div>
+          <div class="titlePolBox">
+            <div class="newsCount left">999</div>
+            <div class="titleName point right" id="compTitleName2">人物二</div>
+          </div>
         </div>
 
         <div class="newslist" id="appendNewsP">
@@ -354,6 +361,8 @@
         appSide.scrollTop = 0;
         if(strictMode === false) {
           getCompare(param);
+          // param.count = "count";
+          // getCount(param);
         } else {
           getCompareLess(param);
         }
@@ -384,6 +393,7 @@
               noContent.style.display = "none";
               appendNews.style.display = "block";
             }
+            newsCount(resp.data.id1Count, resp.data.id2Count);
             dataCompareForm(resp.data.news, param.pol);
             page = 0;
             next_paging = resp.data.next_paging;
@@ -426,6 +436,7 @@
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
           removeData(appendNews);
+          newsCount(resp.data.id1Count, resp.data.id2Count);
           dataCompareForm(resp.data.news, param.pol);
           page = 0;
           next_paging = resp.data.next_paging;
@@ -718,6 +729,24 @@
         } else {
           getCompareLessPage(param, page);
         }
+      }
+    }
+
+    function newsCount(id1_count, id2_count) {
+      if(id1_count === undefined) {
+        id1_count = 0;
+      }
+      if(id2_count === undefined) {
+        id2_count = 0;
+      }
+      if(param.pol.length === 2 && param.issue.length === 1) {
+        document.querySelector(".newsCount.right").style.display = "block";
+        document.querySelector(".newsCount.left").style.display = "block";
+        document.querySelector(".newsCount.right").innerHTML = id1_count;
+        document.querySelector(".newsCount.left").innerHTML = id2_count;
+      } else {
+        document.querySelector(".newsCount.right").style.display = "none";
+        document.querySelector(".newsCount.left").style.display = "none";
       }
     }
 

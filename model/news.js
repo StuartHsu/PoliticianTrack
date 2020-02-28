@@ -210,6 +210,23 @@ module.exports = {
       resolve(news_Data);
     });
   }
+  // getCount: function(param) {
+  //   return new Promise(async function(resolve, reject) {
+  //     let news_Data;
+  //     // 人、題分流
+  //     if(param.pol.length === 2 && param.issue.length === 1) { // compare
+  //       let param1 = {pol: [param.pol[0]], issue: [param.issue[0]]};
+  //       let param2 = {pol: [param.pol[1]], issue: [param.issue[0]]};
+  //       let tag_id1 = await getTagId(param1);
+  //       let tag_id2 = await getTagId(param2);
+  //       let news_id1 = await getNewsId(tag_id1);
+  //       let news_id2 = await getNewsId(tag_id2);
+  //       // let news_id = news_id1.concat(news_id2);
+  //       // news_Data = await getNewsCount(news_id, size, paging, "comp", news_id1, news_id2, param);
+  //     }
+  //     resolve(news_Data);
+  //   });
+  // }
 }
 
 
@@ -251,6 +268,8 @@ function getNews(news_id, size, paging, type, news_id1, news_id2, param) {
     let sql;
     let body = {};
     let news;
+    let id1Count = 0;
+    let id2Count = 0;
     let offset = paging * size;
     if(!news_id) { // All
       sql = `SELECT count(*) AS total FROM news WHERE intent = "politician_say";`;
@@ -284,30 +303,84 @@ function getNews(news_id, size, paging, type, news_id1, news_id2, param) {
 					if(paging < maxPage) {
 						body.next_paging = paging + 1;
 					}
-          sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC LIMIT ?,?;`;
+          sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC;`;
           mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
             if(error) {
               reject(error);
             } else {
               news = await formTagNews(results);　// 新聞加上所含標籤
-
               if(type === "comp") { // 比較
                 for(let i = 0; i < news.length; i++) {
                   if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
-                    news[i].tag_id = "both";
+                    id1Count++;
+                    id2Count++;
                   } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
-                    news[i].tag_id = param.pol[0];
+                    id1Count++;
                   } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
-                    news[i].tag_id = param.pol[1];
+                    id2Count++;
                   } else {
                     console.log("none");
                   }
                 }
+                body.id1Count = id1Count;
+                body.id2Count = id2Count;
               }
-              body.news = news;
-              resolve(body);
+              sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC LIMIT ?,?;`;
+              mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
+                if(error) {
+                  reject(error);
+                } else {
+                  news = await formTagNews(results);　// 新聞加上所含標籤
+
+                  if(type === "comp") { // 比較
+                    for(let i = 0; i < news.length; i++) {
+                      if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
+                        news[i].tag_id = "both";
+                      } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
+                        news[i].tag_id = param.pol[0];
+                      } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
+                        news[i].tag_id = param.pol[1];
+                      } else {
+                        console.log("none");
+                      }
+                    }
+                  }
+                  body.news = news;
+                  resolve(body);
+                }
+              });
             }
           });
+          // sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC LIMIT ?,?;`;
+          // mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
+          //   if(error) {
+          //     reject(error);
+          //   } else {
+          //     news = await formTagNews(results);　// 新聞加上所含標籤
+          //
+          //     if(type === "comp") { // 比較
+          //       for(let i = 0; i < news.length; i++) {
+          //         if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
+          //           news[i].tag_id = "both";
+          //           id1Count++;
+          //           id2Count++;
+          //         } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
+          //           news[i].tag_id = param.pol[0];
+          //           id1Count++;
+          //         } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
+          //           news[i].tag_id = param.pol[1];
+          //           id2Count++;
+          //         } else {
+          //           console.log("none");
+          //         }
+          //       }
+          //       body.id1Count = id1Count;
+          //       body.id2Count = id2Count;
+          //     }
+          //     body.news = news;
+          //     resolve(body);
+          //   }
+          // });
         }
       });
     } else {
@@ -323,6 +396,8 @@ function getNewsStrict(news_id, size, paging, param, type, news_id1, news_id2) {
     let sql;
     let body = {};
     let news;
+    let id1Count = 0;
+    let id2Count = 0;
     let offset = paging * size;
     if(!news_id) { // All
       let news_id = await formPolIntent(param);
@@ -357,7 +432,7 @@ function getNewsStrict(news_id, size, paging, param, type, news_id1, news_id2) {
 					if(paging < maxPage) {
 						body.next_paging = paging + 1;
 					}
-          sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC LIMIT ?,?;`;
+          sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`;
           mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
             if(error) {
               reject(error);
@@ -367,20 +442,69 @@ function getNewsStrict(news_id, size, paging, param, type, news_id1, news_id2) {
               if(type === "comp") { // 比較
                 for(let i = 0; i < news.length; i++) {
                   if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
-                    news[i].tag_id = "both";
+                    id1Count++;
+                    id2Count++;
                   } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
-                    news[i].tag_id = param.pol[0];
+                    id1Count++;
                   } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
-                    news[i].tag_id = param.pol[1];
+                    id2Count++;
                   } else {
                     console.log("none");
                   }
                 }
+                body.id1Count = id1Count;
+                body.id2Count = id2Count;
               }
-              body.news = news;
-              resolve(body);
+              sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC LIMIT ?,?;`;
+              mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
+                if(error) {
+                  reject(error);
+                } else {
+                  news = await formTagNews(results);　// 新聞加上所含標籤
+
+                  if(type === "comp") { // 比較
+                    for(let i = 0; i < news.length; i++) {
+                      if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
+                        news[i].tag_id = "both";
+                      } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
+                        news[i].tag_id = param.pol[0];
+                      } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
+                        news[i].tag_id = param.pol[1];
+                      } else {
+                        console.log("none");
+                      }
+                    }
+                  }
+                  body.news = news;
+                  resolve(body);
+                }
+              });
             }
-          });
+          });          
+          // sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC LIMIT ?,?;`;
+          // mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
+          //   if(error) {
+          //     reject(error);
+          //   } else {
+          //     news = await formTagNews(results);　// 新聞加上所含標籤
+          //
+          //     if(type === "comp") { // 比較
+          //       for(let i = 0; i < news.length; i++) {
+          //         if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
+          //           news[i].tag_id = "both";
+          //         } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
+          //           news[i].tag_id = param.pol[0];
+          //         } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
+          //           news[i].tag_id = param.pol[1];
+          //         } else {
+          //           console.log("none");
+          //         }
+          //       }
+          //     }
+          //     body.news = news;
+          //     resolve(body);
+          //   }
+          // });
         }
       });
     } else {
