@@ -425,16 +425,19 @@ function getNewsId(tagId) {
     let sql;
     if(tagId.length < 2) { // 單人
       sql = `
-      SELECT a.*, b.id, b.name, b.parent_id FROM newstag AS a
-      LEFT JOIN filtercount AS b ON (a.tag_id = b.parent_id)
-      WHERE b.parent_id IN (?);
+        SELECT a.*, b.id, b.name, b.parent_id FROM newstag AS a
+        LEFT JOIN filtercount AS b ON (a.tag_id = b.parent_id)
+        WHERE b.parent_id IN (?);
       `;
     } else { // 人與議題
       sql = `
-      SELECT a.news_id FROM newstag AS a
-      LEFT JOIN filtercount AS b ON (a.tag_id = b.parent_id)
-      WHERE b.parent_id IN (?)
-      GROUP BY news_id HAVING count(*) > 1;
+      SELECT c.id AS news_id
+      FROM filtercount AS a
+      LEFT JOIN newstag AS b ON (a.id = b.tag_id)
+      LEFT JOIN news AS c ON (b.news_id = c.id)
+      LEFT JOIN filtercount AS d ON (a.parent_id = d.id)
+      WHERE c.intent = "politician_say" AND d.parent_id IN (?)
+      GROUP BY c.id HAVING count(*) > 1
       `;
     }
     let data = [];
