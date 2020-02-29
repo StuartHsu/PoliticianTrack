@@ -124,7 +124,7 @@ main {
 
 .sidenav .politician .inner {
 	height: calc(100vh - 162px);
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 /* issue */
@@ -135,7 +135,7 @@ main {
 
 .sidenav .issueList .inner {
 	height: calc(100vh - 162px);
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 /* party */
@@ -143,7 +143,7 @@ main {
 	display: none;
 	width: 170px;
 	height: calc(100vh - 80px);
-	overflow-y: scroll;
+	overflow-y: auto;
 	background-color: #000000;
 }
 
@@ -239,7 +239,7 @@ main {
 }
 
 .content .ulNews {
-	overflow-y: scroll;
+	overflow-y: auto;
 	height: calc(100vh - 260px);
 }
 
@@ -536,11 +536,6 @@ main {
 .news>.news-content .url.hidden {
 	display: none;
 }
-
-/* .news>.news-content .desc {
-	overflow: hidden;
-	text-overflow: ellipsis;
-} */
 
 .news>.news-content .desc p {
 	overflow: hidden;

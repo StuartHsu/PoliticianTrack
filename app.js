@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const newData = require('./model/news');
 const polsData = require('./model/politicians');
 const issuesData = require('./model/issues');
+const filterCount = require('./model/tagFilterCount');
 const hotsData = require('./model/hots');
 const partiesData = require('./model/parties');
 
@@ -87,8 +88,8 @@ app.get('/politician', async function(req, res) {
     param.from = "oncoming";
     results = await newData.get(param, size, paging);
   }
-  let polsResults = await polsData.get();
-  let issuesResults = await issuesData.get();
+  let polsResults = await filterCount.get("pol");
+  let issuesResults = await filterCount.get("issue");
   let partiesResults = await partiesData.get();
   res.render('politician', {
     title: param.pol,
@@ -104,8 +105,8 @@ app.get('/politician', async function(req, res) {
 
 // Compare page
 app.get('/compare', async function(req, res) {
-  let polsResults = await polsData.get();
-  let issuesResults = await issuesData.get();
+  let polsResults = await filterCount.get("pol");
+  let issuesResults = await filterCount.get("issue");
   res.render('compare', {
     polsData: polsResults,
     issuesData: issuesResults

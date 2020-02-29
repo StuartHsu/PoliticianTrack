@@ -155,31 +155,6 @@
     }
 
     // DB 取資料 - subIssue
-    // function getSubData(type, tag_id, name) {
-    //   $.ajax({
-    //     url: `/api/gethots/sub/issue?${type}=${tag_id}`,
-    //     method: "GET",
-    //     success: function(resp) {
-    //       if(preSublistId) {
-    //         if(preSublistId != tag_id) { // 點擊展開外的
-    //           let removeList = document.getElementById(preSublistId);
-    //           removeData(removeList);
-    //           subDataForm(tag_id, resp.data, type, name);
-    //           preSublistId = tag_id;
-    //         } else { // 點擊原本展開的
-    //           removeList = document.getElementById(tag_id);
-    //           removeData(removeList);
-    //           preSublistId = "";
-    //         }
-    //       } else { // 什麼都沒展開
-    //         subDataForm(tag_id, resp.data, type, name);
-    //         preSublistId = tag_id;
-    //       }
-    //     }
-    //   });
-    // }
-
-    // DB 取資料 - subIssue
     function getSubData(type, tag_id, name) {
       $.ajax({
         url: `/api/gethots/sub/${type}?id=${tag_id}`,
