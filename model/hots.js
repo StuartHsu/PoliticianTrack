@@ -35,7 +35,7 @@ module.exports = {
             LEFT JOIN news AS c ON (b.news_id = c.id)
             LEFT JOIN filtercount AS d ON (a.parent_id = d.id)
             WHERE c.intent = "politician_say" AND d.type = ?
-            GROUP BY a.parent_id ORDER BY count DESC;
+            GROUP BY a.parent_id ORDER BY count DESC LIMIT ?,?;
           `;
           mysql.con.query(sql, [tagType, offset, size], async function(error, results, fields) {
             if(error) {
