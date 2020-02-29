@@ -110,6 +110,13 @@ router.get('/api/gettag', async function(req, res) {
   res.send(results);
 });
 
+// x-2. Set synonyms
+router.post('/api/synonyms', async function(req, res) {
+  let param = req.body;
+  let results = await adminTag.setSynonyms(param);
+  res.send(results);
+});
+
 
 
 

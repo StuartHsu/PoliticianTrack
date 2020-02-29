@@ -85,6 +85,34 @@ module.exports={
       }
       resolve("All tag status update ok");
     });
+  },
+  setSynonyms: function(param) {
+    return new Promise(async function(resolve, reject) {
+      let tagName = [param.parentTag, param.childTag];
+      sql = `
+        SELECT id FROM filtercount WHERE name IN (?)
+        ORDER BY CASE
+        WHEN name = ? THEN 1 END DESC;
+      `;
+      mysql.con.query(sql, [[param.parentTag, param.childTag], param.parentTag], async function(error, result, fields) {
+        if(error){
+          reject("Database Insert Error");
+        } else {
+          if(result.length < 2) {
+            resolve("One of tagName which you input dosen's in database");
+          } else {
+            sql = `UPDATE filtercount SET parent_name = ?, parent_id = ? WHERE name = ?`;
+            mysql.con.query(sql, [param.parentTag, result[0].id, param.childTag], async function(error, checkResult, fields) {
+              if(error){
+                reject("Database Insert Error");
+              } else {
+                resolve("Set ok");
+              }
+            });
+          }
+        }
+      });
+    });
   }
 }
 
