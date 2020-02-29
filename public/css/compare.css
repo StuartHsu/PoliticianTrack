@@ -101,7 +101,7 @@
 	content: " ";
   position: absolute;
   top: 50%;
-  left: -3.6%; /* 提示框右側 */
+  left: -3.2%; /* 提示框右側 */
   margin-top: -5px;
   border-width: 5px;
   border-style: solid;

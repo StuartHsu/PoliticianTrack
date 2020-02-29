@@ -137,6 +137,22 @@
             <div class="resultText" id="resultManAddTag"></div>
           </div>
 
+          <h3>Set synonyms</h3>
+          <div class="container">
+            <div class="inputGroup">
+              <div class="inputTitle">Parent_tag：</div>
+              <input type="text" id="parentTag">
+            </div>
+            <div class="inputGroup">
+              <div class="inputTitle">Child_tag：</div>
+              <input type="text" id="childTag">
+            </div>
+            <button class="button" id="synonymsBtn">送出</button>
+          </div>
+          <div class="segResult">
+            <div class="resultText" id="resultSynTag"></div>
+          </div>
+
 
         </div>
       </div>
@@ -158,6 +174,7 @@
       const nlpProcessBtn = document.getElementById("nlpProcessBtn");
       const getTagBtn = document.getElementById("getTagBtn");
       const manAddTagBtn = document.getElementById("manAddTagBtn");
+      const synonymsBtn =  document.getElementById("synonymsBtn");
 
       const date_start = document.getElementById("date_start");
       const date_end = document.getElementById("date_end");
@@ -167,6 +184,8 @@
       const date_end_nlpP = document.getElementById("date_end_nlpP");
       const valueOfinputTagName = document.getElementById("inputTagName");
       const valueOfinputTagType = document.getElementById("inputTagType");
+      const valueOfparentTag = document.getElementById("parentTag");
+      const valueOfchildTag = document.getElementById("childTag");
 
       const resultSeg = document.getElementById("resultSeg");
       const resultTag = document.getElementById("resultTag");
@@ -174,6 +193,8 @@
       const resultNlpT = document.getElementById("resultNlpT");
       const resultNlpP = document.getElementById("resultNlpP");
       const resultGetTag = document.getElementById("resultGetTag");
+      const resultSynTag = document.getElementById("resultSynTag");
+
 
 
       const segResults = document.getElementById("segResults");
@@ -263,7 +284,7 @@
         getTag();
       });
 
-      // 8. Save tag to DB/Dict by manually
+      // x-1. Save tag to DB/Dict by manually
       manAddTagBtn.addEventListener('click', function(event) {
         let inputTagName = valueOfinputTagName.value;
         let inputTagType = valueOfinputTagType.value;
@@ -276,6 +297,17 @@
         updateTagStatus(data);
         valueOfinputTagName.value = "";
         valueOfinputTagType.value = "";
+      });
+
+      // x-2. Set synonyms
+      synonymsBtn.addEventListener('click', function(event) {
+        let data = {
+          parentTag: valueOfparentTag.value,
+          childTag: valueOfchildTag.value
+        }
+        setSynonyms(data);
+        valueOfparentTag.value = "";
+        valueOfchildTag.value = "";
       });
 
 
@@ -337,6 +369,7 @@
           }
         });
       }
+
       // 4-2. Tag count refresh (DB: filterCount) All
       function tagCountAll() {
         $.ajax({
@@ -397,6 +430,21 @@
         });
       }
 
+      // x-2. Set synonyms
+      function setSynonyms(data) {
+        $.ajax({
+          url: "admin/api/synonyms",
+          type: "POST",
+          data: JSON.stringify(data),
+          contentType: "application/json; charset=utf-8", // 送給 server 的格式
+          success: function(resp) {
+            console.log(resp);
+            resultSynTag.innerHTML = "Done";
+            resultSynTag.style.color = "blue";
+            resultSynTag.style.display = "block";
+          }
+        });
+      }
 
       function listForm(results) {
 
