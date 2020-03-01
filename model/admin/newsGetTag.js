@@ -14,7 +14,7 @@ module.exports={
           reject(error);
         }
         let totalCount = result1.length
-        for(let j = 0; j < totalCount; j++) { // news error: 960
+        for(let j = 0; j < totalCount; j++) {
           console.log("處理中：" + j + "/" + totalCount + " New_id：" + result1[j].id);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
@@ -47,12 +47,12 @@ module.exports={
 function getTagId(tagName) {
   // console.log(tagName);
   return new Promise(async function(resolve, reject) {
-    mysql.con.query(`SELECT id FROM filtercount WHERE name = ?`, tagName, async function(error, checkResult, fields) {
-      if(error){
+    mysql.con.query(`SELECT parent_id FROM filtercount WHERE name = ?`, tagName, async function(error, checkResult, fields) {
+      if(error) {
         reject("Database Query Error");
       }
       // console.log(checkResult[0].id);
-      resolve(checkResult[0].id);
+      resolve(checkResult[0].parent_id);
     });
   });
 }
@@ -60,7 +60,7 @@ function getTagId(tagName) {
 function checkNewsId(data) {
   return new Promise(async function(resolve, reject) {
     mysql.con.query(`SELECT * FROM newstag WHERE news_id = ? AND tag_id = ?;`, [data.news_id, data.tag_id], async function(error, checkResult, fields) {
-      if(error){
+      if(error) {
         reject("Database Query Error");
       }
       // console.log(checkResult);
@@ -84,7 +84,7 @@ function saveTagInfo(data, checkResult) {
       });
     } else {
       mysql.con.query(`UPDATE newstag SET ? WHERE news_id = ${data.news_id} AND tag_id = ${data.tag_id}`, [data], async function(error, result, fields) {
-        if(error){
+        if(error) {
           reject("Data Update Error");
         }
         resolve("Update ok");

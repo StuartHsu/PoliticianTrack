@@ -226,36 +226,6 @@ function getNews(news_id, size, paging, type, news_id1, news_id2, param) {
               });
             }
           });
-          // sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC LIMIT ?,?;`;
-          // mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
-          //   if(error) {
-          //     reject(error);
-          //   } else {
-          //     news = await formTagNews(results);　// 新聞加上所含標籤
-          //
-          //     if(type === "comp") { // 比較
-          //       for(let i = 0; i < news.length; i++) {
-          //         if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
-          //           news[i].tag_id = "both";
-          //           id1Count++;
-          //           id2Count++;
-          //         } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
-          //           news[i].tag_id = param.pol[0];
-          //           id1Count++;
-          //         } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
-          //           news[i].tag_id = param.pol[1];
-          //           id2Count++;
-          //         } else {
-          //           console.log("none");
-          //         }
-          //       }
-          //       body.id1Count = id1Count;
-          //       body.id2Count = id2Count;
-          //     }
-          //     body.news = news;
-          //     resolve(body);
-          //   }
-          // });
         }
       });
     } else {
@@ -356,30 +326,6 @@ function getNewsStrict(news_id, size, paging, param, type, news_id1, news_id2) {
               });
             }
           });
-          // sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC LIMIT ?,?;`;
-          // mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
-          //   if(error) {
-          //     reject(error);
-          //   } else {
-          //     news = await formTagNews(results);　// 新聞加上所含標籤
-          //
-          //     if(type === "comp") { // 比較
-          //       for(let i = 0; i < news.length; i++) {
-          //         if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
-          //           news[i].tag_id = "both";
-          //         } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
-          //           news[i].tag_id = param.pol[0];
-          //         } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
-          //           news[i].tag_id = param.pol[1];
-          //         } else {
-          //           console.log("none");
-          //         }
-          //       }
-          //     }
-          //     body.news = news;
-          //     resolve(body);
-          //   }
-          // });
         }
       });
     } else {
