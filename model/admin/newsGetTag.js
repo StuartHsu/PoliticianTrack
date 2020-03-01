@@ -50,9 +50,15 @@ function getTagId(tagName) {
     mysql.con.query(`SELECT parent_id FROM filtercount WHERE name = ?`, tagName, async function(error, checkResult, fields) {
       if(error) {
         reject("Database Query Error");
+      } else {
+        if(checkResult.length > 1) {
+          resolve(checkResult[0].parent_id);
+        } else {
+          reject("No match result");
+        }
       }
       // console.log(checkResult[0].id);
-      resolve(checkResult[0].parent_id);
+      // resolve(checkResult[0].parent_id);
     });
   });
 }

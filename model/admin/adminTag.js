@@ -13,9 +13,10 @@ module.exports={
         if(error) {
           reject(error);
         }
+        let totalCount = result1.length
         console.log("預計處理：" + result1.length);
-        for(let j = 0; j < result1.length; j++) { // result1.length 800 1189
-          console.log("j: " + j);
+        for(let j = 0; j < totalCount; j++) { // result1.length 800 1189
+          console.log("j: " + j + "/" + totalCount);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
             if(jieba[i].tag === "N") {
