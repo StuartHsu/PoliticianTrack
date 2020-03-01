@@ -142,15 +142,25 @@
                     <%_ let appendModContent = results.news[i].content.replace(/(\u3002\u300d)/g, '。」<br><br>').replace(/(\u3002)(?!\u300d)/g, '。<br><br>') _%>
                     <p><%- appendModContent %></p>
                   </div><a class="url hidden" href="<%= results.news[i].href %>" target="_blank"><%= results.news[i].href %></a></div></div><div class="renderTags">
-                <ul><%_ for(let j = 0; j < results.news[i].tag.length && j < 5; j++) { _%>
-                    <%_ if(title.indexOf(results.news[i].tag[j].tagName) == -1 && issue.indexOf(results.news[i].tag[j].tagName) == -1) { _%>
-                      <%_ if(results.news[i].tag[j].tagType === "NRP") { _%>
+                <%_ let rndPolTagC = 0; _%>
+                <%_ let rndIsuTagC = 0; _%>
+                <ul class="ulPol">
+                <%_ for(let j = 0; j < results.news[i].tag.length && rndPolTagC < 8; j++) { _%>
+                  <%_ if(title.indexOf(results.news[i].tag[j].tagName) == -1 && issue.indexOf(results.news[i].tag[j].tagName) == -1) { _%>
+                    <%_ if(results.news[i].tag[j].tagType === "NRP") { _%>
                         <li class="polTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'pol')"><%= results.news[i].tag[j].tagName %></li>
-                      <%_ } else { _%>
-                        <li class="issueTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'issue')"><%= results.news[i].tag[j].tagName %></li>
-                      <%_ } _%>
                     <%_ } _%>
                   <%_ } _%>
+                <%_ } _%>
+                </ul>
+                <ul class="ulIsu">
+                <%_ for(let j = 0; j < results.news[i].tag.length && rndIsuTagC < 8; j++) { _%>
+                  <%_ if(title.indexOf(results.news[i].tag[j].tagName) == -1 && issue.indexOf(results.news[i].tag[j].tagName) == -1) { _%>
+                    <%_ if(results.news[i].tag[j].tagType === "NI") { _%>
+                      <li class="issueTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'issue')"><%= results.news[i].tag[j].tagName %></li>
+                    <%_ } _%>
+                  <%_ } _%>
+                <%_ } _%>
                 </ul>
               </div></li><%_ }; _%></ul>
         </div>
@@ -660,24 +670,37 @@
         var tagsDiv = document.createElement("div");
         tagsDiv.className = "newsTags";
 
-        var tagUl = document.createElement("ul");
+        var tagUlPol = document.createElement("ul");
+        tagUlPol.className = "ulPol";
+        var tagUlIsu = document.createElement("ul");
+        tagUlIsu.className = "ulIsu";
 
-        for(let j = 0; j < respData[i].tag.length && j < 5; j++) {
-          var tagLi = document.createElement("li");
+        let polTagC = 0;
+        let isuTagC = 0;
+        // for(let j = 0; j < respData[i].tag.length && j < 10; j++) {
+        for(let j = 0; j < respData[i].tag.length && polTagC < 8 && isuTagC < 8; j++) {
+          var tagLiPol = document.createElement("li");
+          var tagLiIsu = document.createElement("li");
           // if(respData[i].tag[j].tagName != name) {
           if(param.pol.indexOf(respData[i].tag[j].tagName) == -1 && param.issue.indexOf(respData[i].tag[j].tagName) == -1) {
-            tagLi.innerHTML = respData[i].tag[j].tagName;
+            tagLiPol.innerHTML = respData[i].tag[j].tagName;
+            tagLiIsu.innerHTML = respData[i].tag[j].tagName;
             if(respData[i].tag[j].tagType === "NRP") {
-              tagLi.className = "polTag";
-              tagLi.setAttribute("onclick", `tagCall("${respData[i].tag[j].tagName}", "pol")`);
+              tagLiPol.className = "polTag";
+              tagLiPol.setAttribute("onclick", `tagCall("${respData[i].tag[j].tagName}", "pol")`);
+              tagUlPol.appendChild(tagLiPol);
+              polTagC++;
             } else {
-              tagLi.className = "issueTag";
-              tagLi.setAttribute("onclick", `tagCall("${respData[i].tag[j].tagName}", "issue")`);
+              tagLiIsu.className = "issueTag";
+              tagLiIsu.setAttribute("onclick", `tagCall("${respData[i].tag[j].tagName}", "issue")`);
+              tagUlIsu.appendChild(tagLiIsu);
+              isuTagC++;
             }
-            tagUl.appendChild(tagLi);
+            // tagUl.appendChild(tagLi);
           }
         }
-        tagsDiv.appendChild(tagUl);
+        tagsDiv.appendChild(tagUlPol);
+        tagsDiv.appendChild(tagUlIsu);
 
         // 組合
         li.appendChild(timelineDiv);
@@ -951,12 +974,12 @@
       let renderTagsShow = document.querySelectorAll(".renderTags");
 
       if(document.querySelectorAll(".newsTags") && tagJudge > 1150) {
-        tagsShow.forEach(tagShow => tagShow.style.display = "block");
+        tagsShow.forEach(tagShow => tagShow.style.display = "flex");
       } else if (document.querySelectorAll(".newsTags") && tagJudge < 1151) {
         tagsShow.forEach(tagShow => tagShow.style.display = "none");
       }
       if(document.querySelectorAll(".renderTags") && tagJudge > 1150) {
-        renderTagsShow.forEach(tagShow => tagShow.style.display = "block");
+        renderTagsShow.forEach(tagShow => tagShow.style.display = "flex");
       } else if (document.querySelectorAll(".renderTags") && tagJudge < 1151) {
         renderTagsShow.forEach(tagShow => tagShow.style.display = "none");
       }
