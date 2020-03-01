@@ -25,15 +25,25 @@ module.exports = {
   },
   getPolIssue: function(pol_id) { // 取得該人物相關議題
     return new Promise(function(resolve, reject) {
-      let sql =
-      `SELECT b.tag_id, d.name, count(b.tag_id) AS count
-      FROM newstag AS a
-      LEFT JOIN newstag AS b ON (a.news_id = b.news_id)
-      LEFT JOIN news AS c ON (a.news_id = c.id)
-      LEFT JOIN filtercount AS d ON (b.tag_id = d.id)
-      WHERE a.tag_id = ? AND d.type = "NI" AND c.intent = "politician_say"
-      GROUP BY b.tag_id ORDER BY count DESC;`
-      mysql.con.query(sql, pol_id,function(error, results, fields) {
+      // let sql =
+      // `SELECT b.tag_id, d.name, count(b.tag_id) AS count
+      // FROM newstag AS a
+      // LEFT JOIN newstag AS b ON (a.news_id = b.news_id)
+      // LEFT JOIN news AS c ON (a.news_id = c.id)
+      // LEFT JOIN filtercount AS d ON (b.tag_id = d.id)
+      // WHERE a.tag_id = ? AND d.type = "NI" AND c.intent = "politician_say"
+      // GROUP BY b.tag_id ORDER BY count DESC;`
+      let sql = `
+      SELECT a.parent_id AS tag_id, d.name, d.type, count(a.parent_id) AS count
+      FROM filtercount AS a
+      LEFT JOIN newstag AS b ON (a.id = b.tag_id)
+      LEFT JOIN news AS c ON (b.news_id = c.id)
+      LEFT JOIN filtercount AS d ON (a.parent_id = d.id)
+      LEFT JOIN newstag AS e ON (b.news_id = e.news_id)
+      WHERE e.tag_id = ? AND d.type = "NI" AND c.intent = "politician_say"
+      GROUP BY a.parent_id ORDER BY count DESC;
+      `;
+      mysql.con.query(sql, pol_id, function(error, results, fields) {
         if(error) {
           reject(error);
         }
