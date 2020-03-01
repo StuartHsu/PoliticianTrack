@@ -53,7 +53,7 @@ module.exports={
         }
         let totalCount = result1.length
         // for(let j = 1927; j < 1929; j++) {
-        for(let j = totalCount - 4; j < totalCount; j++) {
+        for(let j = 0; j < totalCount; j++) {
           console.log("處理中2：" + j + "/" + totalCount);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
