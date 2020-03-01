@@ -51,13 +51,13 @@ function getTagId(tagName) {
       if(error) {
         reject("Database Query Error");
       } else {
-        if(checkResult.length > 1) {
+        if(checkResult.length > 0) {
           resolve(checkResult[0].parent_id);
         } else {
-          reject("No match result");
+          console.log("No match result");
         }
       }
-      // console.log(checkResult[0].id);
+      // console.log(checkResult[0]);
       // resolve(checkResult[0].parent_id);
     });
   });
