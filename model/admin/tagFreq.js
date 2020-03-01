@@ -24,11 +24,14 @@ module.exports={
               let data = {
                 name: jieba[i].word,
                 type: jieba[i].tag,
-                count: 1
+                count: 1,
+                parent_name: jieba[i].word,
+                parent_id: 0
               }
-              await db(data).then(async function(result){
-                await db2(data, result);
-              });
+              await db3(data);
+              // await db(data).then(async function(result){
+              //   await db2(data, result);
+              // });
             }
           }
         }
@@ -37,53 +40,9 @@ module.exports={
       });
     });
   },
-  // getPeriodCountAll: function(end) {
-  //   return new Promise(async function(resolve, reject) {
-  //     await clearCount();
-  //
-  //     mysql.con.beginTransaction(function(error) {
-  //       if(error){
-	// 				reject("Database Query Error");
-	// 				return;
-	// 			}
-  //       let sql = 'SELECT content FROM news WHERE pubTime < ?;';
-  //       mysql.con.query(sql, end, async function(error, result1, fields) {
-  //         if(error){
-	// 					reject("Database Query Error: " + error);
-	// 					return mysql.con.rollback(function(){});
-	// 				}
-  //         let totalCount = result1.length
-  //         for(let j = 0; j < totalCount; j++) {
-  //           console.log("處理中2：" + j + "/" + totalCount);
-  //           let jieba = nodejieba.tag(result1[j].title);
-  //           for(let i = 0; i < jieba.length; i++) {
-  //             if(jieba[i].tag === "NRP") {
-  //               let data = {
-  //                 name: jieba[i].word,
-  //                 type: jieba[i].tag,
-  //                 count: 1
-  //               }
-  //               await db(data).then(async function(result){
-  //                 await db2(data, result);
-  //               });
-  //             }
-  //           }
-  //         }
-  //         mysql.con.commit(function(error){
-  //           if(error){
-  //             reject("Database Query Error: "+erorr);
-  //             return mysql.con.rollback(function(){});
-  //           }
-  //           console.log("處理完成");
-  //           resolve("All tags update!");
-  //         });
-  //       });
-  //     }); // Transaction End
-  //   });
-  // },
   getPeriodCountAll2: function(end) {
     return new Promise(async function(resolve, reject) {
-      await clearCountAll();
+      await clearCount();
 
       // let sql = 'SELECT title FROM news WHERE pubTime < ? AND intent = "politician_say";';
       // let sql = 'SELECT title FROM news WHERE pubTime < ?;';
@@ -94,7 +53,7 @@ module.exports={
         }
         let totalCount = result1.length
         // for(let j = 1927; j < 1929; j++) {
-        for(let j = 0; j < totalCount; j++) {
+        for(let j = totalCount - 4; j < totalCount; j++) {
           console.log("處理中2：" + j + "/" + totalCount);
           let jieba = nodejieba.tag(result1[j].content);
           for(let i = 0; i < jieba.length; i++) {
@@ -103,8 +62,11 @@ module.exports={
               let data = {
                 name: jieba[i].word,
                 type: jieba[i].tag,
-                count: 1
+                count: 1,
+                parent_name: jieba[i].word,
+                parent_id: 0
               }
+              // console.log(data);
               // await dbAll(data).then(async function(result){
               //   await db2All(data, result);
               // await db(data).then(async function(result){
@@ -135,40 +97,42 @@ function clearCount() {
   });
 }
 
-function db(data) {
 
-  return new Promise(async function(resolve, reject) {
-
-    mysql.con.query(`select * from filtercount where name = "${data.name}"`, async function(error, checkResult, fields) {
-      if(error){
-        reject("Database Insert Error");
-      }
-      resolve(checkResult);
-    });
-  });
-}
-
-function db2(data, checkResult) {
-
-  return new Promise(async function(resolve, reject) {
-    if(checkResult.length < 1) {
-      mysql.con.query('insert into filtercount set ?', data, function(error, results, fields) {
-        if(error){
-          reject("Database Insert Error");
-        }
-        resolve("ok");
-      });
-    } else {
-      let query = `update filtercount set count = count + 1 where name = "${data.name}"`;
-      mysql.con.query(query, function(error, results, fields){
-        if(error){
-          reject("Database Query Error");
-        }
-        resolve("ok");
-      });
-    }
-  });
-}
+//
+// function db(data) {
+//
+//   return new Promise(async function(resolve, reject) {
+//
+//     mysql.con.query(`select * from filtercount where name = "${data.name}"`, async function(error, checkResult, fields) {
+//       if(error){
+//         reject("Database Insert Error");
+//       }
+//       resolve(checkResult);
+//     });
+//   });
+// }
+//
+// function db2(data, checkResult) {
+//
+//   return new Promise(async function(resolve, reject) {
+//     if(checkResult.length < 1) {
+//       mysql.con.query('insert into filtercount set ?', data, function(error, results, fields) {
+//         if(error){
+//           reject("Database Insert Error");
+//         }
+//         resolve("ok");
+//       });
+//     } else {
+//       let query = `update filtercount set count = count + 1 where name = "${data.name}"`;
+//       mysql.con.query(query, function(error, results, fields){
+//         if(error){
+//           reject("Database Query Error");
+//         }
+//         resolve("ok");
+//       });
+//     }
+//   });
+// }
 
 function db3(data) {
 
@@ -178,12 +142,20 @@ function db3(data) {
       if(error){
         reject("Database 'filtercount' Query Error");
       } else {
+        // console.log(checkResult);
         if(checkResult.length < 1) {
           mysql.con.query('insert into filtercount set ?', data, function(error, results, fields) {
             if(error){
               reject("Database 'filtercount' Insert Error");
+            } else {
+              mysql.con.query('UPDATE filtercount SET parent_id = id;', data, function(error, results, fields) {
+                if(error){
+                  reject("Database 'filtercount' update parent_id Error");
+                } else {
+                  resolve("ok");
+                }
+              });
             }
-            resolve("ok");
           });
         } else {
           let query = `update filtercount set count = count + 1 where name = "${data.name}"`;
