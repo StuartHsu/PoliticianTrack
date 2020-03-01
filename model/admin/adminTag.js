@@ -102,9 +102,6 @@ module.exports={
             resolve("One of tagName which you input dosen's in database");
           } else {
             sql = `UPDATE filtercount SET parent_name = ?, parent_id = ? WHERE name = ?`;
-            console.log(param.parentTag);
-            console.log(result[0].id);
-            console.log(param.childTag);
             mysql.con.query(sql, [param.parentTag, result[0].id, param.childTag], async function(error, checkResult, fields) {
               if(error){
                 reject("Database Insert Error");
