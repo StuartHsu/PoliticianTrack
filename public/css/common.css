@@ -432,6 +432,10 @@ main {
   align-items: flex-start;
 }
 
+/* .newslist>ul>li:nth-child(odd) {
+  background-color: #F6F6F6;
+} */
+
 .newslist>ul {
   width: 100%;
   padding: 1em 2em 0;
@@ -467,11 +471,12 @@ main {
 .newslist .newsTags,
 .newslist .renderTags {
   flex: 2;
-  margin: 10px 0px 10px 50px;
+  margin: 0 0px 0 50px;
+	padding: 30px 0 14px;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	height: 165px;
+	height: 140px;
 }
 
 .newslist .newsTags ul,
@@ -480,8 +485,8 @@ main {
   flex-wrap: wrap;
   align-items: flex-start;
 	width: 330px;
-	height: 80px;
-	padding: 5px 0 0;
+	height: 70px;
+	/* padding: 5px 0 0; */
 }
 
 .newslist .newsTags ul li,
