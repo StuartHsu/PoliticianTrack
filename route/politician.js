@@ -6,10 +6,10 @@ const politician = require('../model/politicians');
 
 
 // Get politician
-router.get('/', async function(req, res) {
-  let data = await politician.get();
-  res.send({data: data});
-});
+// router.get('/', async function(req, res) {
+//   let data = await politician.get();
+//   res.send({data: data});
+// });
 
 
 

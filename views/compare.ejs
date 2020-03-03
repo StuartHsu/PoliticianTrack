@@ -380,7 +380,7 @@
     // Get compare DB data
     function getCompare(param) {
       $.ajax({
-        url: "api/news/getNews",
+        url: "api/news/getNews/normal",
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -407,7 +407,7 @@
     function getComparePage(param, page) {
       scrollStatus = false;
       $.ajax({
-        url: `api/news/getNews?paging=${page}`,
+        url: `api/news/getNews/normal?paging=${page}`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -431,7 +431,7 @@
     // DB 取資料 - 標題 mode
     function getCompareLess(param) {
       $.ajax({
-        url: "api/news/getNews/strict",
+        url: "api/news/getNews/accurate",
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -449,7 +449,7 @@
     function getCompareLessPage(param, page) {
       scrollStatus = false;
       $.ajax({
-        url: `api/news/getNews/strict?paging=${page}`,
+        url: `api/news/getNews/accurate?paging=${page}`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",

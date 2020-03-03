@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router(); // create a router
 const db = require('../model/crawler/savenews');
-const tagFilterCount = require('../model/tagFilterCount');
+const filterTagCount = require('../model/filterTagCount');
 
 
 
 // Get politician
 router.get('/', async function(req, res) {
-  let data = await tagFilterCount.get();
+  let data = await filterTagCount.get();
   res.send({data: data});
 });
 

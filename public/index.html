@@ -35,7 +35,7 @@
 
       anychart.onDocumentReady(function() {
         $.ajax({
-          url: "tagFilterCount",
+          url: "tagCount",
           type: "GET",
           success: function(resp) {
             let data = dataForm(resp.data);
