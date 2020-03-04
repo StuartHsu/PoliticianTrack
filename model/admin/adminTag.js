@@ -2,7 +2,6 @@ const mysql = require("../../util/mysqlcon.js");
 const nodejieba = require('nodejieba');
 const fs = require("fs");
 
-// nodejieba.load({userDict: './util/dict.txt'});
 nodejieba.load({userDict: '../PolsTrackCrawler/util/dict.txt'});
 
 module.exports={
@@ -25,8 +24,11 @@ module.exports={
                 type: jieba[i].tag,
                 count: 1
               }
-              await db(data).then(async function(result){
-                await db2(data, result);
+              // await db(data).then(async function(result){
+              //   await db2(data, result);
+              // });
+              await db3(data).catch(err => {
+                reject(err);
               });
             }
           }
@@ -151,6 +153,76 @@ function db2(data, checkResult) {
     }
   });
 }
+
+function db3(data) {
+  return new Promise(async function(resolve, reject) {
+    mysql.con.getConnection(function(err, connection) {
+      connection.beginTransaction(function(error) {
+        if(error){
+    			reject("Transaction Error: " + error);
+    		}
+        mysql.con.query("SELECT * FROM tagverify WHERE name = ?", data.name, async function(error, checkResult, fields) {
+          if(error){
+            return mysql.con.rollback(function() {
+              connection.release();
+              reject("Database Query Error: " + error);
+            });
+          } else {
+            if(checkResult.length < 1) {
+              mysql.con.query("INSERT into tagverify SET ?", data, function(error, results, fields) {
+                if(error){
+                  return mysql.con.rollback(function() {
+                    connection.release();
+                    reject("Database Insert Error: " + error);
+                  });
+                } else {
+                  connection.commit(function(error) {
+                    if(error) {
+                      return mysql.con.rollback(function() {
+                        connection.release();
+                        reject("Database Commit Error: " + error);
+                      });
+                    }
+                    connection.release();
+                    resolve("OK");
+                  });
+                }
+              });
+            } else {
+              mysql.con.query("UPDATE tagverify SET count = count + 1 WHERE name = ?", data.name, function(error, results, fields){
+                if(error){
+                  return mysql.con.rollback(function() {
+                    connection.release();
+                    reject("Database Update Error: " + error);
+                  });
+                }
+                connection.commit(function(error) {
+                  if(error) {
+                    return mysql.con.rollback(function() {
+                      connection.release();
+                      reject("Database Commit Error: " + error);
+                    });
+                  }
+                  connection.release();
+                  resolve("OK");
+                })
+              });
+            }
+          }
+        });
+      });
+    });
+  });
+}
+
+
+
+
+
+
+
+
+
 
 function updateTagStatus(data) {
 

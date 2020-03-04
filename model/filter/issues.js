@@ -1,26 +1,39 @@
 const mysql = require("../../util/mysqlcon.js");
+const promiseSql = require("../../util/promiseSql.js");
 
-module.exports = {
-  get: function(param) {
-    return new Promise(async function(resolve, reject) {
+module.exports =
+{
+  get: function(param)
+  {
+    return new Promise(async function(resolve, reject)
+    {
       let issueList;
-      let politicianId;
-      if(param.pol.length === 2 && param.issue.length === 0 || param.pol.length === 2 && param.issue.length === 1) { // compare
-        politicianId = await getTagId(param);
-        issueList = await getIssues("twoPoliticians", politicianId);
-      } else if(param.pol.length === 0 && param.issue.length === 0 || param.pol.length === 0 && param.issue.length === 1) { // All
-        issueList = await getIssues();
-      } else {
-        politicianId = await getTagId(param);
-        issueList = await getIssues("onePolitician", politicianId);
+      let politicianIds;
+      
+      if (param.pol.length === 2 && param.issue.length === 0 || param.pol.length === 2 && param.issue.length === 1) // compare
+      {
+        politicianIds = await getTagId(param);
+        issueList = await getIssues("twoPoliticians", politicianIds);
       }
+      else if (param.pol.length === 0 && param.issue.length === 0 || param.pol.length === 0 && param.issue.length === 1) // All
+      {
+        issueList = await getIssues();
+      }
+      else
+      {
+        politicianIds = await getTagId(param);
+        issueList = await getIssues("onePolitician", politicianIds);
+      }
+
       resolve(issueList);
     });
   }
 }
 
-function getIssues(mode, politicianId) {
-  return new Promise(function(resolve, reject) {
+function getIssues(mode, politicianIds)
+{
+  return new Promise(async function(resolve, reject)
+  {
     let param;
     let sql = `
       SELECT d.parent_name AS name, count(*) AS count
@@ -32,49 +45,74 @@ function getIssues(mode, politicianId) {
     `;
     let filter;
 
-    if(mode === "onePolitician") {
+    if (mode === "onePolitician")
+    {
       filter = ` AND a.tag_id = ? AND b.tag_id != ?`;
-      param = [politicianId, politicianId];
-    } else if(mode === "twoPoliticians") {
+      param = [politicianIds, politicianIds];
+    }
+    else if (mode === "twoPoliticians")
+    {
       filter = ` AND a.tag_id IN (?)`;
-      param = [politicianId];
-    } else { // all
+      param = [politicianIds];
+    }
+    else
+    {
       filter = "";
       param = [];
     }
 
-    mysql.con.query(sql+filter+` GROUP BY d.parent_name ORDER BY count(*) DESC;`, param, function(error, results, fields) {
-      if(error) {
-        reject(error);
-      }
-      resolve(results);
-    });
+    try
+    {
+      let data = await promiseSql.query(sql + filter + ` GROUP BY d.parent_name ORDER BY count(*) DESC;`, param);
+      resolve(data);
+    }
+    catch(error)
+    {
+      reject(error);
+    }
   });
 }
 
 // 取得人物 tagId
-function getTagId(param) {
-  return new Promise(function(resolve, reject) {
+function getTagId(param)
+{
+  return new Promise(async function(resolve, reject)
+  {
     let tagNameArr = [];
-    if(param.pol.length > 0) {
-      for(let h = 0; h < param.pol.length; h++) {
+
+    if(param.pol.length > 0)
+    {
+      for(let h = 0; h < param.pol.length; h++)
+      {
         tagNameArr.push(param.pol[h]);
       }
     }
+
     let data = [];
     let sql = `SELECT id FROM filtercount WHERE name IN (?);`;
-    if(tagNameArr.length > 0) { // 人 or 題至少有其一
-      mysql.con.query(sql, [tagNameArr], function(error, results, fields) {
-        if(error) {
-          reject(error);
-        }
-        for(let i = 0; i < results.length; i++) {
+
+    if(tagNameArr.length > 0) // 人 or 題至少有其一
+    {
+      try
+      {
+        let results = await promiseSql.query(sql, tagNameArr);
+
+        for(let i = 0; i < results.length; i++)
+        {
           data.push(results[i].id);
         }
+
         resolve(data);
-      });
-    } else { // 無人、題
+      }
+      catch(error)
+      {
+        reject(error);
+      }
+    }
+    else // 無人、題
+    {
       resolve(data);
     }
+
   });
 }

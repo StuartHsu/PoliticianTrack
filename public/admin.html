@@ -315,7 +315,7 @@
       function segNews(data) {
         console.log(data);
         $.ajax({
-          url: "admin/api/seg",
+          url: "admin/seg",
           type: "POST",
           data: JSON.stringify(data),
           contentType: "application/json; charset=utf-8", // 送給 server 的格式
@@ -331,7 +331,7 @@
       // 2. 撈出未處理標籤
       function querySegs() {
         $.ajax({
-          url: "admin/api/list",
+          url: "admin/list",
           type: "GET",
           success: function(resp) {
             listForm(resp);
@@ -342,7 +342,7 @@
       // 3. 更新標籤 & 字典
       function updateTagStatus(data) {
         $.ajax({
-          url: "admin/api/updateDB",
+          url: "admin/updateDB",
           type: "POST",
           data: JSON.stringify(data),
           contentType: "application/json; charset=utf-8", // 送給 server 的格式
@@ -359,7 +359,7 @@
       // 4-1. Tag count refresh (DB: filterCount)
       function tagCount() {
         $.ajax({
-          url: "admin/api/tagfreq",
+          url: "admin/tagfreq",
           type: "GET",
           success: function(resp) {
             console.log(resp);
@@ -373,7 +373,7 @@
       // 4-2. Tag count refresh (DB: filterCount) All
       function tagCountAll() {
         $.ajax({
-          url: "admin/api/tagfreqall",
+          url: "admin/tagfreqall",
           type: "GET",
           success: function(resp) {
             console.log(resp);
@@ -387,7 +387,7 @@
       // 5. NLP training
       function nlpTrain(data) {
         $.ajax({
-          url: "admin/api/nlp/train",
+          url: "admin/nlp/train",
           type: "POST",
           data: JSON.stringify(data),
           contentType: "application/json; charset=utf-8", // 送給 server 的格式
@@ -403,7 +403,7 @@
       // 6. NLP process
       function nlpProcess(data) {
         $.ajax({
-          url: "admin/api/nlp/process",
+          url: "admin/nlp/process",
           type: "POST",
           data: JSON.stringify(data),
           contentType: "application/json; charset=utf-8", // 送給 server 的格式
@@ -419,7 +419,7 @@
       // 7. News get tag
       function getTag() {
         $.ajax({
-          url: "admin/api/gettag",
+          url: "admin/gettag",
           type: "GET",
           success: function(resp) {
             console.log(resp);
@@ -433,7 +433,7 @@
       // x-2. Set synonyms
       function setSynonyms(data) {
         $.ajax({
-          url: "admin/api/synonyms",
+          url: "admin/synonyms",
           type: "POST",
           data: JSON.stringify(data),
           contentType: "application/json; charset=utf-8", // 送給 server 的格式

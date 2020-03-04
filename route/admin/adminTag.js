@@ -8,7 +8,7 @@ const nlp = require('../../model/admin/nlp');
 const newsGetTag = require('../../model/admin/newsGetTag');
 
 // 1. 執行新聞斷詞
-router.post('/api/seg', async function(req, res) {
+router.post('/seg', async function(req, res) {
   let period = {
     start: req.body.start.replace(/-/g, "/") + " 00:00",
     end:req.body.end.replace(/-/g, "/") + " 23:59"
@@ -18,19 +18,19 @@ router.post('/api/seg', async function(req, res) {
 });
 
 // 2. 撈出未處理標籤
-router.get('/api/list', async function(req, res) {
+router.get('/list', async function(req, res) {
   let data = await adminTag.get();
   res.send({data: data});
 });
 
 // add or modify tag in dict
-router.get('/api/updateDict', async function(req, res) {
+router.get('/updateDict', async function(req, res) {
   let data = await adminTag.updateDic();
   res.send({data: data});
 });
 
 // 3. 更新標籤 & 字典
-router.post('/api/updateDB', async function(req, res) {
+router.post('/updateDB', async function(req, res) {
   let updateData = req.body
   let data = await adminTag.updateDB(updateData); // 更新 DB
   await adminTag.updateDic(updateData); // 更新 Dict
@@ -38,7 +38,7 @@ router.post('/api/updateDB', async function(req, res) {
 });
 
 // 4-1. Tag count refresh (DB: filterCount)
-router.get('/api/tagfreq', async function(req, res) {
+router.get('/tagfreq', async function(req, res) {
   let today = dateForm(new Date()); // YYYY/MM/DD
   let beginDay = startDayForm(today, 14);
 
@@ -51,14 +51,14 @@ router.get('/api/tagfreq', async function(req, res) {
 });
 
 // 4-2. Tag count refresh (DB: filterCount) All
-router.get('/api/tagfreqall', async function(req, res) {
+router.get('/tagfreqall', async function(req, res) {
   let today = dateForm(new Date()) + " 23:59"; // YYYY/MM/DD
   let data = await tagFreq.getPeriodCountAll2(today);
   res.send(data);
 });
 
 // 5. NLP training
-router.post('/api/nlp/train', async function(req, res) {
+router.post('/nlp/train', async function(req, res) {
   let period = {};
   let today = dateForm(new Date()); // YYYY/MM/DD
   if(req.body.start && req.body.end) {
@@ -76,7 +76,7 @@ router.post('/api/nlp/train', async function(req, res) {
 });
 
 // 6. NLP process
-router.post('/api/nlp/process', async function(req, res) {
+router.post('/nlp/process', async function(req, res) {
   let period = {};
   let today = dateForm(new Date()); // YYYY/MM/DD
   if(req.body.start && req.body.end) {
@@ -94,19 +94,19 @@ router.post('/api/nlp/process', async function(req, res) {
 });
 
 // NLP test mode
-router.get('/api/nlp/test', async function(req, res) {
+router.get('/nlp/test', async function(req, res) {
   let results = await nlp.test();
   res.send(results);
 });
 
 // 7. News get tag
-router.get('/api/gettag', async function(req, res) {
+router.get('/gettag', async function(req, res) {
   let results = await newsGetTag.getTag();
   res.send(results);
 });
 
 // x-2. Set synonyms
-router.post('/api/synonyms', async function(req, res) {
+router.post('/synonyms', async function(req, res) {
   let param = req.body;
   let results = await adminTag.setSynonyms(param);
   res.send(results);
