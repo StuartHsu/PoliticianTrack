@@ -5,8 +5,7 @@ const issues = require('../../model/filter/issues');
 
 router.post('/', async function(req, res) {
   let param = req.body;
-  let data;
-  data = await issues.get(param);
+  let data = await issues.get(param);
   res.send(data);
 });
 

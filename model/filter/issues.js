@@ -7,70 +7,43 @@ module.exports = {
       let politicianId;
       if(param.pol.length === 2 && param.issue.length === 0 || param.pol.length === 2 && param.issue.length === 1) { // compare
         politicianId = await getTagId(param);
-        issueList = await getTwoPolIssue(politicianId);
+        issueList = await getIssues("twoPoliticians", politicianId);
       } else if(param.pol.length === 0 && param.issue.length === 0 || param.pol.length === 0 && param.issue.length === 1) { // All
-        issueList = await getAllIssue();
+        issueList = await getIssues();
       } else {
         politicianId = await getTagId(param);
-        issueList = await getPolIssue(politicianId);
+        issueList = await getIssues("onePolitician", politicianId);
       }
       resolve(issueList);
     });
   }
 }
 
-function getAllIssue() {
+function getIssues(mode, politicianId) {
   return new Promise(function(resolve, reject) {
+    let param;
     let sql = `
-      SELECT b.tag_id, d.name, count(b.tag_id) AS count
+      SELECT d.parent_name AS name, count(*) AS count
       FROM newstag AS a
       LEFT JOIN newstag AS b ON (a.news_id = b.news_id)
       LEFT JOIN news AS c ON (a.news_id = c.id)
       LEFT JOIN filtercount AS d ON (b.tag_id = d.id)
-      WHERE d.type = "NI" AND c.intent = "politician_say"
-      GROUP BY b.tag_id ORDER BY count DESC;
+      WHERE c.intent = "politician_say" AND d.type = "NI"
     `;
-    mysql.con.query(sql,function(error, results, fields) {
-      if(error) {
-        reject(error);
-      }
-      resolve(results);
-    });
-  });
-}
+    let filter;
 
-function getPolIssue(politicianId) {
-  return new Promise(function(resolve, reject) {
-    let sql = `
-      SELECT c.parent_name AS name, count(*)
-      FROM newstag AS a
-      LEFT JOIN newstag AS b ON (a.news_id = b.news_id)
-      LEFT JOIN filtercount AS c ON (b.tag_id = c.id)
-      LEFT JOIN news AS d ON (a.news_id = d.id)
-      WHERE a.tag_id = ? AND b.tag_id != ? AND c.type = "NI" AND d.intent = "politician_say"
-      GROUP BY c.parent_name ORDER BY count(*) DESC;
-    `;
-    mysql.con.query(sql, [politicianId, politicianId], function(error, results, fields) {
-      if(error) {
-        reject(error);
-      }
-      resolve(results);
-    });
-  });
-}
+    if(mode === "onePolitician") {
+      filter = ` AND a.tag_id = ? AND b.tag_id != ?`;
+      param = [politicianId, politicianId];
+    } else if(mode === "twoPoliticians") {
+      filter = ` AND a.tag_id IN (?)`;
+      param = [politicianId];
+    } else { // all
+      filter = "";
+      param = [];
+    }
 
-function getTwoPolIssue(politicianId) { // 若無選人則取全部
-  return new Promise(function(resolve, reject) {
-    let sql = `
-      SELECT b.tag_id, d.name, count(b.tag_id) AS count
-      FROM newstag AS a
-      LEFT JOIN newstag AS b ON (a.news_id = b.news_id)
-      LEFT JOIN news AS c ON (a.news_id = c.id)
-      LEFT JOIN filtercount AS d ON (b.tag_id = d.id)
-      WHERE a.tag_id IN (?) AND d.type = "NI" AND c.intent = "politician_say"
-      GROUP BY b.tag_id ORDER BY count DESC;
-    `
-    mysql.con.query(sql, [politicianId], function(error, results, fields) {
+    mysql.con.query(sql+filter+` GROUP BY d.parent_name ORDER BY count(*) DESC;`, param, function(error, results, fields) {
       if(error) {
         reject(error);
       }

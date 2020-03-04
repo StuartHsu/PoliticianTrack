@@ -88,43 +88,6 @@ function clearCount() {
   });
 }
 
-
-//
-// function db(data) {
-//
-//   return new Promise(async function(resolve, reject) {
-//
-//     mysql.con.query(`select * from filtercount where name = "${data.name}"`, async function(error, checkResult, fields) {
-//       if(error){
-//         reject("Database Insert Error");
-//       }
-//       resolve(checkResult);
-//     });
-//   });
-// }
-//
-// function db2(data, checkResult) {
-//
-//   return new Promise(async function(resolve, reject) {
-//     if(checkResult.length < 1) {
-//       mysql.con.query('insert into filtercount set ?', data, function(error, results, fields) {
-//         if(error){
-//           reject("Database Insert Error");
-//         }
-//         resolve("ok");
-//       });
-//     } else {
-//       let query = `update filtercount set count = count + 1 where name = "${data.name}"`;
-//       mysql.con.query(query, function(error, results, fields){
-//         if(error){
-//           reject("Database Query Error");
-//         }
-//         resolve("ok");
-//       });
-//     }
-//   });
-// }
-
 function db3(data) {
 
   return new Promise(async function(resolve, reject) {

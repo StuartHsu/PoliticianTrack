@@ -26,11 +26,11 @@ const news = require('./route/news');
 app.use('/api/news', news);
 
 
-// 新聞頁 人物取得議題
-const polGetIssues = require('./route/filter/issue');
-app.use('/api/polgetissues', polGetIssues);
-
-// 新聞頁 政黨影響人物
+// Filter
+// politician gets issue list
+const politicianGetIssues = require('./route/filter/issue');
+app.use('/api/politicianGetIssues', politicianGetIssues);
+// party gets politician list
 const getParty = require('./route/parties');
 app.use('/api/getparty', getParty);
 

@@ -464,7 +464,7 @@
     // DB 取資料 - 人物影響議題
     function polIssue(param) {
       $.ajax({
-        url: `api/polgetissues`,
+        url: `api/politicianGetIssues`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
