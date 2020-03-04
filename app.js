@@ -3,11 +3,9 @@ const bodyParser = require('body-parser');
 
 const newData = require('./model/news');
 const hotsData = require('./model/hots');
-
 const politicianFilterList = require('./model/filter/politicians');
 const issuesFilterList = require('./model/filter/issues');
 const partiesData = require('./model/filter/parties');
-
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -16,10 +14,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(express.static('public')); // static file
 app.set('view engine', 'ejs');
-
-// = Crawler
-const crawler = require('./route/crawler');
-app.use('/crawler', crawler);
 
 // = News
 const news = require('./route/news');
@@ -44,7 +38,6 @@ app.use('/api/gethots', getHots);
 // = Admin
 const adminTag = require('./route/admin/adminTag');
 app.use('/admin', adminTag);
-
 
 
 let param = {
@@ -116,32 +109,6 @@ app.get('/hots', async function(req, res) {
     results: results.list
   });
 });
-
-
-
-
-// 立法院歷屆立委
-// const request = require('request');
-// const gov_legi = require('./crawler/gov/legislator');
-// app.get('/legtest', function(req, res) {
-//   let data = gov_legi.get();
-//   res.send(data);
-// });
-
-// 讀議員 excel
-// const readExcel = require('./crawler/gov/parliament');
-// app.get('/parliament', async function(req, res) {
-//   let data = await readExcel.get();
-//   res.send(data);
-// });
-
-
-
-
-
-
-
-
 
 
 app.use((req, res, next) => {
