@@ -3,10 +3,10 @@ const bodyParser = require('body-parser');
 
 const newData = require('./model/news');
 const hotsData = require('./model/hots');
-const partiesData = require('./model/parties');
 
 const politicianFilterList = require('./model/filter/politicians');
 const issuesFilterList = require('./model/filter/issues');
+const partiesData = require('./model/filter/parties');
 
 
 const PORT = process.env.PORT || 3000;
@@ -27,11 +27,11 @@ app.use('/api/news', news);
 
 // = Filter
 // - politician gets issue list
-const politicianGetIssues = require('./route/filter/issue');
-app.use('/api/politicianGetIssues', politicianGetIssues);
+const getIssuesByPolitician = require('./route/filter/issue');
+app.use('/api/getIssuesByPolitician', getIssuesByPolitician);
 // - party gets politician list
-const getParty = require('./route/parties');
-app.use('/api/getparty', getParty);
+const getPoliticiansByParty = require('./route/filter/parties');
+app.use('/api/getPoliticiansByParty', getPoliticiansByParty);
 
 // = Index
 const tagCount = require('./route/tagCount');

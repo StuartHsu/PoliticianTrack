@@ -1,11 +1,8 @@
 const express = require("express");
 const router = express.Router(); // create a router
 const bodyParser = require('body-parser');
-const parties = require('../model/parties');
+const parties = require('../../model/filter/parties');
 
-
-
-// Get parties: /api/getparty/
 router.post('/', async function(req, res) {
   let party = req.body.party;
   let data = await parties.getPoliticians(party);

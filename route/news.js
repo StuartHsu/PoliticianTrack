@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router(); // create a router
-
 const bodyParser = require('body-parser');
 const news = require('../model/news');
 

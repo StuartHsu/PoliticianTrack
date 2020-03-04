@@ -1,4 +1,4 @@
-const mysql = require("../util/mysqlcon.js");
+const mysql = require("../../util/mysqlcon.js");
 
 module.exports = {
   getParties: function(party) {

@@ -267,7 +267,7 @@
       });
       appSide.scrollTop = 0;
 
-      polIssue(param);
+      getIssuesByPolitician(param);
       if(strictMode === false) {
         getNews(param);
       } else {
@@ -358,7 +358,7 @@
         personTitle.innerHTML = "人物";
         personTitle.style.color = "#FFFFFF"
         param.pol = [];
-        polIssue(param);
+        getIssuesByPolitician(param);
         if(strictMode === false) {
           getNews(param);
         } else {
@@ -376,7 +376,7 @@
         issueTitle.innerHTML = "議題";
         issueTitle.style.color = "#FFFFFF"
         param.issue = [];
-        polIssue(param);
+        getIssuesByPolitician(param);
         if(strictMode === false) {
           getNews(param);
         } else {
@@ -399,7 +399,7 @@
         param.issue = [tagName]
       }
       getPoliticiansByParty(param);
-      polIssue(param);
+      getIssuesByPolitician(param);
       appSide.scrollTop = 0;
       if(strictMode === false) {
         getNews(param);
@@ -476,7 +476,7 @@
     // DB 取資料 - 政黨影響人物
     function getPoliticiansByParty(param) {
       $.ajax({
-        url: `api/getparty`,
+        url: `api/getPoliticiansByParty`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -489,9 +489,9 @@
     }
 
     // DB 取資料 - 人物影響議題
-    function polIssue(param) {
+    function getIssuesByPolitician(param) {
       $.ajax({
-        url: `api/politicianGetIssues`,
+        url: `api/getIssuesByPolitician`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -853,7 +853,7 @@
           } else {
             getNewsLess(param);
           }
-          polIssue(param);
+          getIssuesByPolitician(param);
           // pol filter 標題改
           if(param.pol.length === 0) {
             personTitle.innerHTML = "人物";
