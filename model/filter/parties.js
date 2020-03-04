@@ -1,7 +1,7 @@
-const mysql = require("../../util/mysqlcon.js");
 const promiseSql = require("../../util/promiseSql.js");
 
-module.exports = {
+module.exports =
+{
   getParties: function(party)
   {
     return new Promise(async function(resolve, reject)

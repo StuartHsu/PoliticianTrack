@@ -1,8 +1,11 @@
-const mysql = require("../../util/mysqlcon.js");
+const promiseSql = require("../../util/promiseSql.js");
 
-module.exports = {
-  get: function() {
-    return new Promise(async function(resolve, reject) {
+module.exports =
+{
+  get: function()
+  {
+    return new Promise(async function(resolve, reject)
+    {
       let sql = `
         SELECT b.parent_name AS name, count(*) AS count
         FROM newstag AS a
@@ -17,12 +20,18 @@ module.exports = {
         AND b.type ="NRP" AND c.intent = "politician_say"
         GROUP BY b.parent_name ORDER BY count(*) DESC;
       `;
-      mysql.con.query(sql, function(error, results, fields) {
-        if(error) {
-          reject(error);
-        }
-        resolve(results);
-      });
+
+      try
+      {
+        let data = await promiseSql.query(sql, null);
+
+        resolve(data);
+      }
+      catch(error)
+      {
+        reject(error);
+      }
+
     });
   }
 }
