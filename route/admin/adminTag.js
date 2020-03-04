@@ -53,11 +53,6 @@ router.get('/api/tagfreq', async function(req, res) {
 // 4-2. Tag count refresh (DB: filterCount) All
 router.get('/api/tagfreqall', async function(req, res) {
   let today = dateForm(new Date()) + " 23:59"; // YYYY/MM/DD
-
-  // let period = {
-  //   end: today + " 23:59"
-  // }
-  // let data = await tagFreq.getPeriodCountAll(today);
   let data = await tagFreq.getPeriodCountAll2(today);
   res.send(data);
 });
@@ -117,11 +112,6 @@ router.post('/api/synonyms', async function(req, res) {
   res.send(results);
 });
 
-
-
-
-
-
 function dateForm(date) {
   var year = date.getFullYear();
   var month = date.getMonth() + 1;
@@ -139,33 +129,6 @@ function startDayForm(today, days) {
 
   return dateForm(startDay);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 module.exports = router;
