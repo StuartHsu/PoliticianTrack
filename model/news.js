@@ -7,7 +7,6 @@ module.exports = {
       let tagId;
       let tagsNewsIds;
       let newsData;
-      // 人、題分流
       if(param.pol.length === 2 && param.issue.length === 1) { // compare
         let param1 = {pol: [param.pol[0]], issue: [param.issue[0]]};
         let param2 = {pol: [param.pol[1]], issue: [param.issue[0]]};
@@ -17,11 +16,11 @@ module.exports = {
         let tag2NewsIds = await getTagNewsId(tag2Id);
         newsData = await getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, null);
       } else if(param.pol.length === 0 && param.issue.length === 0) { // All
-        newsData = await getAllNews(size, paging);　// 以 news_id 取得新聞詳細內容
+        newsData = await getAllNews(size, paging);
       } else {
-        tagId = await getTagId(param); // 取得人物、議題 tagId
-        tagsNewsIds = await getTagNewsId(tagId);　// 取得 tagId 對應之 newsId
-        newsData = await getNews(tagsNewsIds, size, paging);　// 以 newsId 取得新聞詳細內容
+        tagId = await getTagId(param);
+        tagsNewsIds = await getTagNewsId(tagId);
+        newsData = await getNews(tagsNewsIds, size, paging);
       }
       resolve(newsData);
     });
@@ -33,7 +32,6 @@ module.exports = {
       let rawTagNewsIds;
       let tagsNewsIds;
       let newsData;
-      // 人、題分流
       if(param.pol.length === 2 && param.issue.length === 1) { // compare
         let param1 = {pol: [param.pol[0]], issue: [param.issue[0]]};
         let param2 = {pol: [param.pol[1]], issue: [param.issue[0]]};
@@ -41,17 +39,17 @@ module.exports = {
         let tag2Id = await getTagId(param2);
         let rawTag1NewsIds = await getTagNewsId(tag1Id);
         let rawTag2NewsIds = await getTagNewsId(tag2Id);
-        let tag1NewsIds = await getIntentNewsIds(param, rawTag1NewsIds); // 取得 tagId 對應之 polIntent
-        let tag2NewsIds = await getIntentNewsIds(param, rawTag2NewsIds); // 取得 tagId 對應之 polIntent
+        let tag1NewsIds = await getIntentNewsIds(param, rawTag1NewsIds);
+        let tag2NewsIds = await getIntentNewsIds(param, rawTag2NewsIds);
         newsData = await getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, "accurate");
       } else if(param.pol.length === 0 && param.issue.length === 0) { // All
         let intentNewsIds = await getIntentNewsIds(param);
-        newsData = await getAllNews(size, paging, intentNewsIds);　// 以 tagNewsIds 取得新聞詳細內容
+        newsData = await getAllNews(size, paging, intentNewsIds);
       } else {
-        tagId = await getTagId(param); // 取得人物、議題 tagId
-        rawTagNewsIds = await getTagNewsId(tagId);　// 取得 tagId 對應之 tagNewsIds
-        tagsNewsIds = await getIntentNewsIds(param, rawTagNewsIds); // 取得 tagId 對應之 polIntent
-        newsData = await getNews(tagsNewsIds, size, paging);　// 以 tagNewsIds 取得新聞詳細內容
+        tagId = await getTagId(param);
+        rawTagNewsIds = await getTagNewsId(tagId);
+        tagsNewsIds = await getIntentNewsIds(param, rawTagNewsIds);
+        newsData = await getNews(tagsNewsIds, size, paging);
       }
       resolve(newsData);
     });
@@ -134,7 +132,6 @@ function getNews(tagNewsIds, size, paging, mode) {
     } else {
       filter = "";
     }
-    // sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC LIMIT ?,?;`;
     let sql = `SELECT * FROM news WHERE id IN (?)`;
     mysql.con.query(sql+filter+` ORDER BY pubTime DESC LIMIT ?,?;`, [tagNewsIds, offset, size], async function(error, results, fields) {
       if(error) {
@@ -420,9 +417,9 @@ function getTags(news_id) {
       SELECT a.news_id, a.tag_id, b.name, b.type
       FROM newstag AS a
       LEFT JOIN filtercount AS b ON (a.tag_id = b.id)
-      WHERE a.news_id = ${news_id};
+      WHERE a.news_id = ?;
     `;
-    mysql.con.query(sql, function(error, results, fields) {
+    mysql.con.query(sql, news_id, function(error, results, fields) {
       if(error) {
         reject(error);
       }

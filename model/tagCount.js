@@ -20,7 +20,7 @@ module.exports = {
         LEFT JOIN news AS c ON (b.news_id = c.id)
         LEFT JOIN filtercount AS d ON (a.parent_id = d.id)
         WHERE c.intent = "politician_say"
-      `
+      `;
       mysql.con.query(sql+filter+` GROUP BY a.parent_id ORDER BY count DESC;`, function(error, results, fields) {
         if(error) {
           reject(error);

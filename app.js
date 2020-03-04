@@ -1,50 +1,51 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+
 const newData = require('./model/news');
-const politicianFilterList = require('./model/filter/politicians');
-const issuesFilterList = require('./model/filter/issues');
-const filterTagContent = require('./model/filterTagCount');
 const hotsData = require('./model/hots');
 const partiesData = require('./model/parties');
 
+const politicianFilterList = require('./model/filter/politicians');
+const issuesFilterList = require('./model/filter/issues');
+
+
 const PORT = process.env.PORT || 3000;
-
-
 const app = express();
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-
 app.use(express.static('public')); // static file
 app.set('view engine', 'ejs');
 
-// Crawler route
+// = Crawler
 const crawler = require('./route/crawler');
 app.use('/crawler', crawler);
 
+// = News
 const news = require('./route/news');
 app.use('/api/news', news);
 
-
-// Filter
-// politician gets issue list
+// = Filter
+// - politician gets issue list
 const politicianGetIssues = require('./route/filter/issue');
 app.use('/api/politicianGetIssues', politicianGetIssues);
-// party gets politician list
+// - party gets politician list
 const getParty = require('./route/parties');
 app.use('/api/getparty', getParty);
 
-// hots
+// = Index
+const tagCount = require('./route/tagCount');
+app.use('/tagCount', tagCount);
+
+// = Hots
 const getHots = require('./route/hots');
 app.use('/api/gethots', getHots);
 
-// Admin tag & NRP/NI 頻率統計
+// = Admin
 const adminTag = require('./route/admin/adminTag');
 app.use('/admin', adminTag);
 
-// Index page - get tagCount
-const tagCount = require('./route/tagCount');
-app.use('/tagCount', tagCount);
+
 
 let param = {
   pol: [],
@@ -53,7 +54,7 @@ let param = {
   from: ""
 }
 
-// filter page render data when 1st coming
+// News
 app.get('/politician', async function(req, res) {
   let results;
 
@@ -92,8 +93,7 @@ app.get('/politician', async function(req, res) {
   });
 });
 
-
-// Compare page
+// Compare
 app.get('/compare', async function(req, res) {
   let polsResults = await politicianFilterList.get();
   let issuesResults = await issuesFilterList.get(param);
@@ -103,7 +103,7 @@ app.get('/compare', async function(req, res) {
   });
 });
 
-// hots page
+// Hots
 app.get('/hots', async function(req, res) {
   let data = req.body;
   let paging = parseInt(req.query.paging);
@@ -129,11 +129,11 @@ app.get('/hots', async function(req, res) {
 // });
 
 // 讀議員 excel
-const readExcel = require('./crawler/gov/parliament');
-app.get('/parliament', async function(req, res) {
-  let data = await readExcel.get();
-  res.send(data);
-});
+// const readExcel = require('./crawler/gov/parliament');
+// app.get('/parliament', async function(req, res) {
+//   let data = await readExcel.get();
+//   res.send(data);
+// });
 
 
 

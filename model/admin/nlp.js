@@ -5,14 +5,14 @@ const news = require('../../model/news');
 
 const manager = new NlpManager({ languages: ['zh'], nlu: { log: false } });
 
-const filterTagContent = require('../filterTagCount');
+const tagCount = require('../tagCount');
 
 fs.readFile('../PolsTrackCrawler/util/nlp_trained_model/politician.json', async (err, data) => {
   if(err) throw err;
   let country = JSON.parse(data).country;
   let agency = JSON.parse(data).agency;
 
-  let polsResults = await filterTagContent.get("pol");
+  let polsResults = await tagCount.get("pol");
   let pols = [];
   polsResults.forEach(polsResult => {
     pols.push(polsResult.name);
