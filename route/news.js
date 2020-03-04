@@ -7,7 +7,7 @@ const news = require('../model/news');
 
 router.post('/getNews/:category', async function(req, res) {
   let { category } = req.params;
-  let data = req.body;
+  let param = req.body;
   let paging = parseInt(req.query.paging);
 	if(!Number.isInteger(paging)){
 		paging = 0;
@@ -16,14 +16,14 @@ router.post('/getNews/:category', async function(req, res) {
 
   switch (category) {
     case "normal":
-      await news.get(data, size, paging).then(async resp => {
+      await news.get(param, size, paging).then(async resp => {
         res.send({data: resp});
       }).catch(err => {
         res.status(400).send({error: err});
       });
     break;
     case "accurate":
-      await news.getAccurate(data, size, paging).then(async resp => {
+      await news.getAccurate(param, size, paging).then(async resp => {
         res.send({data: resp});
       }).catch(err => {
         res.status(400).send({error: err});

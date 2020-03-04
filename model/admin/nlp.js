@@ -6,7 +6,6 @@ const news = require('../../model/news');
 const manager = new NlpManager({ languages: ['zh'], nlu: { log: false } });
 
 const filterTagContent = require('../filterTagCount');
-const issuesData = require('../issues');
 
 fs.readFile('../PolsTrackCrawler/util/nlp_trained_model/politician.json', async (err, data) => {
   if(err) throw err;

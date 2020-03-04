@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const newData = require('./model/news');
-const issuesData = require('./model/issues');
+const politicianFilterList = require('./model/filter/politicians');
+const issuesFilterList = require('./model/filter/issues');
 const filterTagContent = require('./model/filterTagCount');
 const hotsData = require('./model/hots');
 const partiesData = require('./model/parties');
@@ -25,22 +26,17 @@ const news = require('./route/news');
 app.use('/api/news', news);
 
 
-// filter page pol get issue
-const polGetIssues = require('./route/issue');
+// 新聞頁 人物取得議題
+const polGetIssues = require('./route/filter/issue');
 app.use('/api/polgetissues', polGetIssues);
 
-// filter page get party
+// 新聞頁 政黨影響人物
 const getParty = require('./route/parties');
 app.use('/api/getparty', getParty);
 
 // hots
 const getHots = require('./route/hots');
 app.use('/api/gethots', getHots);
-
-
-
-
-
 
 // Admin tag & NRP/NI 頻率統計
 const adminTag = require('./route/admin/adminTag');
@@ -82,9 +78,9 @@ app.get('/politician', async function(req, res) {
     param.from = "oncoming";
     results = await newData.get(param, size, paging);
   }
-  let polsResults = await filterTagContent.get("pol");
-  let issuesResults = await filterTagContent.get("issue");
-  let partiesResults = await partiesData.get();
+  let polsResults = await politicianFilterList.get();
+  let issuesResults = await issuesFilterList.get(param);
+  let partiesResults = await partiesData.getParties();
   res.render('politician', {
     title: param.pol,
     issue: param.issue,
@@ -99,8 +95,8 @@ app.get('/politician', async function(req, res) {
 
 // Compare page
 app.get('/compare', async function(req, res) {
-  let polsResults = await filterTagContent.get("pol");
-  let issuesResults = await filterTagContent.get("issue");
+  let polsResults = await politicianFilterList.get();
+  let issuesResults = await issuesFilterList.get(param);
   res.render('compare', {
     polsData: polsResults,
     issuesData: issuesResults

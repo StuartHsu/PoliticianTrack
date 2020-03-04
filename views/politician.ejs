@@ -333,7 +333,7 @@
           param.party.push(party.innerText);
         }
       });
-      partyPol(param);
+      getPoliticiansByParty(param);
       filterHL(param);
     }));
 
@@ -398,7 +398,7 @@
       } else {
         param.issue = [tagName]
       }
-      partyPol(param);
+      getPoliticiansByParty(param);
       polIssue(param);
       appSide.scrollTop = 0;
       if(strictMode === false) {
@@ -474,7 +474,7 @@
     }
 
     // DB 取資料 - 政黨影響人物
-    function partyPol(param) {
+    function getPoliticiansByParty(param) {
       $.ajax({
         url: `api/getparty`,
         type: "POST",

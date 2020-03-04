@@ -353,16 +353,16 @@ function getIntentNewsIds(param, rawNewsId) {
 
 
 // 取得人物、議題 tag_id
-function getTagId(tagName) {
+function getTagId(param) {
   return new Promise(function(resolve, reject) {
     let tagNameArr = [];
-    if(tagName.pol.length > 0) {
-      for(let h = 0; h < tagName.pol.length; h++) {
-        tagNameArr.push(tagName.pol[h]);
+    if(param.pol.length > 0) {
+      for(let h = 0; h < param.pol.length; h++) {
+        tagNameArr.push(param.pol[h]);
       }
     }
-    if(tagName.issue.length > 0) {
-      tagNameArr.push(tagName.issue[0]);
+    if(param.issue.length > 0) {
+      tagNameArr.push(param.issue[0]);
     }
     let data = [];
     let sql = `SELECT id FROM filtercount WHERE name IN (?);`;
