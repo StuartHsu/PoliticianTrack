@@ -1,4 +1,3 @@
-const mysql = require("../../util/mysqlcon.js");
 const promiseSql = require("../../util/promiseSql.js");
 
 module.exports =
@@ -9,7 +8,7 @@ module.exports =
     {
       let issueList;
       let politicianIds;
-      
+
       if (param.pol.length === 2 && param.issue.length === 0 || param.pol.length === 2 && param.issue.length === 1) // compare
       {
         politicianIds = await getTagId(param);
