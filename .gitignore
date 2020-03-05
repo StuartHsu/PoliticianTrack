@@ -1,3 +1,7 @@
+# Redis
+*.rdb
+*/*.rdb
+
 # Jieba & NLP
 dict.txt
 */dict.txt

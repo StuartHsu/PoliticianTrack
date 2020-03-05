@@ -1,6 +1,6 @@
 const mysql = require("../../util/mysqlcon.js");
 const promiseSql = require("../../util/promiseSql.js");
-const nodejieba = require('nodejieba');
+const nodejieba = require("nodejieba");
 
 nodejieba.load({userDict: '../PolsTrackCrawler/util/dict.txt'});
 
