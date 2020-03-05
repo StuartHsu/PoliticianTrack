@@ -1,174 +1,139 @@
 const mysql = require("../../util/mysqlcon.js");
+const promiseSql = require("../../util/promiseSql.js");
 const nodejieba = require('nodejieba');
 
-// nodejieba.load({userDict: './util/dict.txt'});
 nodejieba.load({userDict: '../PolsTrackCrawler/util/dict.txt'});
 
-module.exports={
-  getPeriodCount: function(start, end) {
-    return new Promise(async function(resolve, reject) {
-      await clearCount();
+module.exports =
+{
+  getTagPeriodCount: function(start, end)
+  {
+    return new Promise(async function(resolve, reject)
+    {
+      let sql;
+      let timeSet;
 
-      // let sql = 'SELECT content FROM news WHERE pubTime > ? AND pubTime < ? AND intent = "politician_say";';
-      let sql = 'SELECT content FROM news WHERE pubTime > ? AND pubTime < ?;';
-      mysql.con.query(sql, [start, end], async function(error, result1, fields) {
-        if(error) {
-          reject(error);
+      try
+      {
+        await clearCount();
+
+        if (start)
+        {
+          sql = "SELECT content FROM news WHERE pubTime > ? AND pubTime < ?;";
+          timeSet = [start, end];
         }
-        let totalCount = result1.length
-        for(let j = 0; j < totalCount; j++) {
-          console.log("處理中：" + j + "/" + totalCount);
-          let jieba = nodejieba.tag(result1[j].content);
-          for(let i = 0; i < jieba.length; i++) {
-            if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") {
-              let data = {
-                name: jieba[i].word,
-                type: jieba[i].tag,
+        else
+        {
+          sql = "SELECT content FROM news WHERE pubTime < ?;";
+          timeSet = [end];
+        }
+
+        let result = await promiseSql.query(sql, timeSet);
+        let totalCount = result.length;
+
+        for (let i = 0; i < totalCount; i++)
+        {
+          console.log("處理中：" + i + "/" + totalCount);
+          let jieba = nodejieba.tag(result[i].content);
+          let jiebaTotalCount = jieba.length;
+
+          for (let j = 0; j < jiebaTotalCount; j++)
+          {
+            if (jieba[j].tag === "NRP" || jieba[j].tag === "NI")
+            {
+              let data =
+              {
+                name: jieba[j].word,
+                type: jieba[j].tag,
                 count: 1,
-                parent_name: jieba[i].word,
+                parent_name: jieba[j].word,
                 parent_id: 0
               }
-              await db3(data);
-              // await db(data).then(async function(result){
-              //   await db2(data, result);
-              // });
+
+              await updateTagCount(data);
             }
           }
         }
-        console.log("處理完成");
-        resolve("All tags update!");
-      });
-    });
-  },
-  getPeriodCountAll2: function(end) {
-    return new Promise(async function(resolve, reject) {
-      await clearCount();
 
-      // let sql = 'SELECT title FROM news WHERE pubTime < ? AND intent = "politician_say";';
-      // let sql = 'SELECT title FROM news WHERE pubTime < ?;';
-      let sql = 'SELECT content FROM news WHERE pubTime < ?;';
-      mysql.con.query(sql, end, async function(error, result1, fields) {
-        if(error) {
-          reject(error);
-        }
-        let totalCount = result1.length
-        for(let j = 0; j < totalCount; j++) {
-          console.log("處理中2：" + j + "/" + totalCount);
-          let jieba = nodejieba.tag(result1[j].content);
-          for(let i = 0; i < jieba.length; i++) {
-            if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") {
-              let data = {
-                name: jieba[i].word,
-                type: jieba[i].tag,
-                count: 1,
-                parent_name: jieba[i].word,
-                parent_id: 0
-              }
-              await db3(data);
-            }
-          }
-        }
         console.log("處理完成");
         resolve("All tags update!");
-      });
+      }
+      catch(error)
+      {
+        reject(error);
+      }
     });
   }
 }
 
-function clearCount() {
-  return new Promise(function(resolve, reject) {
+
+function updateTagCount(data)
+{
+  return new Promise(async function(resolve, reject)
+  {
+    mysql.con.getConnection(function(err, connection)
+    {
+      connection.beginTransaction(async function(error)
+      {
+        if (error)
+        {
+    			reject("Transaction Error: " + error);
+    		}
+
+        try
+        {
+          let checkResult = await promiseSql.query("SELECT * FROM filtercount WHERE name = ?;", data.name);
+
+          if (checkResult.length < 1)
+          {
+            let insertSql = "INSERT INTO filtercount SET ?;";
+            let updateParentIdSql = "UPDATE filtercount SET parent_id = id WHERE name = ?;";
+
+            await promiseSql.query(insertSql, data);
+            await promiseSql.query(updateParentIdSql, data.name);
+            await promiseSql.commit(connection);
+
+            resolve();
+          }
+          else
+          {
+            let updateCountSql = "UPDATE filtercount SET count = count + 1 WHERE name = ?;";
+
+            await promiseSql.query(updateCountSql, data.name);
+            await promiseSql.commit(connection);
+
+            resolve();
+          }
+        }
+        catch(error)
+        {
+          mysql.con.rollback(function()
+          {
+            connection.release();
+
+            reject("Database TagCount Error: " + error);
+          });
+        }
+      });
+    });
+  });
+}
+
+function clearCount()
+{
+  return new Promise(async function(resolve, reject)
+  {
     let sql = 'UPDATE filtercount SET count = 0;';
-    mysql.con.query(sql, function(error, results, fields) {
-      if(error) {
-        reject(error);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
 
-function db3(data) {
+    try
+    {
+      await promiseSql.query(sql, null);
 
-  return new Promise(async function(resolve, reject) {
-
-    mysql.con.query(`select * from filtercount where name = "${data.name}"`, async function(error, checkResult, fields) {
-      if(error){
-        reject("Database 'filtercount' Query Error");
-      } else {
-        if(checkResult.length < 1) {
-          mysql.con.query('insert into filtercount set ?', data, function(error, results, fields) {
-            if(error){
-              reject("Database 'filtercount' Insert Error");
-            } else {
-              mysql.con.query('UPDATE filtercount SET parent_id = id WHERE name = ?;', [data.name], function(error, results, fields) {
-                if(error){
-                  reject("Database 'filtercount' update parent_id Error");
-                } else {
-                  resolve("ok");
-                }
-              });
-            }
-          });
-        } else {
-          let query = `UPDATE filtercount set count = count + 1 where name = "${data.name}"`;
-          mysql.con.query(query, function(error, results, fields){
-            if(error){
-              reject("Database 'filtercount' Update Error");
-            }
-            resolve("ok");
-          });
-        }
-      }
-    });
-  });
-}
-
-function clearCountAll() {
-  return new Promise(function(resolve, reject) {
-    let sql = 'UPDATE filtercountall SET count = 0;';
-    mysql.con.query(sql, function(error, results, fields) {
-      if(error) {
-        reject(error);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
-
-function dbAll(data) {
-
-  return new Promise(async function(resolve, reject) {
-
-    mysql.con.query(`select * from filtercountall where name = "${data.name}"`, async function(error, checkResult, fields) {
-      if(error){
-        reject("Database Insert Error");
-      }
-      console.log(checkResult);
-      resolve(checkResult);
-    });
-  });
-}
-
-function db2All(data, checkResult) {
-
-  return new Promise(async function(resolve, reject) {
-    if(checkResult.length < 1) {
-      mysql.con.query('insert into filtercountall set ?', data, function(error, results, fields) {
-        if(error){
-          reject("Database Insert Error");
-        }
-        resolve("ok");
-      });
-    } else {
-      let query = `update filtercountall set count = count + 1 where name = "${data.name}"`;
-      mysql.con.query(query, function(error, results, fields){
-        if(error){
-          reject("Database Query Error");
-        }
-        resolve("ok");
-      });
+      resolve();
+    }
+    catch(error)
+    {
+      reject(error);
     }
   });
 }

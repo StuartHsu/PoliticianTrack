@@ -57,7 +57,7 @@ router.get('/tagfreq', async function(req, res)
     start: beginDay + " 00:00",
     end: today + " 23:59"
   }
-  let data = await tagFreq.getPeriodCount(period.start, period.end);
+  let data = await tagFreq.getTagPeriodCount(period.start, period.end);
 
   res.send(data);
 });
@@ -66,7 +66,7 @@ router.get('/tagfreq', async function(req, res)
 router.get('/tagfreqall', async function(req, res)
 {
   let today = dateForm(new Date()) + " 23:59"; // YYYY/MM/DD
-  let data = await tagFreq.getPeriodCountAll2(today);
+  let data = await tagFreq.getTagPeriodCount(null, today);
 
   res.send(data);
 });

@@ -178,14 +178,16 @@ function saveSegmentationResult(data)
           {
             await promiseSql.query("INSERT into tagverify SET ?", data);
             await promiseSql.commit(connection);
+
+            resolve();
           }
           else
           {
             await promiseSql.query("UPDATE tagverify SET count = count + 1 WHERE name = ?", data.name);
             await promiseSql.commit(connection);
-          }
 
-          resolve();
+            resolve();
+          }
         }
         catch(error)
         {

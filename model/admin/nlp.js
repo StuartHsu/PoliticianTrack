@@ -1,6 +1,5 @@
 const { NlpManager } = require('node-nlp');
 const fs = require('fs');
-const mysql = require("../../util/mysqlcon.js");
 const promiseSql = require("../../util/promiseSql.js");
 const news = require('../../model/news');
 const tagCount = require('../tagCount');
