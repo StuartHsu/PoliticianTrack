@@ -1,24 +1,42 @@
 const mysql = require("./mysqlcon.js");
 
 
-const query = function(sql, bind)
+module.exports =
 {
-  return new Promise((resolve, reject) =>
+	query: function(sql, bind)
   {
-    mysql.con.query(sql, bind, function(error, results)
+    return new Promise(function(resolve, reject)
     {
-      if(error)
+      mysql.con.query(sql, bind, function(error, results)
       {
-        reject("Database Query Error");
-      }
-      else
-      {
-        resolve(results);
-      }      
+        if (error)
+        {
+          reject("Database Query Error");
+        }
+        else
+        {
+          resolve(results);
+        }
+      });
     });
-  });
-}
-
-module.exports = {
-	query: query
+  },
+  commit: function(connection)
+  {
+    return new Promise(function(resolve, reject)
+    {
+      connection.commit(function(error)
+      {
+        if (error)
+        {
+          return mysql.con.rollback(function()
+          {
+            connection.release();
+            reject("Database Commit Error: " + error);
+          });
+        }
+        connection.release();
+        resolve("ok");
+      });
+    });
+  }
 };

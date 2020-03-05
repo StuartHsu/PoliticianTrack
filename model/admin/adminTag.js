@@ -1,241 +1,256 @@
 const mysql = require("../../util/mysqlcon.js");
+const promiseSql = require("../../util/promiseSql.js");
 const nodejieba = require('nodejieba');
 const fs = require("fs");
 
 nodejieba.load({userDict: '../PolsTrackCrawler/util/dict.txt'});
 
-module.exports={
-  seg: function(start, end) {
-    return new Promise(function(resolve, reject) {
-      let sql = 'SELECT content FROM news WHERE pubTime > ? AND pubTime < ?';
-      mysql.con.query(sql, [start, end], async function(error, result1, fields) {
-        if(error) {
-          reject(error);
-        }
-        let totalCount = result1.length
-        console.log("預計處理：" + result1.length);
-        for(let j = 0; j < totalCount; j++) { // result1.length 800 1189
-          console.log("j: " + j + "/" + totalCount);
-          let jieba = nodejieba.tag(result1[j].content);
-          for(let i = 0; i < jieba.length; i++) {
-            if(jieba[i].tag === "N") {
-              let data = {
+module.exports =
+{
+  seg: function(start, end)
+  {
+    return new Promise(async function(resolve, reject)
+    {
+      try
+      {
+        let sql = "SELECT content FROM news WHERE pubTime > ? AND pubTime < ?;";
+        let results = await promiseSql.query(sql, [start, end]);
+        let totalCount = results.length;
+
+        for (let j = 0; j < totalCount; j++)
+        {
+          console.log("處理中：" + j + "/" + totalCount);
+          let jieba = nodejieba.tag(results[j].content);
+          for (let i = 0; i < jieba.length; i++)
+          {
+            if (jieba[i].tag === "N")
+            {
+              let data =
+              {
                 name: jieba[i].word,
                 type: jieba[i].tag,
                 count: 1
               }
-              // await db(data).then(async function(result){
-              //   await db2(data, result);
-              // });
-              await db3(data).catch(err => {
-                reject(err);
-              });
+              await saveSegmentationResult(data);
             }
           }
         }
+        console.log("斷詞處理完成");
+
         resolve("Segmentation done");
-      });
+      }
+      catch(error)
+      {
+        reject(error);
+      }
     });
   },
-  get: function() {
-    return new Promise(function(resolve, reject) {
-      mysql.con.query('SELECT * FROM tagverify WHERE status is null AND count > 20 ORDER BY count DESC;', async function(error, results, fields) {
-        if(error) {
-          reject(error);
-        }
+  get: function()
+  {
+    return new Promise(async function(resolve, reject)
+    {
+      let sql = `SELECT * FROM tagverify WHERE status is null AND count > ? ORDER BY count DESC;`;
+      let count = 20;
+
+      try
+      {
+        let results = await promiseSql.query(sql, count);
         let data = [];
-        console.log("需處理標籤數量：" + results.length);
-        for(let i = 0; i < results.length; i++) {
-          let body = {
+        let totalCount = results.length;
+
+        console.log("待處理標籤數量：" + totalCount);
+        for (let i = 0; i < totalCount; i++)
+        {
+          let body =
+          {
             tagName: results[i].name,
             count: results[i].count
           }
           data.push(body);
         }
+
         resolve(data);
-      });
+      }
+      catch(error)
+      {
+        reject(error);
+      }
     });
   },
-  updateDic: function(updateData) {
-    return new Promise(function(resolve, reject) {
-      let data;
-      for(let i = 0; i < updateData.length; i++) {
-        if(updateData[i].inputTag) {
-          data = `${updateData[i].tagName} 1 ${updateData[i].inputTag}\n`
-          fs.appendFile('../PolsTrackCrawler/util/dict.txt', data, (err) => {
-            if (err) throw err;
+  updateDic: function(updateData)
+  {
+    return new Promise(function(resolve, reject)
+    {
+      for (let i = 0; i < updateData.length; i++)
+      {
+        if (updateData[i].inputTag)
+        {
+          let newTag = `${updateData[i].tagName} 1 ${updateData[i].inputTag}\n`;
+
+          fs.appendFile('../PolsTrackCrawler/util/dict.txt', newTag, (err) =>
+          {
+            if (err)
+            {
+              reject(err);
+            }
+
             resolve("Update dict.txt ok");
           });
-        } else {
+        }
+        else
+        {
           resolve("No need to update");
         }
       }
     });
   },
-  updateDB: function(updateData) {
-    return new Promise(async function(resolve, reject) {
-      let data = {};
-      for(let i = 0; i < updateData.length; i++) {
-        data.name = updateData[i].tagName;
-        if(updateData[i].inputTag) {
-          data.type = updateData[i].inputTag;
-          data.status = "Done";
-        } else {
-          data.type = "N";
-          data.status = "Unused";
+  updateDB: function(updateData)
+  {
+    return new Promise(async function(resolve, reject)
+    {
+      let newTag = {};
+
+      for (let i = 0; i < updateData.length; i++)
+      {
+        newTag.name = updateData[i].tagName;
+
+        if (updateData[i].inputTag)
+        {
+          newTag.type = updateData[i].inputTag;
+          newTag.status = "Done";
         }
-        await updateTagStatus(data);
+        else
+        {
+          newTag.type = "N";
+          newTag.status = "Unused";
+        }
+
+        await updateTagStatus(newTag);
       }
       resolve("All tag status update ok");
     });
   },
-  setSynonyms: function(param) {
-    return new Promise(async function(resolve, reject) {
+  setSynonyms: function(param)
+  {
+    return new Promise(async function(resolve, reject)
+    {
       let tagName = [param.parentTag, param.childTag];
       sql = `
-        SELECT id FROM filtercount WHERE name IN (?)
+        SELECT id FROM filtercount
+        WHERE name IN (?)
         ORDER BY CASE
         WHEN name = ? THEN 1 END DESC;
       `;
-      mysql.con.query(sql, [[param.parentTag, param.childTag], param.parentTag], async function(error, result, fields) {
-        if(error){
-          reject("Database Insert Error");
-        } else {
-          if(result.length < 2) {
-            resolve("One of tagName which you input dosen's in database");
-          } else {
-            sql = `UPDATE filtercount SET parent_name = ?, parent_id = ? WHERE name = ?`;
-            mysql.con.query(sql, [param.parentTag, result[0].id, param.childTag], async function(error, checkResult, fields) {
-              if(error){
-                reject("Database Insert Error");
-              } else {
-                resolve("Set ok");
-              }
-            });
-          }
-        }
-      });
+
+      try
+      {
+        await updateSynonyms(param);
+
+        resolve();
+      }
+      catch(error)
+      {
+        reject(error);
+      }
     });
   }
 }
 
-function db(data) {
 
-  return new Promise(async function(resolve, reject) {
+function saveSegmentationResult(data)
+{
+  return new Promise(async function(resolve, reject)
+  {
+    mysql.con.getConnection(function(err, connection)
+    {
+      connection.beginTransaction(async function(error)
+      {
+        if (error)
+        {
+    			reject("Transaction Error: " + error);
+    		}
 
-    mysql.con.query(`select * from tagverify where name = "${data.name}"`, async function(error, checkResult, fields) {
-      if(error){
-        reject("Database Insert Error");
-      }
-      resolve(checkResult);
+        try
+        {
+          let checkResult = await promiseSql.query("SELECT * FROM tagverify WHERE name = ?", data.name);
+
+          if (checkResult.length < 1)
+          {
+            await promiseSql.query("INSERT into tagverify SET ?", data);
+            await promiseSql.commit(connection);
+          }
+          else
+          {
+            await promiseSql.query("UPDATE tagverify SET count = count + 1 WHERE name = ?", data.name);
+            await promiseSql.commit(connection);
+          }
+
+          resolve();
+        }
+        catch(error)
+        {
+          mysql.con.rollback(function()
+          {
+            connection.release();
+
+            reject("Database Segmentation Error: " + error);
+          });
+        }
+      });
     });
   });
 }
 
-function db2(data, checkResult) {
+function updateTagStatus(newTag)
+{
+  return new Promise(async function(resolve, reject)
+  {
+    let sql = `UPDATE tagverify SET type = ?, status = ? WHERE name = ?;`;
 
-  return new Promise(async function(resolve, reject) {
-    if(checkResult.length < 1) {
-      mysql.con.query('insert into tagverify set ?', data, function(error, results, fields) {
-        if(error){
-          reject("Database Insert Error");
-        }
-        resolve("ok");
-      });
-    } else {
-      let query = `update tagverify set count = count + 1 where name = "${data.name}"`;
-      mysql.con.query(query, function(error, results, fields){
-        if(error){
-          reject("Database Query Error");
-        }
-        resolve("ok");
-      });
+    try
+    {
+      let data = await promiseSql.query(sql, [newTag.type, newTag.status, newTag.name]);
+
+      resolve()
+    }
+    catch(error)
+    {
+      reject(error);
     }
   });
 }
 
-function db3(data) {
-  return new Promise(async function(resolve, reject) {
-    mysql.con.getConnection(function(err, connection) {
-      connection.beginTransaction(function(error) {
-        if(error){
-    			reject("Transaction Error: " + error);
-    		}
-        mysql.con.query("SELECT * FROM tagverify WHERE name = ?", data.name, async function(error, checkResult, fields) {
-          if(error){
-            return mysql.con.rollback(function() {
-              connection.release();
-              reject("Database Query Error: " + error);
-            });
-          } else {
-            if(checkResult.length < 1) {
-              mysql.con.query("INSERT into tagverify SET ?", data, function(error, results, fields) {
-                if(error){
-                  return mysql.con.rollback(function() {
-                    connection.release();
-                    reject("Database Insert Error: " + error);
-                  });
-                } else {
-                  connection.commit(function(error) {
-                    if(error) {
-                      return mysql.con.rollback(function() {
-                        connection.release();
-                        reject("Database Commit Error: " + error);
-                      });
-                    }
-                    connection.release();
-                    resolve("OK");
-                  });
-                }
-              });
-            } else {
-              mysql.con.query("UPDATE tagverify SET count = count + 1 WHERE name = ?", data.name, function(error, results, fields){
-                if(error){
-                  return mysql.con.rollback(function() {
-                    connection.release();
-                    reject("Database Update Error: " + error);
-                  });
-                }
-                connection.commit(function(error) {
-                  if(error) {
-                    return mysql.con.rollback(function() {
-                      connection.release();
-                      reject("Database Commit Error: " + error);
-                    });
-                  }
-                  connection.release();
-                  resolve("OK");
-                })
-              });
-            }
-          }
-        });
-      });
-    });
-  });
-}
+function updateSynonyms(param)
+{
+  return new Promise(async function(resolve, reject)
+  {
+    let getTagIdSql = `
+      SELECT id FROM filtercount
+      WHERE name IN (?)
+      ORDER BY CASE
+      WHEN name = ? THEN 1 END DESC;
+    `;
 
+    try
+    {
+      let result = await promiseSql.query(getTagIdSql, [[param.parentTag, param.childTag], param.parentTag]);
 
-
-
-
-
-
-
-
-
-function updateTagStatus(data) {
-
-  return new Promise(async function(resolve, reject) {
-
-    let query = `update tagverify set type = "${data.type}", status = "${data.status}" where name = "${data.name}";`;
-    mysql.con.query(query, function(error, results, fields) {
-      if(error) {
-        reject("Database Update Error");
-      } else {
-        resolve();
+      if (result.length < 2)
+      {
+        resolve("One of tagName which you input dosen's in database");
       }
-    });
+      else
+      {
+        let updateParentSql = `UPDATE filtercount SET parent_name = ?, parent_id = ? WHERE name = ?;`;
 
+        await promiseSql.query(updateParentSql, [param.parentTag, result[0].id, param.childTag]);
+
+        resolve("Set Synonyms Ok");
+      }
+    }
+    catch(error)
+    {
+      reject(error);
+    }
   });
 }

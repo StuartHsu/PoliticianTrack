@@ -40,7 +40,8 @@ const adminTag = require('./route/admin/adminTag');
 app.use('/admin', adminTag);
 
 
-let param = {
+let param =
+{
   politician: [],
   issue: [],
   party: [],
@@ -48,34 +49,46 @@ let param = {
 }
 
 // News
-app.get('/politician', async function(req, res) {
+app.get('/politician', async function(req, res)
+{
   let results;
 
-  if(req.query.politician && req.query.issue) { // hot page's subList 過來
+  if (req.query.politician && req.query.issue) // hot page's subList 過來
+  {
     param.politician = [req.query.politician];
     param.issue = [req.query.issue];
     param.from = "hots";
     results = await newData.get(param, 10, 0);
-  } else if(req.query.politician || req.query.issue) { // index 點擊過來
+  }
+  else if (req.query.politician || req.query.issue) // index 點擊過來
+  {
     param.politician = req.query.politician ? [req.query.politician] : [];
     param.issue = req.query.issue ? [req.query.issue] : [];
     param.from = "index";
     results = await newData.get(param, 10, 0);
-  } else { // 篩選進來預設
+  }
+  else // 篩選進來預設
+  {
     let paging = parseInt(req.query.paging);
-  	if(!Number.isInteger(paging)){
+    let size = 10;
+
+  	if (!Number.isInteger(paging))
+    {
   		paging = 0;
   	}
-  	let size = 10;
+
     param.politician = [];
     param.issue = [];
     param.from = "oncoming";
     results = await newData.get(param, size, paging);
   }
+
   let polsResults = await politicianFilterList.get();
   let issuesResults = await issuesFilterList.get(param);
   let partiesResults = await partiesData.getParties();
-  res.render('politician', {
+
+  res.render('politician',
+  {
     title: param.politician,
     issue: param.issue,
     results: results,
@@ -87,38 +100,51 @@ app.get('/politician', async function(req, res) {
 });
 
 // Compare
-app.get('/compare', async function(req, res) {
+app.get('/compare', async function(req, res)
+{
   let polsResults = await politicianFilterList.get();
   let issuesResults = await issuesFilterList.get(param);
-  res.render('compare', {
+
+  res.render('compare',
+  {
     polsData: polsResults,
     issuesData: issuesResults
   });
 });
 
 // Hots
-app.get('/hots', async function(req, res) {
+app.get('/hots', async function(req, res)
+{
   let data = req.body;
   let paging = parseInt(req.query.paging);
-	if(!Number.isInteger(paging)){
+  let size = 30;
+
+	if (!Number.isInteger(paging))
+  {
 		paging = 0;
 	}
-	let size = 30;
+
   let results = await hotsData.get("politician", size, paging);
-  res.render('hots', {
+
+  res.render('hots',
+  {
     results: results.list
   });
 });
 
 
-app.use((req, res, next) => {
+app.use((req, res, next) =>
+{
   res.status(404).send("Sorry can't find that!");
 });
-app.use(function(err, req, res, next) {
+
+app.use(function(err, req, res, next)
+{
   console.error(err.stack);
   res.status(500).send('Something Error!');
 });
 
-app.listen(3000, () => {
+app.listen(3000, () =>
+{
   console.log(`Server running on port ${PORT}`);
 });
