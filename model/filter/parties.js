@@ -6,7 +6,11 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      let sql = `SELECT party, count(*) FROM politician group by party HAVING count(*)>3 ORDER BY count(*) DESC;`;
+      let sql = `
+        SELECT party, count(*)
+        FROM politician
+        GROUP BY party HAVING count(*) > 3 ORDER BY count(*) DESC;
+      `;
 
       try
       {
@@ -18,7 +22,6 @@ module.exports =
       {
         reject(error);
       }
-
     });
   },
   getPoliticians: function(party)
@@ -27,12 +30,13 @@ module.exports =
     {
       let sql = `
         SELECT filtercount.name, politician.party
-        FROM filtercount LEFT JOIN politician ON (filtercount.name = politician.name)
+        FROM filtercount
+        LEFT JOIN politician ON (filtercount.name = politician.name)
         WHERE filtercount.type = "NRP"
       `;
       let filter;
 
-      if(party.length > 0)
+      if (party.length > 0)
       {
         filter = ` AND politician.party IN (?) ORDER BY count DESC;`
       }
@@ -51,7 +55,6 @@ module.exports =
       {
         reject(error);
       }
-
     });
   }
 }

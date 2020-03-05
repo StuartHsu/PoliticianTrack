@@ -63,6 +63,7 @@ function getIssues(mode, politicianIds)
     try
     {
       let data = await promiseSql.query(sql + filter + ` GROUP BY d.parent_name ORDER BY count(*) DESC;`, param);
+
       resolve(data);
     }
     catch(error)
@@ -79,9 +80,9 @@ function getTagId(param)
   {
     let tagNameArr = [];
 
-    if(param.pol.length > 0)
+    if (param.pol.length > 0)
     {
-      for(let h = 0; h < param.pol.length; h++)
+      for (let h = 0; h < param.pol.length; h++)
       {
         tagNameArr.push(param.pol[h]);
       }
@@ -90,13 +91,13 @@ function getTagId(param)
     let data = [];
     let sql = `SELECT id FROM filtercount WHERE name IN (?);`;
 
-    if(tagNameArr.length > 0) // 人 or 題至少有其一
+    if (tagNameArr.length > 0) // 人 or 題至少有其一
     {
       try
       {
         let results = await promiseSql.query(sql, tagNameArr);
 
-        for(let i = 0; i < results.length; i++)
+        for (let i = 0; i < results.length; i++)
         {
           data.push(results[i].id);
         }
@@ -112,6 +113,5 @@ function getTagId(param)
     {
       resolve(data);
     }
-
   });
 }

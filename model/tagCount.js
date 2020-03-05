@@ -1,19 +1,27 @@
-const mysql = require("../util/mysqlcon.js");
+const promiseSql = require("../util/promiseSql.js");
 
-
-module.exports = {
-  get: function(cond) {
-    return new Promise(async function(resolve, reject) {
-      let sql;
+module.exports =
+{
+  get: function(cond)
+  {
+    return new Promise(async function(resolve, reject)
+    {
       let filter;
-      if(cond === "pol") {
+
+      if (cond === "pol")
+      {
         filter = ` AND d.type = "NRP"`;
-      } else if(cond === "issue") {
+      }
+      else if (cond === "issue")
+      {
         filter = ` AND d.type = "NI"`;
-      } else {
+      }
+      else
+      {
         filter = "";
       }
-      sql = `
+
+      let sql = `
         SELECT a.parent_id AS tag_id, d.name, d.type, count(a.parent_id) AS count
         FROM filtercount AS a
         LEFT JOIN newstag AS b ON (a.id = b.tag_id)
@@ -21,12 +29,17 @@ module.exports = {
         LEFT JOIN filtercount AS d ON (a.parent_id = d.id)
         WHERE c.intent = "politician_say"
       `;
-      mysql.con.query(sql+filter+` GROUP BY a.parent_id ORDER BY count DESC;`, function(error, results, fields) {
-        if(error) {
-          reject(error);
-        }
-        resolve(results);
-      });
+
+      try
+      {
+        let data = await promiseSql.query(sql+filter+` GROUP BY a.parent_id ORDER BY count DESC;`, null);
+
+        resolve(data);
+      }
+      catch(error)
+      {
+        reject(error);
+      }
     });
   }
 }

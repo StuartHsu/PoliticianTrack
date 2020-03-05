@@ -3,6 +3,7 @@
 
   <head>
       <title>PolsTrack</title>
+      <!-- <link rel="icon" type="text/css" href="./xxx.png"> 放網頁上面的小 icon -->
       <link rel="stylesheet" type="text/css" href="./css/index.css">
       <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
       <script src="https://cdn.anychart.com/releases/v8/js/anychart-tag-cloud.min.js"></script>
@@ -35,7 +36,7 @@
 
       anychart.onDocumentReady(function() {
         $.ajax({
-          url: "tagCount",
+          url: "/tagCount",
           type: "GET",
           success: function(resp) {
             let data = dataForm(resp.data);
