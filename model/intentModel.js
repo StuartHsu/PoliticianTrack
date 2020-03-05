@@ -16,17 +16,17 @@ module.exports =
       let intentModel = [];
       let polStatus = true;
 
-      if (param.pol.length === 0)
+      if (param.politician.length === 0)
       {
-        param.pol = [""];
+        param.politician = [""];
         polStatus = false;
       }
 
-      for (let i = 0; i < param.pol.length; i++) // 生成比對 model
+      for (let i = 0; i < param.politician.length; i++) // 生成比對 model
       {
         for (let j = 0; j < intent.length; j++)
         {
-          intentModel.push(param.pol[i]+intent[j])
+          intentModel.push(param.politician[i]+intent[j])
         }
       }
 

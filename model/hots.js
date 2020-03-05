@@ -11,7 +11,7 @@ module.exports =
       let tagType;
       let offset = paging * size;
 
-      if (type === "pol")
+      if (type === "politician")
       {
         tagType = "NRP";
       }
@@ -65,7 +65,7 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      if (type === "pol")
+      if (type === "politician")
       {
         tagType = "NI";
       }

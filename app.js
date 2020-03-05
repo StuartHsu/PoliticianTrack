@@ -41,7 +41,7 @@ app.use('/admin', adminTag);
 
 
 let param = {
-  pol: [],
+  politician: [],
   issue: [],
   party: [],
   from: ""
@@ -51,13 +51,13 @@ let param = {
 app.get('/politician', async function(req, res) {
   let results;
 
-  if(req.query.pol && req.query.issue) { // hot page's subList 過來
-    param.pol = [req.query.pol];
+  if(req.query.politician && req.query.issue) { // hot page's subList 過來
+    param.politician = [req.query.politician];
     param.issue = [req.query.issue];
     param.from = "hots";
     results = await newData.get(param, 10, 0);
-  } else if(req.query.pol || req.query.issue) { // index 點擊過來
-    param.pol = req.query.pol ? [req.query.pol] : [];
+  } else if(req.query.politician || req.query.issue) { // index 點擊過來
+    param.politician = req.query.politician ? [req.query.politician] : [];
     param.issue = req.query.issue ? [req.query.issue] : [];
     param.from = "index";
     results = await newData.get(param, 10, 0);
@@ -67,7 +67,7 @@ app.get('/politician', async function(req, res) {
   		paging = 0;
   	}
   	let size = 10;
-    param.pol = [];
+    param.politician = [];
     param.issue = [];
     param.from = "oncoming";
     results = await newData.get(param, size, paging);
@@ -76,7 +76,7 @@ app.get('/politician', async function(req, res) {
   let issuesResults = await issuesFilterList.get(param);
   let partiesResults = await partiesData.getParties();
   res.render('politician', {
-    title: param.pol,
+    title: param.politician,
     issue: param.issue,
     results: results,
     polsData: polsResults,
@@ -104,7 +104,7 @@ app.get('/hots', async function(req, res) {
 		paging = 0;
 	}
 	let size = 30;
-  let results = await hotsData.get("pol", size, paging);
+  let results = await hotsData.get("politician", size, paging);
   res.render('hots', {
     results: results.list
   });

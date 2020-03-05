@@ -12,18 +12,17 @@ module.exports =
       let tagsNewsIds;
       let newsData;
 
-      if (param.pol.length === 2 && param.issue.length === 1) // compare
+      if (param.politician.length === 2 && param.issue.length === 1) // compare
       {
-        let param1 = {pol: [param.pol[0]], issue: [param.issue[0]]};
-        let param2 = {pol: [param.pol[1]], issue: [param.issue[0]]};
+        let param1 = {politician: [param.politician[0]], issue: [param.issue[0]]};
+        let param2 = {politician: [param.politician[1]], issue: [param.issue[0]]};
         let tag1Id = await getTagId(param1);
         let tag2Id = await getTagId(param2);
         let tag1NewsIds = await getTagNewsId(tag1Id);
         let tag2NewsIds = await getTagNewsId(tag2Id);
-
         newsData = await getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, null);
       }
-      else if (param.pol.length === 0 && param.issue.length === 0) // All
+      else if (param.politician.length === 0 && param.issue.length === 0) // All
       {
         newsData = await getAllNews(size, paging);
       }
@@ -47,23 +46,21 @@ module.exports =
       let tagsNewsIds;
       let newsData;
 
-      if (param.pol.length === 2 && param.issue.length === 1) // compare
+      if (param.politician.length === 2 && param.issue.length === 1) // compare
       {
-        let param1 = {pol: [param.pol[0]], issue: [param.issue[0]]};
-        let param2 = {pol: [param.pol[1]], issue: [param.issue[0]]};
+        let param1 = {politician: [param.politician[0]], issue: [param.issue[0]]};
+        let param2 = {politician: [param.politician[1]], issue: [param.issue[0]]};
         let tag1Id = await getTagId(param1);
         let tag2Id = await getTagId(param2);
         let rawTag1NewsIds = await getTagNewsId(tag1Id);
         let rawTag2NewsIds = await getTagNewsId(tag2Id);
         let tag1NewsIds = await getIntentNewsIds(param, rawTag1NewsIds);
         let tag2NewsIds = await getIntentNewsIds(param, rawTag2NewsIds);
-
         newsData = await getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, "accurate");
       }
-      else if (param.pol.length === 0 && param.issue.length === 0) // All
+      else if (param.politician.length === 0 && param.issue.length === 0) // All
       {
         let intentNewsIds = await getIntentNewsIds(param);
-
         newsData = await getAllNews(size, paging, intentNewsIds);
       }
       else
@@ -71,7 +68,6 @@ module.exports =
         tagId = await getTagId(param);
         rawTagNewsIds = await getTagNewsId(tagId);
         tagsNewsIds = await getIntentNewsIds(param, rawTagNewsIds);
-
         newsData = await getNews(tagsNewsIds, size, paging);
       }
 
@@ -263,11 +259,11 @@ function getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, mode)
         }
         else if (tag1NewsIds.indexOf(news[i].id) > -1 && tag2NewsIds.indexOf(news[i].id) < 0)
         {
-          news[i].tag_id = param.pol[0];
+          news[i].tag_id = param.politician[0];
         }
         else if (tag1NewsIds.indexOf(news[i].id) < 0 && tag2NewsIds.indexOf(news[i].id) > -1)
         {
-          news[i].tag_id = param.pol[1];
+          news[i].tag_id = param.politician[1];
         }
         else
         {
@@ -381,11 +377,11 @@ function getTagId(param)
   {
     let tagNameArr = [];
 
-    if (param.pol.length > 0)
+    if (param.politician.length > 0)
     {
-      for (let h = 0; h < param.pol.length; h++)
+      for (let h = 0; h < param.politician.length; h++)
       {
-        tagNameArr.push(param.pol[h]);
+        tagNameArr.push(param.politician[h]);
       }
     }
 

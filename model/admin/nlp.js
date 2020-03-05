@@ -12,7 +12,7 @@ fs.readFile('../PolsTrackCrawler/util/nlp_trained_model/politician.json', async 
   let country = JSON.parse(data).country;
   let agency = JSON.parse(data).agency;
 
-  let polsResults = await tagCount.get("pol");
+  let polsResults = await tagCount.get("politician");
   let pols = [];
   polsResults.forEach(polsResult => {
     pols.push(polsResult.name);

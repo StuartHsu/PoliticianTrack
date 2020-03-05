@@ -144,7 +144,7 @@
 
     // Pol, Issue record
     let param = {
-      pol: [],
+      politician: [],
       issue: [],
       party: []
     }
@@ -193,7 +193,7 @@
 
     // 人物選擇處理
     people.forEach(person => person.addEventListener('click', function(event) {
-      param.pol = []; // 清空
+      param.politician = []; // 清空
       let compTitleName1 = document.getElementById("compTitleName1");
       let compTitleName2 = document.getElementById("compTitleName2");
       if(this.classList.contains("innerHighlight")) {
@@ -222,17 +222,17 @@
 
       people.forEach(function(person) {
         if(person.classList.contains("innerHighlight")) {
-          param.pol.push(person.innerText);
+          param.politician.push(person.innerText);
         }
       });
 
-      if(param.pol[0] && param.pol[1]) {
-        compTitleName1.innerHTML = param.pol[0];
-        compTitleName2.innerHTML = param.pol[1];
+      if(param.politician[0] && param.politician[1]) {
+        compTitleName1.innerHTML = param.politician[0];
+        compTitleName2.innerHTML = param.politician[1];
         compTitleName1.classList.remove("point");
         compTitleName2.classList.remove("point");
-      } else if(param.pol[0] && !param.pol[1]) {
-        compTitleName1.innerHTML = param.pol[0];
+      } else if(param.politician[0] && !param.politician[1]) {
+        compTitleName1.innerHTML = param.politician[0];
         compTitleName2.innerHTML = "人物二";
         compTitleName1.classList.remove("point");
         compTitleName2.classList.add("point");
@@ -244,7 +244,7 @@
       }
       polIssue(param);
 
-      if(param.pol.length === 2 && param.issue.length === 1) {
+      if(param.politician.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
         appSide.scrollTop = 0;
         if(strictMode === false) {
@@ -282,8 +282,7 @@
         }
       });
 
-      if(param.pol.length === 2 && param.issue.length === 1) {
-        console.log("here")
+      if(param.politician.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
         appSide.scrollTop = 0;
         if(strictMode === false) {
@@ -302,7 +301,7 @@
 
     switchButton.addEventListener('click', function(event) {
 
-      if(param.pol.length === 2 && param.issue.length === 1) {
+      if(param.politician.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
         appSide.scrollTop = 0;
         if(strictMode === false) {
@@ -324,7 +323,7 @@
     // filter - 人物標題處理
     personTitle.addEventListener('click', function(event) {
       people.forEach(r => r.classList.remove("innerHighlight"));
-      param.pol = [];
+      param.politician = [];
       firstPolName = "";
       oldFirstPolName = "";
       compTitleName1.innerHTML = "人物一";
@@ -333,7 +332,7 @@
       compTitleName2.classList.add("point");
       polIssue(param);
 
-      if(param.pol.length === 2 && param.issue.length === 1) {
+      if(param.politician.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
         appSide.scrollTop = 0;
         if(strictMode === false) {
@@ -357,7 +356,7 @@
       compTitleIssue.innerHTML = "比較議題";
       compTitleIssue.classList.add("point");
 
-      if(param.pol.length === 2 && param.issue.length === 1) {
+      if(param.politician.length === 2 && param.issue.length === 1) {
         tips.style.display = "none";
         appSide.scrollTop = 0;
         if(strictMode === false) {
@@ -395,7 +394,7 @@
               appendNews.style.display = "block";
             }
             newsCount(resp.data.id1Count, resp.data.id2Count);
-            dataCompareForm(resp.data.news, param.pol);
+            dataCompareForm(resp.data.news, param.politician);
             page = 0;
             next_paging = resp.data.next_paging;
           }
@@ -420,7 +419,7 @@
               noContent.style.display = "none";
               appendNews.style.display = "block";
             }
-            dataCompareForm(resp.data.news, param.pol);
+            dataCompareForm(resp.data.news, param.politician);
             next_paging = resp.data.next_paging;
             scrollStatus = true;
           }
@@ -438,7 +437,7 @@
         success: function(resp) {
           removeData(appendNews);
           newsCount(resp.data.id1Count, resp.data.id2Count);
-          dataCompareForm(resp.data.news, param.pol);
+          dataCompareForm(resp.data.news, param.politician);
           page = 0;
           next_paging = resp.data.next_paging;
         }
@@ -454,7 +453,7 @@
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
-          dataCompareForm(resp.data.news, param.pol);
+          dataCompareForm(resp.data.news, param.politician);
           next_paging = resp.data.next_paging;
           scrollStatus = true;
         }
@@ -493,7 +492,7 @@
     }
 
     // Compare data 組裝
-    function dataCompareForm(respData, pol) {
+    function dataCompareForm(respData, politician) {
 
       for (let i = 0; i < respData.length; i ++) {
         // timeDivide
@@ -533,10 +532,10 @@
         // link.setAttribute("href", `${respData[i].href}`);
         // link.setAttribute("target", "_blank");
 
-        if(respData[i].tag_id === pol[0]) {
+        if(respData[i].tag_id === politician[0]) {
           positionDiv.className = "left click";
           newsDiv.className = "news leftnews";
-        } else if (respData[i].tag_id === pol[1]) {
+        } else if (respData[i].tag_id === politician[1]) {
           positionDiv.className = "right click";
           newsDiv.className = "news rightnews";
         } else {
@@ -629,7 +628,7 @@
             }
           });
 
-          if(param.pol.length === 2 && param.issue.length === 1) {
+          if(param.politician.length === 2 && param.issue.length === 1) {
             tips.style.display = "none";
             appSide.scrollTop = 0;
             if(strictMode === false) {
@@ -740,7 +739,7 @@
       if(id2_count === undefined) {
         id2_count = 0;
       }
-      if(param.pol.length === 2 && param.issue.length === 1) {
+      if(param.politician.length === 2 && param.issue.length === 1) {
         document.querySelector(".newsCount.right").style.display = "block";
         document.querySelector(".newsCount.left").style.display = "block";
         document.querySelector(".newsCount.right").innerHTML = id1_count;

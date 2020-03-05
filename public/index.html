@@ -94,7 +94,7 @@
         chart.draw();
 
         let param = {
-          pol: [],
+          politician: [],
           issue: []
         }
         // add an event listener
@@ -103,7 +103,7 @@
             let apiUrl;
             let clickTag = e.point.get("tag");
             if(clickTag === "NRP") {
-              apiUrl = "/politician?pol="
+              apiUrl = "/politician?politician="
             } else {
               apiUrl = "/politician?issue="
             }

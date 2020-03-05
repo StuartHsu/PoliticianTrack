@@ -9,12 +9,12 @@ module.exports =
       let issueList;
       let politicianIds;
 
-      if (param.pol.length === 2 && param.issue.length === 0 || param.pol.length === 2 && param.issue.length === 1) // compare
+      if (param.politician.length === 2 && param.issue.length === 0 || param.politician.length === 2 && param.issue.length === 1) // compare
       {
         politicianIds = await getTagId(param);
         issueList = await getIssues("twoPoliticians", politicianIds);
       }
-      else if (param.pol.length === 0 && param.issue.length === 0 || param.pol.length === 0 && param.issue.length === 1) // All
+      else if (param.politician.length === 0 && param.issue.length === 0 || param.politician.length === 0 && param.issue.length === 1) // All
       {
         issueList = await getIssues();
       }
@@ -80,11 +80,11 @@ function getTagId(param)
   {
     let tagNameArr = [];
 
-    if (param.pol.length > 0)
+    if (param.politician.length > 0)
     {
-      for (let h = 0; h < param.pol.length; h++)
+      for (let h = 0; h < param.politician.length; h++)
       {
-        tagNameArr.push(param.pol[h]);
+        tagNameArr.push(param.politician[h]);
       }
     }
 

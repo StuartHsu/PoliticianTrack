@@ -8,7 +8,7 @@ module.exports =
     {
       let filter;
 
-      if (cond === "pol")
+      if (cond === "politician")
       {
         filter = ` AND d.type = "NRP"`;
       }
