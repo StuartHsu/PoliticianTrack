@@ -1,100 +1,115 @@
-const mysql = require("../../util/mysqlcon.js");
+const promiseSql = require("../../util/promiseSql.js");
 const nodejieba = require('nodejieba');
 
-// nodejieba.load({userDict: './util/dict.txt'});
 nodejieba.load({userDict: '../PolsTrackCrawler/util/dict.txt'});
 
-module.exports={
-  getTag: function() {
-    return new Promise(async function(resolve, reject) {
+module.exports =
+{
+  getTag: function()
+  {
+    return new Promise(async function(resolve, reject)
+    {
+      try
+      {
+        let news = await promiseSql.query("SELECT id, content FROM news;", null);
+        let totalCount = news.length;
 
-      let sql = 'SELECT id, content FROM news;';
-      mysql.con.query(sql, async function(error, result1, fields) {
-        if(error) {
-          reject(error);
-        }
-        let totalCount = result1.length
-        for(let j = 0; j < totalCount; j++) {
-          console.log("處理中：" + j + "/" + totalCount + " New_id：" + result1[j].id);
-          let jieba = nodejieba.tag(result1[j].content);
-          for(let i = 0; i < jieba.length; i++) {
-            if(jieba[i].tag === "NRP" || jieba[i].tag === "NI") {
+        for (let j = 0; j < totalCount; j++)
+        {
+          console.log("處理中：" + j + "/" + totalCount + ", news_id：" + news[j].id);
+          let jieba = nodejieba.tag(news[j].content);
+
+          for (let i = 0; i < jieba.length; i++)
+          {
+            if (jieba[i].tag === "NRP" || jieba[i].tag === "NI")
+            {
               let tagId = await getTagId(jieba[i].word);
-              let data = {
-                news_id: result1[j].id,
+              let data =
+              {
+                news_id: news[j].id,
                 tag_id: tagId
               }
-              await checkNewsId(data).then(async function(result) {
-                await saveTagInfo(data, result).then(function(result) {
-                  // nothing
-                }).catch(err => {
-                  console.log("saveTagInfo: " + err);
-                });
-              }).catch(err => {
-                console.log("checkNewsId: " + err);
-              });
+              let checkResult = await checkNewsId(data);
+
+              await saveTagInfo(data, checkResult);
             }
           }
         }
         console.log("處理完成");
         resolve("All tags update!");
-      });
+      }
+      catch(error)
+      {
+        reject(error);
+      }
     });
   }
 }
 
 
-function getTagId(tagName) {
-  // console.log(tagName);
-  return new Promise(async function(resolve, reject) {
-    mysql.con.query(`SELECT parent_id FROM filtercount WHERE name = ?`, tagName, async function(error, checkResult, fields) {
-      if(error) {
-        reject("Database Query Error");
-      } else {
-        if(checkResult.length > 0) {
-          resolve(checkResult[0].parent_id);
-        } else {
-          console.log("No match result");
-        }
+function getTagId(tagName)
+{
+  return new Promise(async function(resolve, reject)
+  {
+    try
+    {
+      let data = await promiseSql.query("SELECT parent_id FROM filtercount WHERE name = ?", tagName);
+
+      if (data.length > 0)
+      {
+        resolve(data[0].parent_id);
       }
-      // console.log(checkResult[0]);
-      // resolve(checkResult[0].parent_id);
-    });
+      else
+      {
+        resolve();
+      }
+    }
+    catch(error)
+    {
+      reject(error);
+    }
   });
 }
 
-function checkNewsId(data) {
-  return new Promise(async function(resolve, reject) {
-    mysql.con.query(`SELECT * FROM newstag WHERE news_id = ? AND tag_id = ?;`, [data.news_id, data.tag_id], async function(error, checkResult, fields) {
-      if(error) {
-        reject("Database Query Error");
-      }
-      // console.log(checkResult);
-      resolve(checkResult);
-    });
+function checkNewsId(data)
+{
+  return new Promise(async function(resolve, reject)
+  {
+    try
+    {
+      let results = await promiseSql.query("SELECT * FROM newstag WHERE news_id = ? AND tag_id = ?;", [data.news_id, data.tag_id]);
+
+      resolve(results);
+    }
+    catch(error)
+    {
+      reject(error);
+    }
   });
 }
 
-function saveTagInfo(data, checkResult) {
-  // console.log(data);
-  // console.log(checkResult);
-  return new Promise(async function(resolve, reject) {
-    if(checkResult.length < 1) {
-      mysql.con.query(`INSERT newstag SET ?`, [data], async function(error, result, fields) {
-        if(error) {
-          // console.log(data);
-          reject("Data Insert Error");
-          // resolve("Data Insert Error");
-        }
-        resolve("Insert ok");
-      });
-    } else {
-      mysql.con.query(`UPDATE newstag SET ? WHERE news_id = ${data.news_id} AND tag_id = ${data.tag_id}`, [data], async function(error, result, fields) {
-        if(error) {
-          reject("Data Update Error");
-        }
+function saveTagInfo(data, checkResult)
+{
+  return new Promise(async function(resolve, reject)
+  {
+    try
+    {
+      if (checkResult.length < 1)
+      {
+        await promiseSql.query("INSERT newstag SET ?;", [data]);
+
+        resolve("Insert Ok");
+      }
+      else
+      {
+        await promiseSql.query("UPDATE newstag SET ? WHERE news_id = ? AND tag_id = ?;", [data, data.news_id, data.tag_id]);
+
         resolve("Update ok");
-      });
+      }
+    }
+    catch(error)
+    {
+      reject(error);
     }
   });
 }
