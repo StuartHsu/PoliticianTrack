@@ -70,7 +70,7 @@ app.get('/politician', async function(req, res)
   else // 篩選進來預設
   {
     let paging = parseInt(req.query.paging);
-    let size = 10;
+    const size = 10;
 
   	if (!Number.isInteger(paging))
     {
@@ -83,9 +83,9 @@ app.get('/politician', async function(req, res)
     results = await newData.get(param, size, paging);
   }
 
-  let polsResults = await politicianFilterList.get();
-  let issuesResults = await issuesFilterList.get(param);
-  let partiesResults = await partiesData.getParties();
+  const polsResults = await politicianFilterList.get();
+  const issuesResults = await issuesFilterList.get(param);
+  const partiesResults = await partiesData.getParties();
 
   res.render('politician',
   {
@@ -102,8 +102,8 @@ app.get('/politician', async function(req, res)
 // Compare
 app.get('/compare', async function(req, res)
 {
-  let polsResults = await politicianFilterList.get();
-  let issuesResults = await issuesFilterList.get(param);
+  const polsResults = await politicianFilterList.get();
+  const issuesResults = await issuesFilterList.get(param);
 
   res.render('compare',
   {
@@ -114,17 +114,16 @@ app.get('/compare', async function(req, res)
 
 // Hots
 app.get('/hots', async function(req, res)
-{
-  let data = req.body;
+{  
   let paging = parseInt(req.query.paging);
-  let size = 30;
+  const size = 30;
 
 	if (!Number.isInteger(paging))
   {
 		paging = 0;
 	}
 
-  let results = await hotsData.get("politician", size, paging);
+  const results = await hotsData.get("politician", size, paging);
 
   res.render('hots',
   {

@@ -34,7 +34,8 @@ function getIssues(mode, politicianIds)
   return new Promise(async function(resolve, reject)
   {
     let param;
-    let sql = `
+    let filter;
+    const sql = `
       SELECT d.parent_name AS name, count(*) AS count
       FROM newstag AS a
       LEFT JOIN newstag AS b ON (a.news_id = b.news_id)
@@ -42,7 +43,6 @@ function getIssues(mode, politicianIds)
       LEFT JOIN filtercount AS d ON (b.tag_id = d.id)
       WHERE c.intent = "politician_say" AND d.type = "NI"
     `;
-    let filter;
 
     if (mode === "onePolitician")
     {
@@ -62,7 +62,7 @@ function getIssues(mode, politicianIds)
 
     try
     {
-      let data = await promiseSql.query(sql + filter + ` GROUP BY d.parent_name ORDER BY count(*) DESC;`, param);
+      const data = await promiseSql.query(sql + filter + ` GROUP BY d.parent_name ORDER BY count(*) DESC;`, param);
 
       resolve(data);
     }
@@ -78,7 +78,7 @@ function getTagId(param)
 {
   return new Promise(async function(resolve, reject)
   {
-    let tagNameArr = [];
+    const tagNameArr = [];
 
     if (param.politician.length > 0)
     {
@@ -88,14 +88,14 @@ function getTagId(param)
       }
     }
 
-    let data = [];
-    let sql = `SELECT id FROM filtercount WHERE name IN (?);`;
+    const data = [];
+    const sql = `SELECT id FROM filtercount WHERE name IN (?);`;
 
     if (tagNameArr.length > 0) // 人 or 題至少有其一
     {
       try
       {
-        let results = await promiseSql.query(sql, tagNameArr);
+        const results = await promiseSql.query(sql, tagNameArr);
 
         for (let i = 0; i < results.length; i++)
         {

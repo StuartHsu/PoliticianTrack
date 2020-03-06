@@ -11,25 +11,25 @@ module.exports =
     {
       try
       {
-        let news = await promiseSql.query("SELECT id, content FROM news;", null);
-        let totalCount = news.length;
+        const news = await promiseSql.query("SELECT id, content FROM news;", null);
+        const totalCount = news.length;
 
         for (let j = 0; j < totalCount; j++)
         {
           console.log("處理中：" + j + "/" + totalCount + ", news_id：" + news[j].id);
-          let jieba = nodejieba.tag(news[j].content);
+          const jieba = nodejieba.tag(news[j].content);
 
           for (let i = 0; i < jieba.length; i++)
           {
             if (jieba[i].tag === "NRP" || jieba[i].tag === "NI")
             {
-              let tagId = await getTagId(jieba[i].word);
-              let data =
+              const tagId = await getTagId(jieba[i].word);
+              const data =
               {
                 news_id: news[j].id,
                 tag_id: tagId
               }
-              let checkResult = await checkNewsId(data);
+              const checkResult = await checkNewsId(data);
 
               await saveTagInfo(data, checkResult);
             }
@@ -53,7 +53,7 @@ function getTagId(tagName)
   {
     try
     {
-      let data = await promiseSql.query("SELECT parent_id FROM filtercount WHERE name = ?", tagName);
+      const data = await promiseSql.query("SELECT parent_id FROM filtercount WHERE name = ?", tagName);
 
       if (data.length > 0)
       {
@@ -77,7 +77,7 @@ function checkNewsId(data)
   {
     try
     {
-      let results = await promiseSql.query("SELECT * FROM newstag WHERE news_id = ? AND tag_id = ?;", [data.news_id, data.tag_id]);
+      const results = await promiseSql.query("SELECT * FROM newstag WHERE news_id = ? AND tag_id = ?;", [data.news_id, data.tag_id]);
 
       resolve(results);
     }

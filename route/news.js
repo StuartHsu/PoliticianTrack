@@ -5,9 +5,9 @@ const news = require('../model/news');
 
 router.post('/getNews/:category', async function(req, res)
 {
-  let { category } = req.params;
-  let param = req.body;
-  let size = 10;
+  const { category } = req.params;
+  const param = req.body;
+  const size = 10;
   let paging = parseInt(req.query.paging);
 
 	if (!Number.isInteger(paging))

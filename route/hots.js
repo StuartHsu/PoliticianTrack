@@ -6,10 +6,10 @@ const hotsData = require('../model/hots');
 // Get hots
 router.get('/:category', async function(req, res)
 {
-  let { category } = req.params;
+  const { category } = req.params;
   let type;
-  let data = req.body;
-  let size = 30;
+  const data = req.body;
+  const size = 30;
   let paging = parseInt(req.query.paging);
 
 	if (!Number.isInteger(paging))
@@ -31,7 +31,7 @@ router.get('/:category', async function(req, res)
       res.send("Sorry..., this category dosen't exist in database.");
   }
 
-  let results = await hotsData.get(type, size, paging);
+  const results = await hotsData.get(type, size, paging);
 
   res.send({data: results});
 });
@@ -39,8 +39,8 @@ router.get('/:category', async function(req, res)
 // Get hots - sub
 router.get('/sub/:category', async function(req, res)
 {
-  let { category } = req.params;
-  let tagId = req.query.id;
+  const { category } = req.params;
+  const tagId = req.query.id;
   let type;
 
   switch (category)
@@ -57,7 +57,7 @@ router.get('/sub/:category', async function(req, res)
       res.send("Sorry..., this category dosen't exist in database.");
   }
 
-  let results = await hotsData.getSub(type, tagId);
+  const results = await hotsData.getSub(type, tagId);
 
   res.send({data: results});
 });

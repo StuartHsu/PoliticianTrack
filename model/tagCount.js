@@ -21,7 +21,7 @@ module.exports =
         filter = "";
       }
 
-      let sql = `
+      const sql = `
         SELECT a.parent_id AS tag_id, d.name, d.type, count(a.parent_id) AS count
         FROM filtercount AS a
         LEFT JOIN newstag AS b ON (a.id = b.tag_id)
@@ -32,7 +32,7 @@ module.exports =
 
       try
       {
-        let data = await promiseSql.query(sql+filter+` GROUP BY a.parent_id ORDER BY count DESC;`, null);
+        const data = await promiseSql.query(sql+filter+` GROUP BY a.parent_id ORDER BY count DESC;`, null);
 
         resolve(data);
       }

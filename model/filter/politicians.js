@@ -6,7 +6,7 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      let sql = `
+      const sql = `
         SELECT b.parent_name AS name, count(*) AS count
         FROM newstag AS a
         LEFT JOIN filtercount AS b ON (a.tag_id = b.parent_id)
@@ -23,7 +23,7 @@ module.exports =
 
       try
       {
-        let data = await promiseSql.query(sql, null);
+        const data = await promiseSql.query(sql, null);
 
         resolve(data);
       }

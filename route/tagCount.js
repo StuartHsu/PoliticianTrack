@@ -18,11 +18,11 @@ async function getData(req, res)
 {
   try
   {
-    let tagCountList = await tagCount.get();
+    const tagCountList = await tagCount.get();
     console.log('Fetching data from DB');
 
     // Set data to Redis
-    let resTagCountList = JSON.stringify(tagCountList);
+    const resTagCountList = JSON.stringify(tagCountList);
     client.setex("tagCount", 1800, resTagCountList);
 
     res.send({data: setRespnse("tagCount", resTagCountList)});

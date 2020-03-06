@@ -13,19 +13,19 @@ module.exports =
     {
       try
       {
-        let sql = "SELECT content FROM news WHERE pubTime > ? AND pubTime < ?;";
-        let results = await promiseSql.query(sql, [start, end]);
-        let totalCount = results.length;
+        const sql = "SELECT content FROM news WHERE pubTime > ? AND pubTime < ?;";
+        const results = await promiseSql.query(sql, [start, end]);
+        const totalCount = results.length;
 
         for (let j = 0; j < totalCount; j++)
         {
           console.log("處理中：" + j + "/" + totalCount);
-          let jieba = nodejieba.tag(results[j].content);
+          const jieba = nodejieba.tag(results[j].content);
           for (let i = 0; i < jieba.length; i++)
           {
             if (jieba[i].tag === "N")
             {
-              let data =
+              const data =
               {
                 name: jieba[i].word,
                 type: jieba[i].tag,
@@ -49,19 +49,19 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      let sql = `SELECT * FROM tagverify WHERE status is null AND count > ? ORDER BY count DESC;`;
-      let count = 20;
+      const sql = `SELECT * FROM tagverify WHERE status is null AND count > ? ORDER BY count DESC;`;
+      const count = 20;
 
       try
       {
-        let results = await promiseSql.query(sql, count);
+        const results = await promiseSql.query(sql, count);
         let data = [];
-        let totalCount = results.length;
+        const totalCount = results.length;
 
         console.log("待處理標籤數量：" + totalCount);
         for (let i = 0; i < totalCount; i++)
         {
-          let body =
+          const body =
           {
             tagName: results[i].name,
             count: results[i].count
@@ -108,7 +108,7 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      let newTag = {};
+      const newTag = {};
 
       for (let i = 0; i < updateData.length; i++)
       {
@@ -134,8 +134,8 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      let tagName = [param.parentTag, param.childTag];
-      sql = `
+      // let tagName = [param.parentTag, param.childTag];
+      const sql = `
         SELECT id FROM filtercount
         WHERE name IN (?)
         ORDER BY CASE
@@ -172,7 +172,7 @@ function saveSegmentationResult(data)
 
         try
         {
-          let checkResult = await promiseSql.query("SELECT * FROM tagverify WHERE name = ?", data.name);
+          const checkResult = await promiseSql.query("SELECT * FROM tagverify WHERE name = ?", data.name);
 
           if (checkResult.length < 1)
           {
@@ -207,11 +207,11 @@ function updateTagStatus(newTag)
 {
   return new Promise(async function(resolve, reject)
   {
-    let sql = `UPDATE tagverify SET type = ?, status = ? WHERE name = ?;`;
+    const sql = `UPDATE tagverify SET type = ?, status = ? WHERE name = ?;`;
 
     try
     {
-      let data = await promiseSql.query(sql, [newTag.type, newTag.status, newTag.name]);
+      await promiseSql.query(sql, [newTag.type, newTag.status, newTag.name]);
 
       resolve()
     }
@@ -226,7 +226,7 @@ function updateSynonyms(param)
 {
   return new Promise(async function(resolve, reject)
   {
-    let getTagIdSql = `
+    const getTagIdSql = `
       SELECT id FROM filtercount
       WHERE name IN (?)
       ORDER BY CASE
@@ -235,7 +235,7 @@ function updateSynonyms(param)
 
     try
     {
-      let result = await promiseSql.query(getTagIdSql, [[param.parentTag, param.childTag], param.parentTag]);
+      const result = await promiseSql.query(getTagIdSql, [[param.parentTag, param.childTag], param.parentTag]);
 
       if (result.length < 2)
       {
@@ -243,7 +243,7 @@ function updateSynonyms(param)
       }
       else
       {
-        let updateParentSql = `UPDATE filtercount SET parent_name = ?, parent_id = ? WHERE name = ?;`;
+        const updateParentSql = `UPDATE filtercount SET parent_name = ?, parent_id = ? WHERE name = ?;`;
 
         await promiseSql.query(updateParentSql, [param.parentTag, result[0].id, param.childTag]);
 

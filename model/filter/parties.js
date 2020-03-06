@@ -6,7 +6,7 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      let sql = `
+      const sql = `
         SELECT party, count(*)
         FROM politician
         GROUP BY party HAVING count(*) > 3 ORDER BY count(*) DESC;
@@ -14,7 +14,7 @@ module.exports =
 
       try
       {
-        let data = await promiseSql.query(sql, null);
+        const data = await promiseSql.query(sql, null);
 
         resolve(data);
       }
@@ -28,7 +28,7 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      let sql = `
+      const sql = `
         SELECT filtercount.name, politician.party
         FROM filtercount
         LEFT JOIN politician ON (filtercount.name = politician.name)
@@ -47,7 +47,7 @@ module.exports =
 
       try
       {
-        let data = await promiseSql.query(sql + filter, party);
+        const data = await promiseSql.query(sql + filter, party);
 
         resolve(data);
       }

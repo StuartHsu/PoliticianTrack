@@ -10,10 +10,10 @@ fs.readFile('../PolsTrackCrawler/util/nlp_trained_model/politician.json', async 
 {
   if(err) throw err;
 
-  let country = JSON.parse(data).country;
-  let agency = JSON.parse(data).agency;
-  let politicianInfos = await tagCount.get("politician");
-  let politicianList = [];
+  const country = JSON.parse(data).country;
+  const agency = JSON.parse(data).agency;
+  const politicianInfos = await tagCount.get("politician");
+  const politicianList = [];
 
   politicianInfos.forEach(politicianInfo =>
   {
@@ -91,13 +91,13 @@ module.exports =
       await manager.train();
       manager.save('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
 
-      let data = await news.getPeriod(start, end);
-      let totalCount = data.length;
+      const data = await news.getPeriod(start, end);
+      const totalCount = data.length;
 
       for (let i = 0; i < totalCount; i++)
       {
         console.log("Training：" + i + "/" + totalCount + ", news_id：" + data[i].id);
-        let content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
+        const content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
 
         try
         {
@@ -119,16 +119,16 @@ module.exports =
     {
       manager.load('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
 
-      let data = await news.getPeriod(start, end);
-      let totalCount = data.length;
+      const data = await news.getPeriod(start, end);
+      const totalCount = data.length;
 
       for (let i = 0; i < totalCount; i++)
       {
         console.log("Processing：" + i + "/" + totalCount + ", news_id：" + data[i].id);
-        let content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
-        let response = await manager.process('zh', content);
-        let intent = response.nluAnswer.classifications[0].intent;
-        let intent_score = response.nluAnswer.classifications[0].score;
+        const content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
+        const response = await manager.process('zh', content);
+        const intent = response.nluAnswer.classifications[0].intent;
+        const intent_score = response.nluAnswer.classifications[0].score;
 
         try
         {
@@ -150,8 +150,8 @@ module.exports =
     {
       manager.load('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
 
-      let content = '黨籍案引爭議  郝龍斌：支持傅崐萁回到黨內'.replace('：', '表示').replace(/[A-Za-z]+/, '');
-      let response = await manager.process('zh', content);
+      const content = '黨籍案引爭議  郝龍斌：支持傅崐萁回到黨內'.replace('：', '表示').replace(/[A-Za-z]+/, '');
+      const response = await manager.process('zh', content);
 
       resolve (JSON.stringify(response));
     });

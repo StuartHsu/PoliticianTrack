@@ -7,19 +7,18 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      let sql;
       let tagId;
       let tagsNewsIds;
       let newsData;
 
       if (param.politician.length === 2 && param.issue.length === 1) // compare
       {
-        let param1 = {politician: [param.politician[0]], issue: [param.issue[0]]};
-        let param2 = {politician: [param.politician[1]], issue: [param.issue[0]]};
-        let tag1Id = await getTagId(param1);
-        let tag2Id = await getTagId(param2);
-        let tag1NewsIds = await getTagNewsId(tag1Id);
-        let tag2NewsIds = await getTagNewsId(tag2Id);
+        const param1 = {politician: [param.politician[0]], issue: [param.issue[0]]};
+        const param2 = {politician: [param.politician[1]], issue: [param.issue[0]]};
+        const tag1Id = await getTagId(param1);
+        const tag2Id = await getTagId(param2);
+        const tag1NewsIds = await getTagNewsId(tag1Id);
+        const tag2NewsIds = await getTagNewsId(tag2Id);
         newsData = await getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, null);
       }
       else if (param.politician.length === 0 && param.issue.length === 0) // All
@@ -40,7 +39,6 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      let sql;
       let tagId;
       let rawTagNewsIds;
       let tagsNewsIds;
@@ -48,19 +46,19 @@ module.exports =
 
       if (param.politician.length === 2 && param.issue.length === 1) // compare
       {
-        let param1 = {politician: [param.politician[0]], issue: [param.issue[0]]};
-        let param2 = {politician: [param.politician[1]], issue: [param.issue[0]]};
-        let tag1Id = await getTagId(param1);
-        let tag2Id = await getTagId(param2);
-        let rawTag1NewsIds = await getTagNewsId(tag1Id);
-        let rawTag2NewsIds = await getTagNewsId(tag2Id);
-        let tag1NewsIds = await getIntentNewsIds(param, rawTag1NewsIds);
-        let tag2NewsIds = await getIntentNewsIds(param, rawTag2NewsIds);
+        const param1 = {politician: [param.politician[0]], issue: [param.issue[0]]};
+        const param2 = {politician: [param.politician[1]], issue: [param.issue[0]]};
+        const tag1Id = await getTagId(param1);
+        const tag2Id = await getTagId(param2);
+        const rawTag1NewsIds = await getTagNewsId(tag1Id);
+        const rawTag2NewsIds = await getTagNewsId(tag2Id);
+        const tag1NewsIds = await getIntentNewsIds(param, rawTag1NewsIds);
+        const tag2NewsIds = await getIntentNewsIds(param, rawTag2NewsIds);
         newsData = await getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, "accurate");
       }
       else if (param.politician.length === 0 && param.issue.length === 0) // All
       {
-        let intentNewsIds = await getIntentNewsIds(param);
+        const intentNewsIds = await getIntentNewsIds(param);
         newsData = await getAllNews(size, paging, intentNewsIds);
       }
       else
@@ -91,7 +89,7 @@ module.exports =
 
       try
       {
-        let data = await promiseSql.query(sql, [start, end]);
+        const data = await promiseSql.query(sql, [start, end]);
 
         resolve(data);
       }
@@ -112,12 +110,12 @@ function getAllNews(size, paging, intentNewsIds)
     let newsQuantity;
     let filter;
     let dataSet = [];
-    let body = {};
-    let offset = paging * size;
+    const body = {};
+    const offset = paging * size;
 
     try
     {
-      if(intentNewsIds)
+      if (intentNewsIds)
       {
         newsQuantity = await getNewsQuantity(intentNewsIds, "accurate");
         filter = ` id IN (?)`;
@@ -130,16 +128,16 @@ function getAllNews(size, paging, intentNewsIds)
         dataSet = [offset, size]
       }
 
-      let maxPage = Math.floor((newsQuantity - 1) / size);
+      const maxPage = Math.floor((newsQuantity - 1) / size);
 
-      if(paging < maxPage)
+      if (paging < maxPage)
       {
         body.next_paging = paging + 1;
       }
 
-      let sql = `SELECT * FROM news WHERE`;
-      let data = await promiseSql.query(sql + filter + ` ORDER BY pubTime DESC LIMIT ?,?;`, dataSet);
-      let news = await formNews(data); // 新聞加上所含標籤
+      const sql = `SELECT * FROM news WHERE`;
+      const data = await promiseSql.query(sql + filter + ` ORDER BY pubTime DESC LIMIT ?,?;`, dataSet);
+      const news = await formNews(data); // 新聞加上所含標籤
       body.news = news;
 
       resolve(body);
@@ -156,12 +154,12 @@ function getNews(tagNewsIds, size, paging, mode)
   return new Promise(async function(resolve, reject)
   {
     let filter;
-    let body = {};
-    let offset = paging * size;
+    const body = {};
+    const offset = paging * size;
 
     try
     {
-      let newsQuantity = await getNewsQuantity(tagNewsIds);
+      const newsQuantity = await getNewsQuantity(tagNewsIds);
 
       if (newsQuantity === 0)
       {
@@ -171,7 +169,7 @@ function getNews(tagNewsIds, size, paging, mode)
       }
       else
       {
-        let maxPage = Math.floor((newsQuantity - 1) / size);
+        const maxPage = Math.floor((newsQuantity - 1) / size);
 
         if (paging < maxPage)
         {
@@ -188,9 +186,9 @@ function getNews(tagNewsIds, size, paging, mode)
         filter = "";
       }
 
-      let sql = `SELECT * FROM news WHERE id IN (?)`;
-      let data = await promiseSql.query(sql + filter + ` ORDER BY pubTime DESC LIMIT ?,?;`, [tagNewsIds, offset, size]);
-      let news = await formNews(data);　// 新聞加上所含標籤
+      const sql = `SELECT * FROM news WHERE id IN (?)`;
+      const data = await promiseSql.query(sql + filter + ` ORDER BY pubTime DESC LIMIT ?,?;`, [tagNewsIds, offset, size]);
+      const news = await formNews(data);　// 新聞加上所含標籤
       body.news = news;
 
       resolve(body);
@@ -207,17 +205,17 @@ function getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, mode)
 {
   return new Promise(async function(resolve, reject)
   {
-    let body =
+    const body =
     {
       id1Count: 0,
       id2Count: 0
     }
-    let offset = paging * size;
-    let tagsNewsIds = tag1NewsIds.concat(tag2NewsIds);
+    const offset = paging * size;
+    const tagsNewsIds = tag1NewsIds.concat(tag2NewsIds);
 
     try
     {
-      let newsQuantity = await getNewsQuantity(tagsNewsIds);
+      const newsQuantity = await getNewsQuantity(tagsNewsIds);
 
       if (newsQuantity === 0)
       {
@@ -227,7 +225,7 @@ function getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, mode)
       }
       else
       {
-        let maxPage = Math.floor((newsQuantity - 1) / size);
+        const maxPage = Math.floor((newsQuantity - 1) / size);
 
         if (paging < maxPage)
         {
@@ -247,9 +245,9 @@ function getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, mode)
         filter = ` AND intent = "politician_say"`;
       }
 
-      let sql = `SELECT * FROM news WHERE id IN (?)`;
-      let data = await promiseSql.query(sql + filter + ` ORDER BY pubTime DESC LIMIT ?,?;`, [tagsNewsIds, offset, size]);
-      let news = await formNews(data);　// 新聞加上所含標籤
+      const sql = `SELECT * FROM news WHERE id IN (?)`;
+      const data = await promiseSql.query(sql + filter + ` ORDER BY pubTime DESC LIMIT ?,?;`, [tagsNewsIds, offset, size]);
+      const news = await formNews(data);　// 新聞加上所含標籤
 
       for (let i = 0; i < news.length; i++)
       {
@@ -289,7 +287,7 @@ function getNewsQuantity(newsIds, mode)
   {
     let filter;
 
-    if(!newsIds)
+    if (!newsIds)
     {
       filter = ` intent = "politician_say";`;
     }
@@ -309,8 +307,8 @@ function getNewsQuantity(newsIds, mode)
 
     try
     {
-      let sql = `SELECT count(*) AS total FROM news WHERE`;
-      let data = await promiseSql.query(sql+filter, [newsIds]);
+      const sql = `SELECT count(*) AS total FROM news WHERE`;
+      const data = await promiseSql.query(sql+filter, [newsIds]);
 
       resolve(data[0].total);
     }
@@ -325,19 +323,19 @@ function formNews(news)
 {
   return new Promise(async function(resolve, reject)
   {
-    let data = [];
+    const data = [];
     let newsData = {};
 
     try
     {
       for (let i = 0; i < news.length; i++)
       {
-        let tagsRaw = await getTags(news[i].id);
-        let tagsData = [];
+        const tagsRaw = await getTags(news[i].id);
+        const tagsData = [];
 
         for (let j = 0; j < tagsRaw.length; j++)
         {
-          let body =
+          const body =
           {
             tagName: tagsRaw[j].name,
             tagType: tagsRaw[j].type
@@ -375,7 +373,7 @@ function getTagId(param)
 {
   return new Promise(async function(resolve, reject)
   {
-    let tagNameArr = [];
+    const tagNameArr = [];
 
     if (param.politician.length > 0)
     {
@@ -390,14 +388,14 @@ function getTagId(param)
       tagNameArr.push(param.issue[0]);
     }
 
-    let data = [];
-    let sql = `SELECT id FROM filtercount WHERE name IN (?);`;
+    const data = [];
+    const sql = `SELECT id FROM filtercount WHERE name IN (?);`;
 
-    if(tagNameArr.length > 0) // 人 or 題至少有其一
+    if (tagNameArr.length > 0) // 人 or 題至少有其一
     {
       try
       {
-        let results = await promiseSql.query(sql, [tagNameArr]);
+        const results = await promiseSql.query(sql, [tagNameArr]);
 
         for (let i = 0; i < results.length; i++)
         {
@@ -425,7 +423,7 @@ function getTagNewsId(tagId)
   {
     let sql;
 
-    if(tagId.length < 2) // 單人
+    if (tagId.length < 2) // 單人
     {
       sql = `SELECT news_id FROM newstag WHERE tag_id IN (?);`;
     }
@@ -440,13 +438,13 @@ function getTagNewsId(tagId)
       `;
     }
 
-    let data = [];
+    const data = [];
 
     if (tagId.length > 0) // 人 or 題至少有其一
     {
       try
       {
-        let results = await promiseSql.query(sql, [tagId]);
+        const results = await promiseSql.query(sql, [tagId]);
 
         for (let i = 0; i < results.length; i++)
         {
@@ -471,7 +469,7 @@ function getTags(news_id)
 {
   return new Promise(async function(resolve, reject)
   {
-    let sql = `
+    const sql = `
       SELECT a.news_id, a.tag_id, b.name, b.type
       FROM newstag AS a
       LEFT JOIN filtercount AS b ON (a.tag_id = b.id)
@@ -480,7 +478,7 @@ function getTags(news_id)
 
     try
     {
-      let data = await promiseSql.query(sql, news_id);
+      const data = await promiseSql.query(sql, news_id);
 
       resolve(data);
     }

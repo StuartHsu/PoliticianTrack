@@ -28,20 +28,20 @@ module.exports =
           timeSet = [end];
         }
 
-        let result = await promiseSql.query(sql, timeSet);
-        let totalCount = result.length;
+        const result = await promiseSql.query(sql, timeSet);
+        const totalCount = result.length;
 
         for (let i = 0; i < totalCount; i++)
         {
           console.log("處理中：" + i + "/" + totalCount);
-          let jieba = nodejieba.tag(result[i].content);
-          let jiebaTotalCount = jieba.length;
+          const jieba = nodejieba.tag(result[i].content);
+          const jiebaTotalCount = jieba.length;
 
           for (let j = 0; j < jiebaTotalCount; j++)
           {
             if (jieba[j].tag === "NRP" || jieba[j].tag === "NI")
             {
-              let data =
+              const data =
               {
                 name: jieba[j].word,
                 type: jieba[j].tag,
@@ -82,12 +82,12 @@ function updateTagCount(data)
 
         try
         {
-          let checkResult = await promiseSql.query("SELECT * FROM filtercount WHERE name = ?;", data.name);
+          const checkResult = await promiseSql.query("SELECT * FROM filtercount WHERE name = ?;", data.name);
 
           if (checkResult.length < 1)
           {
-            let insertSql = "INSERT INTO filtercount SET ?;";
-            let updateParentIdSql = "UPDATE filtercount SET parent_id = id WHERE name = ?;";
+            const insertSql = "INSERT INTO filtercount SET ?;";
+            const updateParentIdSql = "UPDATE filtercount SET parent_id = id WHERE name = ?;";
 
             await promiseSql.query(insertSql, data);
             await promiseSql.query(updateParentIdSql, data.name);
@@ -97,7 +97,7 @@ function updateTagCount(data)
           }
           else
           {
-            let updateCountSql = "UPDATE filtercount SET count = count + 1 WHERE name = ?;";
+            const updateCountSql = "UPDATE filtercount SET count = count + 1 WHERE name = ?;";
 
             await promiseSql.query(updateCountSql, data.name);
             await promiseSql.commit(connection);
@@ -123,7 +123,7 @@ function clearCount()
 {
   return new Promise(async function(resolve, reject)
   {
-    let sql = 'UPDATE filtercount SET count = 0;';
+    const sql = 'UPDATE filtercount SET count = 0;';
 
     try
     {

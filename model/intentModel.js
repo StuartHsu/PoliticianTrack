@@ -7,13 +7,13 @@ module.exports =
     return new Promise(async function(resolve, reject)
     {
       let data;
-      let intent =
+      const intent =
       [
         "表示","認為","說","覺得","痛批","批","嗆","嗆爆","一句話","呼籲","表態",
         "自爆","稱","聲稱","反稱","估","籲","呼籲","轟","砲轟","酸","酸爆","回",
         ":","：","喊話","感慨","重申","下令","令","拍板","駁斥"
       ];
-      let intentModel = [];
+      const intentModel = [];
       let polStatus = true;
 
       if (param.politician.length === 0)
@@ -57,8 +57,8 @@ function getAllNewsIds(intentModel)
 {
   return new Promise(async function(resolve, reject)
   {
-    let data = [];
-    let sql = "SELECT * FROM news";
+    const data = [];
+    const sql = "SELECT * FROM news";
 
     try
     {
@@ -89,15 +89,15 @@ function getOtherCondNewsIds(intentModel, rawNewsId)
 {
   return new Promise(async function(resolve, reject)
   {
-    let data = [];
-    sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
+    const data = [];
+    const sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
 
     try
     {
       if (rawNewsId.length > 0)
       {
 
-        let results = await promiseSql.query(sql, [rawNewsId]);
+        const results = await promiseSql.query(sql, [rawNewsId]);
 
         if (results.length > 0)
         {

@@ -6,10 +6,10 @@ module.exports =
   {
     return new Promise(async function(resolve, reject)
     {
-      let body = {};
+      const body = {};
       let hotPol;
       let tagType;
-      let offset = paging * size;
+      const offset = paging * size;
 
       if (type === "politician")
       {
@@ -20,7 +20,7 @@ module.exports =
         tagType = "NI";
       }
 
-      let sql = `
+      const sql = `
         SELECT count(*) AS total
         FROM (
           SELECT newstag.tag_id, filtercount.name,count(newstag.tag_id) AS count
@@ -30,7 +30,7 @@ module.exports =
           GROUP BY tag_id ORDER BY count DESC
         ) AS a;
       `;
-      let queryHotsListSql = `
+      const queryHotsListSql = `
         SELECT a.parent_id AS tag_id, d.name, d.type, count(a.parent_id) AS count
         FROM filtercount AS a
         LEFT JOIN newstag AS b ON (a.id = b.tag_id)
@@ -42,15 +42,15 @@ module.exports =
 
       try
       {
-        let hotCounts = await promiseSql.query(sql, tagType);
-        let maxPage = Math.floor((hotCounts[0].total - 1) / size);
+        const hotCounts = await promiseSql.query(sql, tagType);
+        const maxPage = Math.floor((hotCounts[0].total - 1) / size);
 
         if (paging < maxPage)
         {
           body.next_paging = paging + 1;
         }
 
-        let data = await promiseSql.query(queryHotsListSql, [tagType, offset, size]);
+        const data = await promiseSql.query(queryHotsListSql, [tagType, offset, size]);
         body.list = data;
 
         resolve(body);
@@ -74,7 +74,7 @@ module.exports =
         tagType = "NRP";
       }
 
-      let sql = `
+      const sql = `
         SELECT a.parent_id AS tag_id, d.name, d.type, count(a.parent_id) AS count
         FROM filtercount AS a
         LEFT JOIN newstag AS b ON (a.id = b.tag_id)
@@ -87,7 +87,7 @@ module.exports =
 
       try
       {
-        let data = await promiseSql.query(sql, [tagId, tagType]);
+        const data = await promiseSql.query(sql, [tagId, tagType]);
 
         resolve(data);
       }
