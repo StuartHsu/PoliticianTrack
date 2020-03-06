@@ -2,59 +2,53 @@ const promiseSql = require("../../util/promiseSql.js");
 
 module.exports =
 {
-  getParties: function(party)
+  getParties: async function(party)
   {
-    return new Promise(async function(resolve, reject)
+    const sql = `
+      SELECT party, count(*)
+      FROM politician
+      GROUP BY party HAVING count(*) > 3 ORDER BY count(*) DESC;
+    `;
+
+    try
     {
-      const sql = `
-        SELECT party, count(*)
-        FROM politician
-        GROUP BY party HAVING count(*) > 3 ORDER BY count(*) DESC;
-      `;
+      const data = await promiseSql.query(sql, null);
 
-      try
-      {
-        const data = await promiseSql.query(sql, null);
-
-        resolve(data);
-      }
-      catch(error)
-      {
-        reject(error);
-      }
-    });
+      return data;
+    }
+    catch(error)
+    {
+      return error;
+    }
   },
-  getPoliticians: function(party)
+  getPoliticians: async function(party)
   {
-    return new Promise(async function(resolve, reject)
+    const sql = `
+      SELECT filtercount.name, politician.party
+      FROM filtercount
+      LEFT JOIN politician ON (filtercount.name = politician.name)
+      WHERE filtercount.type = "NRP"
+    `;
+    let filter;
+
+    if (party.length > 0)
     {
-      const sql = `
-        SELECT filtercount.name, politician.party
-        FROM filtercount
-        LEFT JOIN politician ON (filtercount.name = politician.name)
-        WHERE filtercount.type = "NRP"
-      `;
-      let filter;
+      filter = ` AND politician.party IN (?) ORDER BY count DESC;`
+    }
+    else
+    {
+      filter = ` ORDER BY count DESC;`
+    }
 
-      if (party.length > 0)
-      {
-        filter = ` AND politician.party IN (?) ORDER BY count DESC;`
-      }
-      else
-      {
-        filter = ` ORDER BY count DESC;`
-      }
+    try
+    {
+      const data = await promiseSql.query(sql + filter, party);
 
-      try
-      {
-        const data = await promiseSql.query(sql + filter, party);
-
-        resolve(data);
-      }
-      catch(error)
-      {
-        reject(error);
-      }
-    });
+      return data;
+    }
+    catch(error)
+    {
+      return error;
+    }
   }
 }

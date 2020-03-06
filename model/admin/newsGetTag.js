@@ -5,111 +5,99 @@ nodejieba.load({userDict: '../PolsTrackCrawler/util/dict.txt'});
 
 module.exports =
 {
-  getTag: function()
+  getTag: async function()
   {
-    return new Promise(async function(resolve, reject)
+    try
     {
-      try
+      const news = await promiseSql.query("SELECT id, content FROM news;", null);
+      const totalCount = news.length;
+
+      for (let j = 0; j < totalCount; j++)
       {
-        const news = await promiseSql.query("SELECT id, content FROM news;", null);
-        const totalCount = news.length;
+        console.log("處理中：" + j + "/" + totalCount + ", news_id：" + news[j].id);
+        const jieba = nodejieba.tag(news[j].content);
 
-        for (let j = 0; j < totalCount; j++)
+        for (let i = 0; i < jieba.length; i++)
         {
-          console.log("處理中：" + j + "/" + totalCount + ", news_id：" + news[j].id);
-          const jieba = nodejieba.tag(news[j].content);
-
-          for (let i = 0; i < jieba.length; i++)
+          if (jieba[i].tag === "NRP" || jieba[i].tag === "NI")
           {
-            if (jieba[i].tag === "NRP" || jieba[i].tag === "NI")
+            const tagId = await getTagId(jieba[i].word);
+            const data =
             {
-              const tagId = await getTagId(jieba[i].word);
-              const data =
-              {
-                news_id: news[j].id,
-                tag_id: tagId
-              }
-              const checkResult = await checkNewsId(data);
-
-              await saveTagInfo(data, checkResult);
+              news_id: news[j].id,
+              tag_id: tagId
             }
+            const checkResult = await checkNewsId(data);
+
+            await saveTagInfo(data, checkResult);
           }
         }
-        console.log("處理完成");
-        resolve("All tags update!");
       }
-      catch(error)
-      {
-        reject(error);
-      }
-    });
+      console.log("處理完成");
+      return ("All tags update!");
+    }
+    catch(error)
+    {
+      return error;
+    }
   }
 }
 
 
-function getTagId(tagName)
+async function getTagId(tagName)
 {
-  return new Promise(async function(resolve, reject)
+  try
   {
-    try
-    {
-      const data = await promiseSql.query("SELECT parent_id FROM filtercount WHERE name = ?", tagName);
+    const data = await promiseSql.query("SELECT parent_id FROM filtercount WHERE name = ?", tagName);
 
-      if (data.length > 0)
-      {
-        resolve(data[0].parent_id);
-      }
-      else
-      {
-        resolve();
-      }
-    }
-    catch(error)
+    if (data.length > 0)
     {
-      reject(error);
+      return data[0].parent_id;
     }
-  });
+    else
+    {
+      return;
+    }
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
 
-function checkNewsId(data)
+async function checkNewsId(data)
 {
-  return new Promise(async function(resolve, reject)
+  try
   {
-    try
-    {
-      const results = await promiseSql.query("SELECT * FROM newstag WHERE news_id = ? AND tag_id = ?;", [data.news_id, data.tag_id]);
+    const results = await promiseSql.query("SELECT * FROM newstag WHERE news_id = ? AND tag_id = ?;", [data.news_id, data.tag_id]);
 
-      resolve(results);
-    }
-    catch(error)
-    {
-      reject(error);
-    }
-  });
+    return results;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
 
-function saveTagInfo(data, checkResult)
+async function saveTagInfo(data, checkResult)
 {
-  return new Promise(async function(resolve, reject)
+  try
   {
-    try
+    if (checkResult.length < 1)
     {
-      if (checkResult.length < 1)
-      {
-        await promiseSql.query("INSERT newstag SET ?;", [data]);
+      await promiseSql.query("INSERT newstag SET ?;", [data]);
 
-        resolve("Insert Ok");
-      }
-      else
-      {
-        await promiseSql.query("UPDATE newstag SET ? WHERE news_id = ? AND tag_id = ?;", [data, data.news_id, data.tag_id]);
-
-        resolve("Update ok");
-      }
+      return ("Insert Ok");
     }
-    catch(error)
+    else
     {
-      reject(error);
+      await promiseSql.query("UPDATE newstag SET ? WHERE news_id = ? AND tag_id = ?;", [data, data.news_id, data.tag_id]);
+
+      return ("Update ok");
     }
-  });
+  }
+  catch(error)
+  {
+    return error;
+  }
 }

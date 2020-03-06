@@ -2,127 +2,118 @@ const promiseSql = require("../util/promiseSql.js");
 
 module.exports =
 {
-  getIntentNewsIds: function(param, rawNewsId)
+  getIntentNewsIds: async function(param, rawNewsId)
   {
-    return new Promise(async function(resolve, reject)
+    let data;
+    const intent =
+    [
+      "表示","認為","說","覺得","痛批","批","嗆","嗆爆","一句話","呼籲","表態",
+      "自爆","稱","聲稱","反稱","估","籲","呼籲","轟","砲轟","酸","酸爆","回",
+      ":","：","喊話","感慨","重申","下令","令","拍板","駁斥"
+    ];
+    const intentModel = [];
+    let polStatus = true;
+
+    if (param.politician.length === 0)
     {
-      let data;
-      const intent =
-      [
-        "表示","認為","說","覺得","痛批","批","嗆","嗆爆","一句話","呼籲","表態",
-        "自爆","稱","聲稱","反稱","估","籲","呼籲","轟","砲轟","酸","酸爆","回",
-        ":","：","喊話","感慨","重申","下令","令","拍板","駁斥"
-      ];
-      const intentModel = [];
-      let polStatus = true;
+      param.politician = [""];
+      polStatus = false;
+    }
 
-      if (param.politician.length === 0)
+    for (let i = 0; i < param.politician.length; i++) // 生成比對 model
+    {
+      for (let j = 0; j < intent.length; j++)
       {
-        param.politician = [""];
-        polStatus = false;
+        intentModel.push(param.politician[i]+intent[j])
       }
+    }
 
-      for (let i = 0; i < param.politician.length; i++) // 生成比對 model
+    try
+    {
+      if (polStatus == false && param.issue.length === 0) // All
       {
-        for (let j = 0; j < intent.length; j++)
-        {
-          intentModel.push(param.politician[i]+intent[j])
-        }
-      }
+        data = getAllNewsIds(intentModel);
 
-      try
+        return data;
+      }
+      else // 人、人題、題
       {
-        if (polStatus == false && param.issue.length === 0) // All
-        {
-          data = getAllNewsIds(intentModel);
+        data = await getOtherCondNewsIds(intentModel, rawNewsId);
 
-          resolve(data);
-        }
-        else // 人、人題、題
-        {
-          data = await getOtherCondNewsIds(intentModel, rawNewsId);
-
-          resolve(data);
-        }
+        return data;
       }
-      catch(error)
-      {
-        reject(error);
-      }
-    });
+    }
+    catch(error)
+    {
+      return error;
+    }
   }
 }
 
-function getAllNewsIds(intentModel)
+async function getAllNewsIds(intentModel)
 {
-  return new Promise(async function(resolve, reject)
+  const data = [];
+  const sql = "SELECT * FROM news";
+
+  try
   {
-    const data = [];
-    const sql = "SELECT * FROM news";
+    let results = await promiseSql.query(sql, null);
 
-    try
+    for (let i = 0; i < results.length; i++)
     {
-      let results = await promiseSql.query(sql, null);
-
-      for (let i = 0; i < results.length; i++)
+      for (let j = 0; j < intentModel.length; j++)
       {
-        for (let j = 0; j < intentModel.length; j++)
+        if (results[i].title.indexOf(intentModel[j]) !== -1)
         {
-          if (results[i].title.indexOf(intentModel[j]) !== -1)
-          {
-            data.push(results[i].id);
-            j = intentModel.length;
-          }
+          data.push(results[i].id);
+          j = intentModel.length;
         }
       }
-      resolve(data);
     }
-    catch(error)
-    {
-      reject(error);
-    }
-  });
+    return data;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
 
 
-function getOtherCondNewsIds(intentModel, rawNewsId)
+async function getOtherCondNewsIds(intentModel, rawNewsId)
 {
-  return new Promise(async function(resolve, reject)
+  const data = [];
+  const sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
+
+  try
   {
-    const data = [];
-    const sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
-
-    try
+    if (rawNewsId.length > 0)
     {
-      if (rawNewsId.length > 0)
+
+      const results = await promiseSql.query(sql, [rawNewsId]);
+
+      if (results.length > 0)
       {
-
-        const results = await promiseSql.query(sql, [rawNewsId]);
-
-        if (results.length > 0)
+        for (let i = 0; i < results.length; i++)
         {
-          for (let i = 0; i < results.length; i++)
+          for (let j = 0; j < intentModel.length; j++)
           {
-            for (let j = 0; j < intentModel.length; j++)
+            if (results[i].title.indexOf(intentModel[j]) !== -1)
             {
-              if (results[i].title.indexOf(intentModel[j]) !== -1)
-              {
-                data.push(results[i].id);
-                j = intentModel.length;
-              }
+              data.push(results[i].id);
+              j = intentModel.length;
             }
           }
-          resolve(data);
         }
-      }
-      else
-      {
-        resolve(data);
+        return data;
       }
     }
-    catch(error)
+    else
     {
-      reject(error);
+      return data;
     }
-  });
+  }
+  catch(error)
+  {
+    return error;
+  }
 }

@@ -7,157 +7,141 @@ nodejieba.load({userDict: '../PolsTrackCrawler/util/dict.txt'});
 
 module.exports =
 {
-  seg: function(start, end)
+  seg: async function(start, end)
   {
-    return new Promise(async function(resolve, reject)
+    try
     {
-      try
-      {
-        const sql = "SELECT content FROM news WHERE pubTime > ? AND pubTime < ?;";
-        const results = await promiseSql.query(sql, [start, end]);
-        const totalCount = results.length;
+      const sql = "SELECT content FROM news WHERE pubTime > ? AND pubTime < ?;";
+      const results = await promiseSql.query(sql, [start, end]);
+      const totalCount = results.length;
 
-        for (let j = 0; j < totalCount; j++)
+      for (let j = 0; j < totalCount; j++)
+      {
+        console.log("處理中：" + j + "/" + totalCount);
+        const jieba = nodejieba.tag(results[j].content);
+        for (let i = 0; i < jieba.length; i++)
         {
-          console.log("處理中：" + j + "/" + totalCount);
-          const jieba = nodejieba.tag(results[j].content);
-          for (let i = 0; i < jieba.length; i++)
+          if (jieba[i].tag === "N")
           {
-            if (jieba[i].tag === "N")
+            const data =
             {
-              const data =
-              {
-                name: jieba[i].word,
-                type: jieba[i].tag,
-                count: 1
-              }
-              await saveSegmentationResult(data);
+              name: jieba[i].word,
+              type: jieba[i].tag,
+              count: 1
             }
+            await saveSegmentationResult(data);
           }
         }
-        console.log("斷詞處理完成");
+      }
+      console.log("斷詞處理完成");
 
-        resolve("Segmentation done");
-      }
-      catch(error)
-      {
-        reject(error);
-      }
-    });
-  },
-  get: function()
-  {
-    return new Promise(async function(resolve, reject)
+      return ("Segmentation done");
+    }
+    catch(error)
     {
-      const sql = `SELECT * FROM tagverify WHERE status is null AND count > ? ORDER BY count DESC;`;
-      const count = 20;
+      return error;
+    }
+  },
+  get: async function()
+  {
+    const sql = `SELECT * FROM tagverify WHERE status is null AND count > ? ORDER BY count DESC;`;
+    const count = 20;
 
-      try
+    try
+    {
+      const results = await promiseSql.query(sql, count);
+      let data = [];
+      const totalCount = results.length;
+
+      console.log("待處理標籤數量：" + totalCount);
+      for (let i = 0; i < totalCount; i++)
       {
-        const results = await promiseSql.query(sql, count);
-        let data = [];
-        const totalCount = results.length;
-
-        console.log("待處理標籤數量：" + totalCount);
-        for (let i = 0; i < totalCount; i++)
+        const body =
         {
-          const body =
+          tagName: results[i].name,
+          count: results[i].count
+        }
+        data.push(body);
+      }
+
+      return data;
+    }
+    catch(error)
+    {
+      return error;
+    }
+  },
+  updateDic: async function(updateData)
+  {
+    for (let i = 0; i < updateData.length; i++)
+    {
+      if (updateData[i].inputTag)
+      {
+        let newTag = `${updateData[i].tagName} 1 ${updateData[i].inputTag}\n`;
+
+        fs.appendFile('../PolsTrackCrawler/util/dict.txt', newTag, (err) =>
+        {
+          if (err)
           {
-            tagName: results[i].name,
-            count: results[i].count
+            return err;
           }
-          data.push(body);
-        }
 
-        resolve(data);
+          return ("Update dict.txt ok");
+        });
       }
-      catch(error)
+      else
       {
-        reject(error);
+        return ("No need to update");
       }
-    });
+    }
   },
-  updateDic: function(updateData)
+  updateDB: async function(updateData)
   {
-    return new Promise(function(resolve, reject)
+    const newTag = {};
+
+    for (let i = 0; i < updateData.length; i++)
     {
-      for (let i = 0; i < updateData.length; i++)
+      newTag.name = updateData[i].tagName;
+
+      if (updateData[i].inputTag)
       {
-        if (updateData[i].inputTag)
-        {
-          let newTag = `${updateData[i].tagName} 1 ${updateData[i].inputTag}\n`;
-
-          fs.appendFile('../PolsTrackCrawler/util/dict.txt', newTag, (err) =>
-          {
-            if (err)
-            {
-              reject(err);
-            }
-
-            resolve("Update dict.txt ok");
-          });
-        }
-        else
-        {
-          resolve("No need to update");
-        }
+        newTag.type = updateData[i].inputTag;
+        newTag.status = "Done";
       }
-    });
+      else
+      {
+        newTag.type = "N";
+        newTag.status = "Unused";
+      }
+
+      await updateTagStatus(newTag);
+    }
+    return ("All tag status update ok");
   },
-  updateDB: function(updateData)
+  setSynonyms: async function(param)
   {
-    return new Promise(async function(resolve, reject)
+    const sql = `
+      SELECT id FROM filtercount
+      WHERE name IN (?)
+      ORDER BY CASE
+      WHEN name = ? THEN 1 END DESC;
+    `;
+
+    try
     {
-      const newTag = {};
+      await updateSynonyms(param);
 
-      for (let i = 0; i < updateData.length; i++)
-      {
-        newTag.name = updateData[i].tagName;
-
-        if (updateData[i].inputTag)
-        {
-          newTag.type = updateData[i].inputTag;
-          newTag.status = "Done";
-        }
-        else
-        {
-          newTag.type = "N";
-          newTag.status = "Unused";
-        }
-
-        await updateTagStatus(newTag);
-      }
-      resolve("All tag status update ok");
-    });
-  },
-  setSynonyms: function(param)
-  {
-    return new Promise(async function(resolve, reject)
+      return;
+    }
+    catch(error)
     {
-      // let tagName = [param.parentTag, param.childTag];
-      const sql = `
-        SELECT id FROM filtercount
-        WHERE name IN (?)
-        ORDER BY CASE
-        WHEN name = ? THEN 1 END DESC;
-      `;
-
-      try
-      {
-        await updateSynonyms(param);
-
-        resolve();
-      }
-      catch(error)
-      {
-        reject(error);
-      }
-    });
+      return error;
+    }
   }
 }
 
 
-function saveSegmentationResult(data)
+async function saveSegmentationResult(data)
 {
   return new Promise(async function(resolve, reject)
   {
@@ -203,56 +187,50 @@ function saveSegmentationResult(data)
   });
 }
 
-function updateTagStatus(newTag)
+async function updateTagStatus(newTag)
 {
-  return new Promise(async function(resolve, reject)
+  const sql = `UPDATE tagverify SET type = ?, status = ? WHERE name = ?;`;
+
+  try
   {
-    const sql = `UPDATE tagverify SET type = ?, status = ? WHERE name = ?;`;
+    await promiseSql.query(sql, [newTag.type, newTag.status, newTag.name]);
 
-    try
-    {
-      await promiseSql.query(sql, [newTag.type, newTag.status, newTag.name]);
-
-      resolve()
-    }
-    catch(error)
-    {
-      reject(error);
-    }
-  });
+    return;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
 
-function updateSynonyms(param)
+async function updateSynonyms(param)
 {
-  return new Promise(async function(resolve, reject)
+  const getTagIdSql = `
+    SELECT id FROM filtercount
+    WHERE name IN (?)
+    ORDER BY CASE
+    WHEN name = ? THEN 1 END DESC;
+  `;
+
+  try
   {
-    const getTagIdSql = `
-      SELECT id FROM filtercount
-      WHERE name IN (?)
-      ORDER BY CASE
-      WHEN name = ? THEN 1 END DESC;
-    `;
+    const result = await promiseSql.query(getTagIdSql, [[param.parentTag, param.childTag], param.parentTag]);
 
-    try
+    if (result.length < 2)
     {
-      const result = await promiseSql.query(getTagIdSql, [[param.parentTag, param.childTag], param.parentTag]);
-
-      if (result.length < 2)
-      {
-        resolve("One of tagName which you input dosen's in database");
-      }
-      else
-      {
-        const updateParentSql = `UPDATE filtercount SET parent_name = ?, parent_id = ? WHERE name = ?;`;
-
-        await promiseSql.query(updateParentSql, [param.parentTag, result[0].id, param.childTag]);
-
-        resolve("Set Synonyms Ok");
-      }
+      resolve("One of tagName which you input dosen's in database");
     }
-    catch(error)
+    else
     {
-      reject(error);
+      const updateParentSql = `UPDATE filtercount SET parent_name = ?, parent_id = ? WHERE name = ?;`;
+
+      await promiseSql.query(updateParentSql, [param.parentTag, result[0].id, param.childTag]);
+
+      return ("Set Synonyms Ok");
     }
-  });
+  }
+  catch(error)
+  {
+    return error;
+  }
 }

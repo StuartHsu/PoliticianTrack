@@ -2,116 +2,107 @@ const promiseSql = require("../../util/promiseSql.js");
 
 module.exports =
 {
-  get: function(param)
+  get: async function(param)
   {
-    return new Promise(async function(resolve, reject)
+    let issueList;
+    let politicianIds;
+
+    if (param.politician.length === 2 && param.issue.length === 0 || param.politician.length === 2 && param.issue.length === 1) // compare
     {
-      let issueList;
-      let politicianIds;
-
-      if (param.politician.length === 2 && param.issue.length === 0 || param.politician.length === 2 && param.issue.length === 1) // compare
-      {
-        politicianIds = await getTagId(param);
-        issueList = await getIssues("twoPoliticians", politicianIds);
-      }
-      else if (param.politician.length === 0 && param.issue.length === 0 || param.politician.length === 0 && param.issue.length === 1) // All
-      {
-        issueList = await getIssues();
-      }
-      else
-      {
-        politicianIds = await getTagId(param);
-        issueList = await getIssues("onePolitician", politicianIds);
-      }
-
-      resolve(issueList);
-    });
-  }
-}
-
-function getIssues(mode, politicianIds)
-{
-  return new Promise(async function(resolve, reject)
-  {
-    let param;
-    let filter;
-    const sql = `
-      SELECT d.parent_name AS name, count(*) AS count
-      FROM newstag AS a
-      LEFT JOIN newstag AS b ON (a.news_id = b.news_id)
-      LEFT JOIN news AS c ON (a.news_id = c.id)
-      LEFT JOIN filtercount AS d ON (b.tag_id = d.id)
-      WHERE c.intent = "politician_say" AND d.type = "NI"
-    `;
-
-    if (mode === "onePolitician")
-    {
-      filter = ` AND a.tag_id = ? AND b.tag_id != ?`;
-      param = [politicianIds, politicianIds];
+      politicianIds = await getTagId(param);
+      issueList = await getIssues("twoPoliticians", politicianIds);
     }
-    else if (mode === "twoPoliticians")
+    else if (param.politician.length === 0 && param.issue.length === 0 || param.politician.length === 0 && param.issue.length === 1) // All
     {
-      filter = ` AND a.tag_id IN (?)`;
-      param = [politicianIds];
+      issueList = await getIssues();
     }
     else
     {
-      filter = "";
-      param = [];
+      politicianIds = await getTagId(param);
+      issueList = await getIssues("onePolitician", politicianIds);
     }
 
-    try
-    {
-      const data = await promiseSql.query(sql + filter + ` GROUP BY d.parent_name ORDER BY count(*) DESC;`, param);
+    return issueList;
+  }
+}
 
-      resolve(data);
-    }
-    catch(error)
-    {
-      reject(error);
-    }
-  });
+async function getIssues(mode, politicianIds)
+{
+  let param;
+  let filter;
+  const sql = `
+    SELECT d.parent_name AS name, count(*) AS count
+    FROM newstag AS a
+    LEFT JOIN newstag AS b ON (a.news_id = b.news_id)
+    LEFT JOIN news AS c ON (a.news_id = c.id)
+    LEFT JOIN filtercount AS d ON (b.tag_id = d.id)
+    WHERE c.intent = "politician_say" AND d.type = "NI"
+  `;
+
+  if (mode === "onePolitician")
+  {
+    filter = ` AND a.tag_id = ? AND b.tag_id != ?`;
+    param = [politicianIds, politicianIds];
+  }
+  else if (mode === "twoPoliticians")
+  {
+    filter = ` AND a.tag_id IN (?)`;
+    param = [politicianIds];
+  }
+  else
+  {
+    filter = "";
+    param = [];
+  }
+
+  try
+  {
+    const data = await promiseSql.query(sql + filter + ` GROUP BY d.parent_name ORDER BY count(*) DESC;`, param);
+
+    return data;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
 
 // 取得人物 tagId
-function getTagId(param)
+async function getTagId(param)
 {
-  return new Promise(async function(resolve, reject)
+  const tagNameArr = [];
+
+  if (param.politician.length > 0)
   {
-    const tagNameArr = [];
-
-    if (param.politician.length > 0)
+    for (let h = 0; h < param.politician.length; h++)
     {
-      for (let h = 0; h < param.politician.length; h++)
-      {
-        tagNameArr.push(param.politician[h]);
-      }
+      tagNameArr.push(param.politician[h]);
     }
+  }
 
-    const data = [];
-    const sql = `SELECT id FROM filtercount WHERE name IN (?);`;
+  const data = [];
+  const sql = `SELECT id FROM filtercount WHERE name IN (?);`;
 
-    if (tagNameArr.length > 0) // 人 or 題至少有其一
+  if (tagNameArr.length > 0) // 人 or 題至少有其一
+  {
+    try
     {
-      try
-      {
-        const results = await promiseSql.query(sql, tagNameArr);
+      const results = await promiseSql.query(sql, tagNameArr);
 
-        for (let i = 0; i < results.length; i++)
-        {
-          data.push(results[i].id);
-        }
-
-        resolve(data);
-      }
-      catch(error)
+      for (let i = 0; i < results.length; i++)
       {
-        reject(error);
+        data.push(results[i].id);
       }
+
+      return data;
     }
-    else // 無人、題
+    catch(error)
     {
-      resolve(data);
+      return error;
     }
-  });
+  }
+  else // 無人、題
+  {
+    return data;
+  }
 }

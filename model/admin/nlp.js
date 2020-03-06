@@ -86,92 +86,80 @@ module.exports =
 {
   train: async function(start, end)
   {
-    return new Promise(async function(resolve, reject)
+    await manager.train();
+    manager.save('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
+
+    const data = await news.getPeriod(start, end);
+    const totalCount = data.length;
+
+    for (let i = 0; i < totalCount; i++)
     {
-      await manager.train();
-      manager.save('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
+      console.log("Training：" + i + "/" + totalCount + ", news_id：" + data[i].id);
+      const content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
 
-      const data = await news.getPeriod(start, end);
-      const totalCount = data.length;
-
-      for (let i = 0; i < totalCount; i++)
+      try
       {
-        console.log("Training：" + i + "/" + totalCount + ", news_id：" + data[i].id);
-        const content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
-
-        try
-        {
-          await manager.process('zh', content);
-        }
-        catch(error)
-        {
-          reject(error);
-        }
+        await manager.process('zh', content);
       }
+      catch(error)
+      {
+        return error;
+      }
+    }
 
-      console.log("處理完成");
-      resolve("NLP training finished");
-    });
+    console.log("處理完成");
+    return ("NLP training finished");
   },
   process: async function(start, end)
   {
-    return new Promise(async function(resolve, reject)
+    manager.load('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
+
+    const data = await news.getPeriod(start, end);
+    const totalCount = data.length;
+
+    for (let i = 0; i < totalCount; i++)
     {
-      manager.load('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
+      console.log("Processing：" + i + "/" + totalCount + ", news_id：" + data[i].id);
+      const content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
+      const response = await manager.process('zh', content);
+      const intent = response.nluAnswer.classifications[0].intent;
+      const intent_score = response.nluAnswer.classifications[0].score;
 
-      const data = await news.getPeriod(start, end);
-      const totalCount = data.length;
-
-      for (let i = 0; i < totalCount; i++)
+      try
       {
-        console.log("Processing：" + i + "/" + totalCount + ", news_id：" + data[i].id);
-        const content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
-        const response = await manager.process('zh', content);
-        const intent = response.nluAnswer.classifications[0].intent;
-        const intent_score = response.nluAnswer.classifications[0].score;
-
-        try
-        {
-          await updateIntens(intent, intent_score, data[i].id);
-        }
-        catch(error)
-        {
-          reject(error);
-        }
+        await updateIntens(intent, intent_score, data[i].id);
       }
+      catch(error)
+      {
+        return error;
+      }
+    }
 
-      console.log("處理完成");
-      resolve("News intent update ok");
-    });
+    console.log("處理完成");
+    return ("News intent update ok");
   },
   test: async function()
   {
-    return new Promise(async function(resolve, reject)
-    {
-      manager.load('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
+    manager.load('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
 
-      const content = '黨籍案引爭議  郝龍斌：支持傅崐萁回到黨內'.replace('：', '表示').replace(/[A-Za-z]+/, '');
-      const response = await manager.process('zh', content);
+    const content = '黨籍案引爭議  郝龍斌：支持傅崐萁回到黨內'.replace('：', '表示').replace(/[A-Za-z]+/, '');
+    const response = await manager.process('zh', content);
 
-      resolve (JSON.stringify(response));
-    });
+    return (JSON.stringify(response));
   }
 }
 
 
-function updateIntens(intent, intent_score, id)
+async function updateIntens(intent, intent_score, id)
 {
-  return new Promise(async function(resolve, reject)
+  try
   {
-    try
-    {
-      await promiseSql.query("UPDATE news SET intent = ?, intent_score = ? WHERE id = ?;", [intent, intent_score, id]);
+    await promiseSql.query("UPDATE news SET intent = ?, intent_score = ? WHERE id = ?;", [intent, intent_score, id]);
 
-      resolve();
-    }
-    catch(error)
-    {
-      reject(error);
-    }
-  });
+    return;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }

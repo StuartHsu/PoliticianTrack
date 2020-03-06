@@ -6,63 +6,60 @@ nodejieba.load({userDict: '../PolsTrackCrawler/util/dict.txt'});
 
 module.exports =
 {
-  getTagPeriodCount: function(start, end)
+  getTagPeriodCount: async function(start, end)
   {
-    return new Promise(async function(resolve, reject)
+    let sql;
+    let timeSet;
+
+    try
     {
-      let sql;
-      let timeSet;
+      await clearCount();
 
-      try
+      if (start)
       {
-        await clearCount();
+        sql = "SELECT content FROM news WHERE pubTime > ? AND pubTime < ?;";
+        timeSet = [start, end];
+      }
+      else
+      {
+        sql = "SELECT content FROM news WHERE pubTime < ?;";
+        timeSet = [end];
+      }
 
-        if (start)
+      const result = await promiseSql.query(sql, timeSet);
+      const totalCount = result.length;
+
+      for (let i = 0; i < totalCount; i++)
+      {
+        console.log("處理中：" + i + "/" + totalCount);
+        const jieba = nodejieba.tag(result[i].content);
+        const jiebaTotalCount = jieba.length;
+
+        for (let j = 0; j < jiebaTotalCount; j++)
         {
-          sql = "SELECT content FROM news WHERE pubTime > ? AND pubTime < ?;";
-          timeSet = [start, end];
-        }
-        else
-        {
-          sql = "SELECT content FROM news WHERE pubTime < ?;";
-          timeSet = [end];
-        }
-
-        const result = await promiseSql.query(sql, timeSet);
-        const totalCount = result.length;
-
-        for (let i = 0; i < totalCount; i++)
-        {
-          console.log("處理中：" + i + "/" + totalCount);
-          const jieba = nodejieba.tag(result[i].content);
-          const jiebaTotalCount = jieba.length;
-
-          for (let j = 0; j < jiebaTotalCount; j++)
+          if (jieba[j].tag === "NRP" || jieba[j].tag === "NI")
           {
-            if (jieba[j].tag === "NRP" || jieba[j].tag === "NI")
+            const data =
             {
-              const data =
-              {
-                name: jieba[j].word,
-                type: jieba[j].tag,
-                count: 1,
-                parent_name: jieba[j].word,
-                parent_id: 0
-              }
-
-              await updateTagCount(data);
+              name: jieba[j].word,
+              type: jieba[j].tag,
+              count: 1,
+              parent_name: jieba[j].word,
+              parent_id: 0
             }
+
+            await updateTagCount(data);
           }
         }
+      }
 
-        console.log("處理完成");
-        resolve("All tags update!");
-      }
-      catch(error)
-      {
-        reject(error);
-      }
-    });
+      console.log("處理完成");
+      return ("All tags update!");
+    }
+    catch(error)
+    {
+      return error;
+    }
   }
 }
 
@@ -119,21 +116,18 @@ function updateTagCount(data)
   });
 }
 
-function clearCount()
+async function clearCount()
 {
-  return new Promise(async function(resolve, reject)
+  const sql = 'UPDATE filtercount SET count = 0;';
+
+  try
   {
-    const sql = 'UPDATE filtercount SET count = 0;';
+    await promiseSql.query(sql, null);
 
-    try
-    {
-      await promiseSql.query(sql, null);
-
-      resolve();
-    }
-    catch(error)
-    {
-      reject(error);
-    }
-  });
+    return;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
