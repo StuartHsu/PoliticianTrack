@@ -77,7 +77,7 @@ module.exports =
     {
       if (updateData[i].inputTag)
       {
-        let newTag = `${updateData[i].tagName} 1 ${updateData[i].inputTag}\n`;
+        const newTag = `${updateData[i].tagName} 1 ${updateData[i].inputTag}\n`;
 
         fs.appendFile('../PolsTrackCrawler/util/dict.txt', newTag, (err) =>
         {
