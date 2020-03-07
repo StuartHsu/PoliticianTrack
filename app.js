@@ -114,7 +114,7 @@ app.get('/compare', async function(req, res)
 
 // Hots
 app.get('/hots', async function(req, res)
-{  
+{
   let paging = parseInt(req.query.paging);
   const size = 30;
 
