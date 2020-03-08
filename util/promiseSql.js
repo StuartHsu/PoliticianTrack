@@ -11,6 +11,7 @@ module.exports =
       {
         if (error)
         {
+					console.log(error);
           reject("Database Query Error");
         }
         else
