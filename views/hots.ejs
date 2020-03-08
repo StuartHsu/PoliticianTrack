@@ -33,7 +33,7 @@
       <div class="content scrollBar">
         <div class="tabs">
           <div class="tabFrom">
-            <li class="tabTitle" id="pol">人物</li>
+            <li class="tabTitle" id="politician">人物</li>
             <div class="pointer"></div>
           </div>
           <div class="tabFrom">
@@ -98,7 +98,7 @@
 
     var preSublistId;
 
-    let tabCond = "pol"
+    let tabCond = "politician"
 
     tabsTitle.forEach(tabTitle => tabTitle.addEventListener('click', function(event) {
       preSublistId = "";
@@ -114,12 +114,12 @@
       getData(event.target.id);
     }));
 
-    // get Pol sub Issue after click tabTitle
-    function subListCallIssue(pol_id, pol) {
-      getSubData(tabCond, pol_id, pol);
+    // get politician sub Issue after click tabTitle
+    function subListCallIssue(politician_id, politician) {
+      getSubData(tabCond, politician_id, politician);
     }
 
-    // get Issue sub Pol after click tabTitle
+    // get Issue sub politician after click tabTitle
     function subListCallPol(issue_id, issue) {
       getSubData(tabCond, issue_id, issue);
     }
@@ -189,7 +189,7 @@
         }
       });
     }
-    getMax("pol");
+    getMax("politician");
 
     function dataForm(data, type, cond) {
       // document.getElementById('oncomingHots').style.display = "none";
@@ -202,7 +202,7 @@
 
         var mainListDiv = document.createElement("div");
         mainListDiv.className = "mainList";
-        if(type === "pol") {
+        if(type === "politician") {
           mainListDiv.setAttribute("onclick", `subListCallIssue(${data[i].tag_id},'${data[i].name}')`);
         } else {
           mainListDiv.setAttribute("onclick", `subListCallPol(${data[i].tag_id},'${data[i].name}')`);
@@ -266,10 +266,10 @@
       for(let i = 0; i < data.length; i++) {
         var subListA = document.createElement("a");
         subListA.className = "subList";
-        if(type === "pol") {
-          subListA.setAttribute("href", `/politician?pol=${name}&issue=${data[i].name}`);
+        if(type === "politician") {
+          subListA.setAttribute("href", `/politician?politician=${name}&issue=${data[i].name}`);
         } else {
-          subListA.setAttribute("href", `/politician?pol=${data[i].name}&issue=${name}`);
+          subListA.setAttribute("href", `/politician?politician=${data[i].name}&issue=${name}`);
         }
 
         var nameDiv = document.createElement("div");

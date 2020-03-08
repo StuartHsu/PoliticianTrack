@@ -3,6 +3,7 @@
 
   <head>
       <title>PolsTrack</title>
+      <!-- <link rel="icon" type="text/css" href="./xxx.png"> 放網頁上面的小 icon -->
       <link rel="stylesheet" type="text/css" href="./css/index.css">
       <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
       <script src="https://cdn.anychart.com/releases/v8/js/anychart-tag-cloud.min.js"></script>
@@ -35,7 +36,7 @@
 
       anychart.onDocumentReady(function() {
         $.ajax({
-          url: "tagFilterCount",
+          url: "/tagCount",
           type: "GET",
           success: function(resp) {
             let data = dataForm(resp.data);
@@ -93,7 +94,7 @@
         chart.draw();
 
         let param = {
-          pol: [],
+          politician: [],
           issue: []
         }
         // add an event listener
@@ -102,7 +103,7 @@
             let apiUrl;
             let clickTag = e.point.get("tag");
             if(clickTag === "NRP") {
-              apiUrl = "/politician?pol="
+              apiUrl = "/politician?politician="
             } else {
               apiUrl = "/politician?issue="
             }

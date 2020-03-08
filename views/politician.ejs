@@ -148,7 +148,7 @@
                 <%_ for(let j = 0; j < results.news[i].tag.length && rndPolTagC < 8; j++) { _%>
                   <%_ if(title.indexOf(results.news[i].tag[j].tagName) == -1 && issue.indexOf(results.news[i].tag[j].tagName) == -1) { _%>
                     <%_ if(results.news[i].tag[j].tagType === "NRP") { _%>
-                        <li class="polTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'pol')"><%= results.news[i].tag[j].tagName %></li>
+                        <li class="polTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'politician')"><%= results.news[i].tag[j].tagName %></li>
                     <%_ } _%>
                   <%_ } _%>
                 <%_ } _%>
@@ -200,14 +200,14 @@
 
     // Pol, Issue record
     let param = {
-      pol: [],
+      politician: [],
       issue: [],
       party: []
     }
 
     // 檢查是否來自 index/hots
-    if(getQueryStringValue("pol")) {
-      param.pol = [getQueryStringValue("pol")];
+    if(getQueryStringValue("politician")) {
+      param.politician = [getQueryStringValue("politician")];
     }
     if(getQueryStringValue("issue")) {
       param.issue = [getQueryStringValue("issue")];
@@ -251,10 +251,10 @@
 
     // 人物選擇處理
     people.forEach(person => person.addEventListener('click', function(event) {
-      param.pol = [];
+      param.politician = [];
       if(this.classList.contains("innerHighlight")) {
         this.classList.remove("innerHighlight");
-        param.pol = [];
+        param.politician = [];
       } else {
         people.forEach(r => r.classList.remove("innerHighlight"));
         this.classList.add("innerHighlight");
@@ -262,12 +262,12 @@
 
       people.forEach(function(person) {
         if(person.classList.contains("innerHighlight")) {
-          param.pol.push(person.innerText);
+          param.politician.push(person.innerText);
         }
       });
       appSide.scrollTop = 0;
 
-      polIssue(param);
+      getIssuesByPolitician(param);
       if(strictMode === false) {
         getNews(param);
       } else {
@@ -275,11 +275,11 @@
       }
       filterHL(param);
 
-      if(param.pol.length === 0) {
+      if(param.politician.length === 0) {
         personTitle.innerHTML = "人物";
         personTitle.style.color = "#FFFFFF"
       } else {
-        personTitle.innerHTML = param.pol;
+        personTitle.innerHTML = param.politician;
         personTitle.style.color = "#FFD479"
       }
       // personTitle.innerHTML = person.innerText;
@@ -333,7 +333,7 @@
           param.party.push(party.innerText);
         }
       });
-      partyPol(param);
+      getPoliticiansByParty(param);
       filterHL(param);
     }));
 
@@ -353,12 +353,12 @@
     // 人物標題處理
     personTitle.addEventListener('click', function(event) {
       appPols = document.querySelectorAll('.person');
-      if(param.pol.length !== 0) {
+      if(param.politician.length !== 0) {
         appPols.forEach(r => r.classList.remove("innerHighlight"));
         personTitle.innerHTML = "人物";
         personTitle.style.color = "#FFFFFF"
-        param.pol = [];
-        polIssue(param);
+        param.politician = [];
+        getIssuesByPolitician(param);
         if(strictMode === false) {
           getNews(param);
         } else {
@@ -376,7 +376,7 @@
         issueTitle.innerHTML = "議題";
         issueTitle.style.color = "#FFFFFF"
         param.issue = [];
-        polIssue(param);
+        getIssuesByPolitician(param);
         if(strictMode === false) {
           getNews(param);
         } else {
@@ -389,17 +389,17 @@
     // 新聞旁標籤點選切換
     function tagCall(tagName, cond) {
       param = {
-        pol: [],
+        politician: [],
         issue: [],
         party: []
       }
-      if(cond === "pol") {
-        param.pol = [tagName]
+      if(cond === "politician") {
+        param.politician = [tagName]
       } else {
         param.issue = [tagName]
       }
-      partyPol(param);
-      polIssue(param);
+      getPoliticiansByParty(param);
+      getIssuesByPolitician(param);
       appSide.scrollTop = 0;
       if(strictMode === false) {
         getNews(param);
@@ -408,11 +408,11 @@
       }
       filterHL(param);
 
-      if(param.pol.length === 0) {
+      if(param.politician.length === 0) {
         personTitle.innerHTML = "人物";
         personTitle.style.color = "#FFFFFF"
       } else {
-        personTitle.innerHTML = param.pol;
+        personTitle.innerHTML = param.politician;
         personTitle.style.color = "#FFD479"
       }
 
@@ -430,13 +430,13 @@
     // DB 取資料
     function getNews(param) {
       $.ajax({
-        url: `api/news/getNews`,
+        url: `api/news/getNews/normal`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
           removeData(appendNews);
-          changeTitle(param.pol, param.issue);
+          changeTitle(param.politician, param.issue);
           if(resp.data) {
             if(resp.data.news.length < 1){ // 無資料
               appNoContent.style.display = "block";
@@ -458,7 +458,7 @@
     function getNewsPage(param, page, cond) {
       scrollStatus = false;
       $.ajax({
-        url: `api/news/getNews?paging=${page}`,
+        url: `api/news/getNews/normal?paging=${page}`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -474,9 +474,9 @@
     }
 
     // DB 取資料 - 政黨影響人物
-    function partyPol(param) {
+    function getPoliticiansByParty(param) {
       $.ajax({
-        url: `api/getparty`,
+        url: `api/getPoliticiansByParty`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -489,9 +489,9 @@
     }
 
     // DB 取資料 - 人物影響議題
-    function polIssue(param) {
+    function getIssuesByPolitician(param) {
       $.ajax({
-        url: `api/polgetissues`,
+        url: `api/getIssuesByPolitician`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -506,13 +506,13 @@
     // DB 取資料 - 標題 mode
     function getNewsLess(param) {
       $.ajax({
-        url: "api/news/getNews/strict",
+        url: "api/news/getNews/accurate",
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
           removeData(appendNews);
-          changeTitle(param.pol, param.issue);
+          changeTitle(param.politician, param.issue);
           if(resp.data) {
             if(resp.data.news.length < 1) {
               appNoContent.style.display = "block";
@@ -534,7 +534,7 @@
     function getNewsLessPage(param, page, cond) {
       scrollStatus = false;
       $.ajax({
-        url: `api/news/getNews/strict?paging=${page}`,
+        url: `api/news/getNews/accurate?paging=${page}`,
         type: "POST",
         data: JSON.stringify(param),
         contentType: "application/json; charset=utf-8",
@@ -682,12 +682,12 @@
           var tagLiPol = document.createElement("li");
           var tagLiIsu = document.createElement("li");
           // if(respData[i].tag[j].tagName != name) {
-          if(param.pol.indexOf(respData[i].tag[j].tagName) == -1 && param.issue.indexOf(respData[i].tag[j].tagName) == -1) {
+          if(param.politician.indexOf(respData[i].tag[j].tagName) == -1 && param.issue.indexOf(respData[i].tag[j].tagName) == -1) {
             tagLiPol.innerHTML = respData[i].tag[j].tagName;
             tagLiIsu.innerHTML = respData[i].tag[j].tagName;
             if(respData[i].tag[j].tagType === "NRP") {
               tagLiPol.className = "polTag";
-              tagLiPol.setAttribute("onclick", `tagCall("${respData[i].tag[j].tagName}", "pol")`);
+              tagLiPol.setAttribute("onclick", `tagCall("${respData[i].tag[j].tagName}", "politician")`);
               tagUlPol.appendChild(tagLiPol);
               polTagC++;
             } else {
@@ -718,7 +718,7 @@
     }
 
     // Data 組裝 Less
-    function dataFormLess(respData, pol) {
+    function dataFormLess(respData, politician) {
       document.getElementById('oncomingNewsP').style.display = "none";
       document.getElementById('appendNewsP').style.display = "flex";
 
@@ -831,11 +831,11 @@
         // 建立 child-pols 監聽
         filPolLi.addEventListener('click', function() {
           // polList = [];
-          param.pol = [];
+          param.politician = [];
           appPols = document.querySelectorAll('.person');
           if(this.classList.contains("innerHighlight")) {
             this.classList.remove("innerHighlight");
-            param.pol = [];
+            param.politician = [];
           } else {
             appPols.forEach(r => r.classList.remove("innerHighlight"));
             this.classList.add("innerHighlight");
@@ -843,7 +843,7 @@
 
           appPols.forEach(function(person) {
             if(person.classList.contains("innerHighlight")) {
-              param.pol.push(person.innerHTML);
+              param.politician.push(person.innerHTML);
             }
           });
 
@@ -853,13 +853,13 @@
           } else {
             getNewsLess(param);
           }
-          polIssue(param);
+          getIssuesByPolitician(param);
           // pol filter 標題改
-          if(param.pol.length === 0) {
+          if(param.politician.length === 0) {
             personTitle.innerHTML = "人物";
             personTitle.style.color = "#FFFFFF"
           } else {
-            personTitle.innerHTML = param.pol;
+            personTitle.innerHTML = param.politician;
             personTitle.style.color = "#FFD479"
           }
         });
@@ -954,7 +954,7 @@
 
       for(let i = 0; i < people.length; i++) {
         let polContent = people[i].innerText;
-        if (polContent.indexOf(param.pol[0]) != -1) {
+        if (polContent.indexOf(param.politician[0]) != -1) {
           people[i].classList.add("innerHighlight");
         }
       }
@@ -1032,7 +1032,7 @@
       }
       let x = appSide.scrollHeight - appSide.scrollTop;
       if(cond === "index" || cond === "hots") {
-        param.pol = getQueryStringValue("pol") ? [getQueryStringValue("pol")] : [];
+        param.politician = getQueryStringValue("politician") ? [getQueryStringValue("politician")] : [];
         param.issue = getQueryStringValue("issue") ? [getQueryStringValue("issue")] : [];
       }
       if(cond === "oncoming" || cond === "index" || cond === "hots") {

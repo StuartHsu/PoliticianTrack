@@ -1,465 +1,326 @@
-const mysql = require("../util/mysqlcon.js");
+const promiseSql = require("../util/promiseSql.js");
+const { getIntentNewsIds } = require("./intentModel.js");
 
-module.exports = {
-  getPeriod: function(start, end) { // Admin use
-    return new Promise(function(resolve, reject) {
-      let sql;
-      if(!start && !end) {
-        sql = `SELECT * FROM news WHERE intent = "";`
-      } else {
-        sql = 'SELECT * FROM news WHERE pubTime > ? AND pubTime < ?';
-      }
-      mysql.con.query(sql, [start, end], function(error, results, fields) {
-        if(error) {
-          reject(error);
-        }
-        resolve(results);
-      });
-    });
+module.exports =
+{
+  get: async function(param, size, paging)
+  {
+    let tagId;
+    let tagsNewsIds;
+    let newsData;
+
+    if (param.politician.length === 2 && param.issue.length === 1) // compare
+    {
+      const param1 = {politician: [param.politician[0]], issue: [param.issue[0]]};
+      const param2 = {politician: [param.politician[1]], issue: [param.issue[0]]};
+      const tag1Id = await getTagId(param1);
+      const tag2Id = await getTagId(param2);
+      const tag1NewsIds = await getTagNewsId(tag1Id);
+      const tag2NewsIds = await getTagNewsId(tag2Id);
+      newsData = await getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, null);
+    }
+    else if (param.politician.length === 0 && param.issue.length === 0) // All
+    {
+      newsData = await getAllNews(size, paging);
+    }
+    else
+    {
+      tagId = await getTagId(param);
+      tagsNewsIds = await getTagNewsId(tagId);
+      newsData = await getNews(tagsNewsIds, size, paging);
+    }
+
+    return newsData;
   },
-  listTag: function(title, titleKeyword, content, contentKeyword) { // politician oncoming render
-    let data = [];
-    return new Promise(async function(resolve, reject) {
-      let newsRaw = await getNewsG(title, titleKeyword, content, contentKeyword);
-      let newsData = {};
-      for(let i = 0; i < newsRaw.length; i++) {
-        var tagsRaw = await getTags(newsRaw[i].id);
-        let tagsData = [];
-        for(let j = 0; j < tagsRaw.length; j++) {
-          let body = {
-            tagName: tagsRaw[j].name,
-            tagType: tagsRaw[j].type
-          }
-          tagsData.push(body);
-        }
-        newsData = {
-          id: newsRaw[i].id,
-          title: newsRaw[i].title,
-          description: newsRaw[i].description,
-          content: newsRaw[i].content,
-          href: newsRaw[i].href,
-          pubTime: newsRaw[i].pubTime,
-          publisher: newsRaw[i].publisher,
-          tag: tagsData
-        }
-        data.push(newsData);
-      }
-      resolve(data);
-    });
+  getAccurate: async function(param, size, paging)
+  {
+    let tagId;
+    let rawTagNewsIds;
+    let tagsNewsIds;
+    let newsData;
+
+    if (param.politician.length === 2 && param.issue.length === 1) // compare
+    {
+      const param1 = {politician: [param.politician[0]], issue: [param.issue[0]]};
+      const param2 = {politician: [param.politician[1]], issue: [param.issue[0]]};
+      const tag1Id = await getTagId(param1);
+      const tag2Id = await getTagId(param2);
+      const rawTag1NewsIds = await getTagNewsId(tag1Id);
+      const rawTag2NewsIds = await getTagNewsId(tag2Id);
+      const tag1NewsIds = await getIntentNewsIds(param, rawTag1NewsIds);
+      const tag2NewsIds = await getIntentNewsIds(param, rawTag2NewsIds);
+      newsData = await getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, "accurate");
+    }
+    else if (param.politician.length === 0 && param.issue.length === 0) // All
+    {
+      const intentNewsIds = await getIntentNewsIds(param);
+      newsData = await getAllNews(size, paging, intentNewsIds);
+    }
+    else
+    {
+      tagId = await getTagId(param);
+      rawTagNewsIds = await getTagNewsId(tagId);
+      tagsNewsIds = await getIntentNewsIds(param, rawTagNewsIds);
+      newsData = await getNews(tagsNewsIds, size, paging);
+    }
+
+    return newsData;
   },
-  get: function(param, size, paging) {
-    return new Promise(async function(resolve, reject) {
-      let sql;
-      let tag_id;
-      let news_id;
-      let news_Data;
-      // 人、題分流
-      if(param.pol.length === 2 && param.issue.length === 1) { // compare
-        let param1 = {pol: [param.pol[0]], issue: [param.issue[0]]};
-        let param2 = {pol: [param.pol[1]], issue: [param.issue[0]]};
-        let tag_id1 = await getTagId(param1);
-        let tag_id2 = await getTagId(param2);
-        let news_id1 = await getNewsId(tag_id1);
-        let news_id2 = await getNewsId(tag_id2);
-        let news_id = news_id1.concat(news_id2);
-        news_Data = await getNews(news_id, size, paging, "comp", news_id1, news_id2, param);
-      } else if(param.pol.length === 0 && param.issue.length === 0) { // All
-        news_Data = await getNews(news_id, size, paging);　// 以 news_id 取得新聞詳細內容
-      } else {
-        tag_id = await getTagId(param); // 取得人物、議題 tag_id
-        news_id = await getNewsId(tag_id);　// 取得 tag_id 對應之 news_id
-        news_Data = await getNews(news_id, size, paging);　// 以 news_id 取得新聞詳細內容
-      }
-      resolve(news_Data);
-    });
-  },
-  getStrict: function(param, size, paging) {
-    return new Promise(async function(resolve, reject) {
-      let sql;
-      let tag_id;
-      let news_id;
-      let rawNews_id;
-      let news_Data;
-      // 人、題分流
-      if(param.pol.length === 2 && param.issue.length === 1) { // compare
-        let param1 = {pol: [param.pol[0]], issue: [param.issue[0]]};
-        let param2 = {pol: [param.pol[1]], issue: [param.issue[0]]};
-        let tag_id1 = await getTagId(param1);
-        let tag_id2 = await getTagId(param2);
-        let rawNews_id1 = await getNewsId(tag_id1);
-        let rawNews_id2 = await getNewsId(tag_id2);
-        rawNews_id = rawNews_id1.concat(rawNews_id2);
-        news_id = await formPolIntent(param, rawNews_id); // 取得 tag_id 對應之 polIntent
-        news_Data = await getNewsStrict(news_id, size, paging, param, "comp", rawNews_id1, rawNews_id2);
-      } else if(param.pol.length === 0 && param.issue.length === 0) { // All
-        news_Data = await getNewsStrict(news_id, size, paging, param);　// 以 news_id 取得新聞詳細內容
-      } else {
-        tag_id = await getTagId(param); // 取得人物、議題 tag_id
-        rawNews_id = await getNewsId(tag_id);　// 取得 tag_id 對應之 news_id
-        news_id = await formPolIntent(param, rawNews_id); // 取得 tag_id 對應之 polIntent
-        news_Data = await getNewsStrict(news_id, size, paging);　// 以 news_id 取得新聞詳細內容
-      }
-      resolve(news_Data);
-    });
+  getPeriod: async function(start, end) // Admin NLP use
+  {
+    let sql;
+
+    if (!start && !end)
+    {
+      sql = `SELECT * FROM news WHERE intent = "";`
+    }
+    else
+    {
+      sql = 'SELECT * FROM news WHERE pubTime > ? AND pubTime < ?';
+    }
+
+    try
+    {
+      const data = await promiseSql.query(sql, [start, end]);
+
+      return data;
+    }
+    catch(error)
+    {
+      return error;
+    }
   }
 }
 
 
+// get News route
+async function getAllNews(size, paging, intentNewsIds)
+{
+  let newsQuantity;
+  let filter;
+  let dataSet = [];
+  const body = {};
+  const offset = paging * size;
 
-
-
-
-function getNewsG(title, titleKeyword, content, contentKeyword) {
-  return new Promise(function(resolve, reject) {
-    let arrayWord = titleKeyword.split(",");
-    let addSql = ")";
-    if(arrayWord[1]) {
-      addSql = `or ${title} like '%${arrayWord[1]}%') ` ;
+  try
+  {
+    if (intentNewsIds)
+    {
+      newsQuantity = await getNewsQuantity(intentNewsIds, "accurate");
+      filter = ` id IN (?)`;
+      dataSet = [intentNewsIds, offset, size]
+    }
+    else
+    {
+      newsQuantity = await getNewsQuantity();
+      filter = ` intent = "politician_say"`;
+      dataSet = [offset, size]
     }
 
-    let sql;
-    if(titleKeyword && contentKeyword) {
-      sql = `select * from news where (${title} like '%${arrayWord[0]}%' ${addSql}and ${content} like '%${contentKeyword}%' and intent = "politician_say" order by pubTime desc;`
-    } else if (titleKeyword && !contentKeyword) {
-      sql = `select * from news where (${title} like '%${arrayWord[0]}%' ${addSql}and intent = "politician_say" order by pubTime desc;`
-    } else if (!titleKeyword && contentKeyword) {
-      sql = `select * from news where ${content} like '%${contentKeyword}%' and intent = "politician_say" order by pubTime desc;`
-    } else {
-      // sql = `select * from news where intent = "politician_say" order by pubTime desc;`
-      sql = `select * from news where intent = "politician_say" order by pubTime desc LIMIT 0,20;`
+    const maxPage = Math.floor((newsQuantity - 1) / size);
+
+    if (paging < maxPage)
+    {
+      body.next_paging = paging + 1;
     }
-    mysql.con.query(sql, function(error, results, fields) {
-      if(error) {
-        reject(error);
-      }
-      resolve(results);
-    });
-  });
+
+    const sql = `SELECT * FROM news WHERE`;
+    const data = await promiseSql.query(sql + filter + ` ORDER BY pubTime DESC LIMIT ?,?;`, dataSet);
+    const news = await formNews(data); // 新聞加上所含標籤
+    body.news = news;
+
+    return body;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
 
-// 以 news_id 取得新聞詳細內容
-function getNews(news_id, size, paging, type, news_id1, news_id2, param) {
-  return new Promise(function(resolve, reject) {
-    let sql;
-    let body = {};
-    let news;
-    let id1Count = 0;
-    let id2Count = 0;
-    let offset = paging * size;
-    if(!news_id) { // All
-      sql = `SELECT count(*) AS total FROM news WHERE intent = "politician_say";`;
-      mysql.con.query(sql, async function(error, results, fields) {
-        if(error) {
-          reject(error);
-        } else {
-          let maxPage = Math.floor((results[0].total - 1) / size);
-					if(paging < maxPage) {
-						body.next_paging = paging + 1;
-					}
-          sql = `SELECT * FROM news WHERE intent = "politician_say" ORDER BY pubTime DESC LIMIT ?,?;`;
-          mysql.con.query(sql, [offset, size],async function(error, results, fields) {
-            if(error) {
-              reject(error);
-            } else {
-              news = await formTagNews(results);　// 新聞加上所含標籤
-              body.news = news;
-              resolve(body);
-            }
-          });
-        }
-      });
-    } else if (news_id.length > 0) {
-      sql = `SELECT count(*) AS total FROM news WHERE id IN (?) AND intent = "politician_say";`;
-      mysql.con.query(sql, [news_id], async function(error, results, fields) {
-        if(error) {
-          reject(error);
-        } else {
-          let maxPage = Math.floor((results[0].total - 1) / size);
-					if(paging < maxPage) {
-						body.next_paging = paging + 1;
-					}
-          sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC;`;
-          mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
-            if(error) {
-              reject(error);
-            } else {
-              news = await formTagNews(results);　// 新聞加上所含標籤
-              if(type === "comp") { // 比較
-                for(let i = 0; i < news.length; i++) {
-                  if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
-                    id1Count++;
-                    id2Count++;
-                  } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
-                    id1Count++;
-                  } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
-                    id2Count++;
-                  } else {
-                    console.log("none");
-                  }
-                }
-                body.id1Count = id1Count;
-                body.id2Count = id2Count;
-              }
-              sql = `SELECT * FROM news WHERE id IN (?) AND intent = "politician_say" ORDER BY pubTime DESC LIMIT ?,?;`;
-              mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
-                if(error) {
-                  reject(error);
-                } else {
-                  news = await formTagNews(results);　// 新聞加上所含標籤
+async function getNews(tagNewsIds, size, paging, mode)
+{
+  let filter;
+  const body = {};
+  const offset = paging * size;
 
-                  if(type === "comp") { // 比較
-                    for(let i = 0; i < news.length; i++) {
-                      if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
-                        news[i].tag_id = "both";
-                      } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
-                        news[i].tag_id = param.pol[0];
-                      } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
-                        news[i].tag_id = param.pol[1];
-                      } else {
-                        console.log("none");
-                      }
-                    }
-                  }
-                  body.news = news;
-                  resolve(body);
-                }
-              });
-            }
-          });
-        }
-      });
-    } else {
+  try
+  {
+    const newsQuantity = await getNewsQuantity(tagNewsIds);
+
+    if (newsQuantity === 0)
+    {
       body.news = [];
-      resolve(body);
+
+      return body;
     }
-  });
+    else
+    {
+      const maxPage = Math.floor((newsQuantity - 1) / size);
+
+      if (paging < maxPage)
+      {
+        body.next_paging = paging + 1;
+      }
+    }
+
+    if (mode === "accurate")
+    {
+      filter = ` AND intent = "politician_say"`;
+    }
+    else
+    {
+      filter = "";
+    }
+
+    const sql = `SELECT * FROM news WHERE id IN (?)`;
+    const data = await promiseSql.query(sql + filter + ` ORDER BY pubTime DESC LIMIT ?,?;`, [tagNewsIds, offset, size]);
+    const news = await formNews(data);　// 新聞加上所含標籤
+    body.news = news;
+
+    return body;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
 
-// 以 news_id 取得新聞詳細內容 - Strict
-function getNewsStrict(news_id, size, paging, param, type, news_id1, news_id2) {
-  return new Promise(async function(resolve, reject) {
-    let sql;
-    let body = {};
-    let news;
-    let id1Count = 0;
-    let id2Count = 0;
-    let offset = paging * size;
-    if(!news_id) { // All
-      let news_id = await formPolIntent(param);
-      sql = `SELECT count(*) AS total FROM news WHERE id IN (?)`;
-      mysql.con.query(sql, [news_id], async function(error, results, fields) {
-        if(error) {
-          reject(error);
-        } else {
-          let maxPage = Math.floor((results[0].total - 1) / size);
-					if(paging < maxPage) {
-						body.next_paging = paging + 1;
-					}
-          sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC LIMIT ?,?;`;
-          mysql.con.query(sql, [news_id, offset, size],async function(error, results, fields) {
-            if(error) {
-              reject(error);
-            } else {
-              news = await formTagNews(results);　// 新聞加上所含標籤
-              body.news = news;
-              resolve(body);
-            }
-          });
-        }
-      });
-    } else if (news_id.length > 0) {
-      sql = `SELECT count(*) AS total FROM news WHERE id IN (?);`;
-      mysql.con.query(sql, [news_id], async function(error, results, fields) {
-        if(error) {
-          reject(error);
-        } else {
-          let maxPage = Math.floor((results[0].total - 1) / size);
-					if(paging < maxPage) {
-						body.next_paging = paging + 1;
-					}
-          sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`;
-          mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
-            if(error) {
-              reject(error);
-            } else {
-              news = await formTagNews(results);　// 新聞加上所含標籤
+async function getCompareNews(tag1NewsIds, tag2NewsIds, size, paging, param, mode)
+{
+  const body =
+  {
+    id1Count: 0,
+    id2Count: 0
+  }
+  const offset = paging * size;
+  const tagsNewsIds = tag1NewsIds.concat(tag2NewsIds);
 
-              if(type === "comp") { // 比較
-                for(let i = 0; i < news.length; i++) {
-                  if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
-                    id1Count++;
-                    id2Count++;
-                  } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
-                    id1Count++;
-                  } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
-                    id2Count++;
-                  } else {
-                    console.log("none");
-                  }
-                }
-                body.id1Count = id1Count;
-                body.id2Count = id2Count;
-              }
-              sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC LIMIT ?,?;`;
-              mysql.con.query(sql, [news_id, offset, size], async function(error, results, fields) {
-                if(error) {
-                  reject(error);
-                } else {
-                  news = await formTagNews(results);　// 新聞加上所含標籤
+  try
+  {
+    const newsQuantity = await getNewsQuantity(tagsNewsIds);
 
-                  if(type === "comp") { // 比較
-                    for(let i = 0; i < news.length; i++) {
-                      if(news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) > -1) {
-                        news[i].tag_id = "both";
-                      } else if (news_id1.indexOf(news[i].id) > -1 && news_id2.indexOf(news[i].id) < 0) {
-                        news[i].tag_id = param.pol[0];
-                      } else if (news_id1.indexOf(news[i].id) < 0 && news_id2.indexOf(news[i].id) > -1) {
-                        news[i].tag_id = param.pol[1];
-                      } else {
-                        console.log("none");
-                      }
-                    }
-                  }
-                  body.news = news;
-                  resolve(body);
-                }
-              });
-            }
-          });
-        }
-      });
-    } else {
+    if (newsQuantity === 0)
+    {
       body.news = [];
-      resolve(body);
-    }
-  });
-}
 
-// 取得人物、議題 tag_id
-function getTagId(tagName) {
-  return new Promise(function(resolve, reject) {
-    let tagNameArr = [];
-    if(tagName.pol.length > 0) {
-      for(let h = 0; h < tagName.pol.length; h++) {
-        tagNameArr.push(tagName.pol[h]);
+      return body;
+    }
+    else
+    {
+      const maxPage = Math.floor((newsQuantity - 1) / size);
+
+      if (paging < maxPage)
+      {
+        body.next_paging = paging + 1;
       }
     }
-    if(tagName.issue.length > 0) {
-      tagNameArr.push(tagName.issue[0]);
+
+    body.id1Count = await getNewsQuantity(tag1NewsIds, mode);
+    body.id2Count = await getNewsQuantity(tag2NewsIds, mode);
+
+    if (mode === "accurate")
+    {
+      filter = "";
     }
-    let data = [];
-    let sql = `SELECT id FROM filtercount WHERE name IN (?);`;
-    if(tagNameArr.length > 0) { // 人 or 題至少有其一
-      mysql.con.query(sql, [tagNameArr], function(error, results, fields) {
-        if(error) {
-          reject(error);
-        }
-        for(let i = 0; i < results.length; i++) {
-          data.push(results[i].id);
-        }
-        resolve(data);
-      });
-    } else { // 無人、題
-      resolve(data);
+    else
+    {
+      filter = ` AND intent = "politician_say"`;
     }
-  });
-}
 
-// 取得 tag_id 對應之 news_id
-function getNewsId(tagId) {
-  return new Promise(function(resolve, reject) {
-    let sql;
-    if(tagId.length < 2) { // 單人
-      // sql = `
-      //   SELECT a.*, b.id, b.name, b.parent_id FROM newstag AS a
-      //   LEFT JOIN filtercount AS b ON (a.tag_id = b.parent_id)
-      //   WHERE b.parent_id IN (?);
-      // `;
-      sql = `SELECT news_id FROM newstag WHERE tag_id IN (?);`;
-    } else { // 人與議題
-      // sql = `
-      // SELECT c.id AS news_id
-      // FROM filtercount AS a
-      // LEFT JOIN newstag AS b ON (a.id = b.tag_id)
-      // LEFT JOIN news AS c ON (b.news_id = c.id)
-      // LEFT JOIN filtercount AS d ON (a.parent_id = d.id)
-      // WHERE c.intent = "politician_say" AND d.parent_id IN (?)
-      // GROUP BY c.id HAVING count(*) > 1
-      // `;
-      sql = `
-        SELECT a.news_id, b.title FROM newstag AS a
-        LEFT JOIN news as b ON (a.news_id = b.id)
-        WHERE tag_id IN (?) GROUP BY news_id HAVING count(*) > 1;
-      `;
-    }
-    let data = [];
-    if(tagId.length > 0) { // 人 or 題至少有其一
-      mysql.con.query(sql, [tagId], function(error, results, fields) {
-        if(error) {
-          reject(error);
-        }
-        for(let i = 0; i < results.length; i++) {
-          data.push(results[i].news_id);
-        }
-        resolve(data);
-      });
-    } else { // 無人、題
-      resolve(data);
-    }
-  });
-}
+    const sql = `SELECT * FROM news WHERE id IN (?)`;
+    const data = await promiseSql.query(sql + filter + ` ORDER BY pubTime DESC LIMIT ?,?;`, [tagsNewsIds, offset, size]);
+    const news = await formNews(data);　// 新聞加上所含標籤
 
-
-
-
-
-// 可廢棄
-function getBothNewsId(param, limit) {
-  return new Promise(function(resolve, reject) {
-
-    let sql = `SELECT news_id FROM newstag WHERE tag_id IN (?) GROUP BY news_id HAVING count(*) > ?;`;
-    // let sql = `SELECT news_id FROM newsTag WHERE tag_id IN (${param[0].id},${param[1].id}) GROUP BY news_id HAVING count(*) > ${limit};`;
-
-    mysql.con.query(sql, [param, limit],function(error, results, fields) {
-      if(error) {
-        reject(error);
+    for (let i = 0; i < news.length; i++)
+    {
+      if (tag1NewsIds.indexOf(news[i].id) > -1 && tag2NewsIds.indexOf(news[i].id) > -1)
+      {
+        news[i].tag_id = "both";
       }
-      let data = [];
-      for(let i = 0; i < results.length; i++) {
-        data.push(results[i].news_id);
+      else if (tag1NewsIds.indexOf(news[i].id) > -1 && tag2NewsIds.indexOf(news[i].id) < 0)
+      {
+        news[i].tag_id = param.politician[0];
       }
-      resolve(data);
-    });
-  });
+      else if (tag1NewsIds.indexOf(news[i].id) < 0 && tag2NewsIds.indexOf(news[i].id) > -1)
+      {
+        news[i].tag_id = param.politician[1];
+      }
+      else
+      {
+        console.log("none");
+      }
+    }
+    body.news = news;
+
+    return body;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
 
-function getTags(news_id) {
-  return new Promise(function(resolve, reject) {
-    let sql = `SELECT a.news_id, a.tag_id, b.name, b.type FROM newstag as a LEFT JOIN filtercount as b ON a.tag_id = b.id WHERE a.news_id = ${news_id};`;
-    mysql.con.query(sql, function(error, results, fields) {
-      if(error) {
-        reject(error);
-      }
-      resolve(results);
-    });
-  });
+
+// toolkit
+async function getNewsQuantity(newsIds, mode)
+{
+  let filter;
+
+  if (!newsIds)
+  {
+    filter = ` intent = "politician_say";`;
+  }
+  else if (newsIds.length === 0)
+  {
+    return 0;
+  }
+  else
+  {
+    filter = ` id IN (?) AND intent = "politician_say";`;
+  }
+
+  if (mode === "accurate")
+  {
+    filter = " id IN (?);";
+  }
+
+  try
+  {
+    const sql = `SELECT count(*) AS total FROM news WHERE`;
+    const data = await promiseSql.query(sql+filter, [newsIds]);
+
+    return data[0].total;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
 
-function formTagNews(news) {
-  return new Promise(async function(resolve, reject) {
-    let data = [];
-    let newsData = {};
-    for(let i = 0; i < news.length; i++) {
-      var tagsRaw = await getTags(news[i].id);
-      let tagsData = [];
-      for(let j = 0; j < tagsRaw.length; j++) {
-        let body = {
+async function formNews(news)
+{
+  const data = [];
+  let newsData = {};
+
+  try
+  {
+    for (let i = 0; i < news.length; i++)
+    {
+      const tagsRaw = await getTags(news[i].id);
+      const tagsData = [];
+
+      for (let j = 0; j < tagsRaw.length; j++)
+      {
+        const body =
+        {
           tagName: tagsRaw[j].name,
           tagType: tagsRaw[j].type
         }
         tagsData.push(body);
       }
-      newsData = {
+
+      newsData =
+      {
         id: news[i].id,
         title: news[i].title,
         description: news[i].description,
@@ -471,99 +332,125 @@ function formTagNews(news) {
       }
       data.push(newsData);
     }
-    resolve(data);
-  });
+
+    return data;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
 
-function formPolIntent(param, rawNewsId) {
-  return new Promise(async function(resolve, reject) {
-    let intent = [
-      "表示",
-      "認為",
-      "說",
-      "覺得",
-      "痛批",
-      "批",
-      "嗆",
-      "嗆爆",
-      "一句話",
-      "呼籲",
-      "表態",
-      "自爆",
-      "稱",
-      "聲稱",
-      "反稱",
-      "估",
-      "籲",
-      "呼籲",
-      "轟",
-      "砲轟",
-      "酸",
-      "酸爆",
-      "回",
-      ":",
-      "：",
-      "喊話",
-      "感慨",
-      "重申",
-      "下令",
-      "令",
-      "拍板",
-      "駁斥"];
-    let sql;
-    let data = [];
-    let polStatus = true;
-    if(param.pol.length === 0) {
-      param.pol = [""];
-      polStatus = false;
+
+
+// 取得人物、議題 tag_id
+async function getTagId(param)
+{
+  const tagNameArr = [];
+
+  if (param.politician.length > 0)
+  {
+    for (let h = 0; h < param.politician.length; h++)
+    {
+      tagNameArr.push(param.politician[h]);
     }
-    // 生成比對 model
-    let intentModel = [];
-    for(let i = 0; i < param.pol.length; i++) {
-      for(let j = 0; j < intent.length; j++) {
-        intentModel.push(param.pol[i]+intent[j])
+  }
+
+  if (param.issue.length > 0)
+  {
+    tagNameArr.push(param.issue[0]);
+  }
+
+  const data = [];
+  const sql = `SELECT id FROM filtercount WHERE name IN (?);`;
+
+  if (tagNameArr.length > 0) // 人 or 題至少有其一
+  {
+    try
+    {
+      const results = await promiseSql.query(sql, [tagNameArr]);
+
+      for (let i = 0; i < results.length; i++)
+      {
+        data.push(results[i].id);
       }
+
+      return data;
     }
-    if(polStatus == false && param.issue.length === 0) { // All
-      sql = "SELECT * FROM news";
-      mysql.con.query(sql, function(error, results, fields) {
-        if(error) {
-          reject(error);
-        } else {
-          for(let i = 0; i < results.length; i++) {
-            for(let j = 0; j < intentModel.length; j++) {
-              if(results[i].title.indexOf(intentModel[j]) != -1) {
-                data.push(results[i].id);
-                j = intentModel.length;
-              }
-            }
-          }
-          resolve(data);
-        }
-      });
-    } else {  // 人、人題、題
-      sql = `SELECT * FROM news WHERE id IN (?) ORDER BY pubTime DESC;`
-      if(rawNewsId.length > 0) {
-        mysql.con.query(sql, [rawNewsId], function(error, results, fields) {
-          if(error) {
-            reject(error);
-          } else {
-            if(results.length > 0) {
-              for(let i = 0; i < results.length; i++) {
-                for(let j = 0; j < intentModel.length; j++) {
-                  if(results[i].title.indexOf(intentModel[j]) != -1) {
-                    data.push(results[i].id);
-                    j = intentModel.length;
-                  }
-                }
-              }
-              resolve(data);
-            }
-          }
-        });
-      } else {
-        resolve(data);
+    catch(error)
+    {
+      return error;
+    }
+  }
+  else // 無人、題
+  {
+    return data;
+  }
+}
+
+// 取得 tag_id 對應之 news_id
+async function getTagNewsId(tagId)
+{
+  let sql;
+
+  if (tagId.length < 2) // 單人
+  {
+    sql = `SELECT news_id FROM newstag WHERE tag_id IN (?);`;
+  }
+  else // 人與議題
+  {
+    sql = `
+      SELECT a.news_id, b.title
+      FROM newstag AS a
+      LEFT JOIN news as b ON (a.news_id = b.id)
+      WHERE tag_id IN (?)
+      GROUP BY news_id HAVING count(*) > 1;
+    `;
+  }
+
+  const data = [];
+
+  if (tagId.length > 0) // 人 or 題至少有其一
+  {
+    try
+    {
+      const results = await promiseSql.query(sql, [tagId]);
+
+      for (let i = 0; i < results.length; i++)
+      {
+        data.push(results[i].news_id);
       }
+
+      return data;
     }
-  });
+    catch(error)
+    {
+      return error;
+    }
+  }
+  else // 無人、題
+  {
+    return data;
+  }
+}
+
+async function getTags(news_id)
+{
+  const sql = `
+    SELECT a.news_id, a.tag_id, b.name, b.type
+    FROM newstag AS a
+    LEFT JOIN filtercount AS b ON (a.tag_id = b.id)
+    WHERE a.news_id = ?;
+  `;
+
+  try
+  {
+    const data = await promiseSql.query(sql, news_id);
+
+    return data;
+  }
+  catch(error)
+  {
+    return error;
+  }
 }
