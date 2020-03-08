@@ -15,10 +15,10 @@ fs.readFile('../PolsTrackCrawler/util/nlp_trained_model/politician.json', async 
   const politicianInfos = await tagCount.get("politician");
   const politicianList = [];
 
-  politicianInfos.forEach(politicianInfo =>
-  {
-    politicianList.push(politicianInfo.name);
-  });
+  // politicianInfos.forEach(politicianInfo =>
+  // {
+  //   politicianList.push(politicianInfo.name);
+  // });
 
   manager.addNamedEntityText(
     'politician',

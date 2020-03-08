@@ -147,3 +147,5 @@ app.listen(3000, () =>
 {
   console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = app;
