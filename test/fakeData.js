@@ -121,6 +121,42 @@ const news =
     intent: "politician_say",
     intent_score: 0.999999
   }
+  ,
+  {
+    id: 12,
+    title: "nt12",
+    description: "nd12",
+    content: "nc12",
+    href: "nh12",
+    pubTime: "2020/02/18 14:52",
+    publisher: "np12",
+    intent: "politician_say",
+    intent_score: 0.999999
+  }
+  ,
+  {
+    id: 13,
+    title: "nt13",
+    description: "nd13",
+    content: "nc13",
+    href: "nh13",
+    pubTime: "2020/02/18 14:52",
+    publisher: "np13",
+    intent: "politician_say",
+    intent_score: 0.999999
+  }
+  ,
+  {
+    id: 14,
+    title: "nt14",
+    description: "nd14",
+    content: "nc14",
+    href: "nh14",
+    pubTime: "2020/02/18 14:52",
+    publisher: "np14",
+    intent: "politician_say",
+    intent_score: 0.999999
+  }
 ];
 
 const filtercount =
@@ -140,6 +176,14 @@ const filtercount =
     count: 20,
     parent_name: "柯文哲",
     parent_id: 2
+  },
+  {
+    id: 3,
+    name: "武漢肺炎",
+    type: "NI",
+    count: 60,
+    parent_name: "武漢肺炎",
+    parent_id: 3
   }
 ]
 
@@ -154,7 +198,43 @@ const newstag =
     id: 2,
     news_id: 2,
     tag_id: 2
+  },
+  { // news_id 3 -> 2人同一議題
+    id: 3,
+    news_id: 4,
+    tag_id: 1
+  },
+  {
+    id: 4,
+    news_id: 4,
+    tag_id: 2
+  },
+  {
+    id: 5,
+    news_id: 4,
+    tag_id: 3
+  },
+  { // news_id 4 & 5 同議題，不同人落在不同新聞
+    id: 6,
+    news_id: 5,
+    tag_id: 1
+  },
+  {
+    id: 7,
+    news_id: 5,
+    tag_id: 3
+  },
+  {
+    id: 8,
+    news_id: 7,
+    tag_id: 2
+  },
+  {
+    id: 9,
+    news_id: 7,
+    tag_id: 3
   }
+
 ]
 
 const tagverify =
@@ -171,6 +251,13 @@ const tagverify =
     name: "柯文哲",
     type: "NRP",
     count: 43,
+    status: "DONE"
+  },
+  {
+    id: 3,
+    name: "武漢肺炎",
+    type: "NI",
+    count: 70,
     status: "DONE"
   }
 ]
