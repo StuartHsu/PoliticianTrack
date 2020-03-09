@@ -145,10 +145,11 @@
                 <%_ let rndPolTagC = 0; _%>
                 <%_ let rndIsuTagC = 0; _%>
                 <ul class="ulPol">
-                <%_ for(let j = 0; j < results.news[i].tag.length && rndPolTagC < 8; j++) { _%>
+                <%_ for(let j = 0; j < results.news[i].tag.length && rndPolTagC < 3; j++) { _%>
                   <%_ if(title.indexOf(results.news[i].tag[j].tagName) == -1 && issue.indexOf(results.news[i].tag[j].tagName) == -1) { _%>
                     <%_ if(results.news[i].tag[j].tagType === "NRP") { _%>
                         <li class="polTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'politician')"><%= results.news[i].tag[j].tagName %></li>
+                        <%_ rndPolTagC++; _%>
                     <%_ } _%>
                   <%_ } _%>
                 <%_ } _%>
@@ -158,6 +159,7 @@
                   <%_ if(title.indexOf(results.news[i].tag[j].tagName) == -1 && issue.indexOf(results.news[i].tag[j].tagName) == -1) { _%>
                     <%_ if(results.news[i].tag[j].tagType === "NI") { _%>
                       <li class="issueTag" onclick="tagCall('<%=results.news[i].tag[j].tagName%>', 'issue')"><%= results.news[i].tag[j].tagName %></li>
+                      <%_ rndIsuTagC++; _%>
                     <%_ } _%>
                   <%_ } _%>
                 <%_ } _%>
