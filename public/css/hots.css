@@ -102,10 +102,17 @@
   width: 30%;
   padding: 10px;
   position: relative;
-  top: -10px;
-  left: 150px;
   display: flex;
   flex-direction: column;
+}
+
+.subListTitle {
+  font-size: 1.4rem;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #000000;
 }
 
 .subList {

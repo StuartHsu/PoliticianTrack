@@ -165,6 +165,13 @@
 
     <script>
 
+      const ADMIN_PASSWORD = prompt("請輸入密碼");
+      if (ADMIN_PASSWORD !== "9527")
+      {
+        window.location.href = "/";
+      }
+
+
       const execBtn = document.getElementById("execBtn");
       const queryBtn = document.getElementById("queryBtn");
       const updateBtn = document.getElementById("updateBtn");

@@ -1,5 +1,6 @@
-const app = require('../app');
 require('dotenv').config()
+
+const app = require('../app');
 const request = require('supertest');
 const { ENVIRONMENT } = process.env;
 const mysql = require("../util/mysqlcon.js");
