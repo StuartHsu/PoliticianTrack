@@ -3,6 +3,8 @@
 
   <head>
       <title>Admin Page</title>
+      <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
+      <link rel="shortcut icon" type="image/x-icon" href="./img/favicon.ico">
       <link rel="stylesheet" type="text/css" href="./css/admin.css">
       <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
   </head>
@@ -322,7 +324,7 @@
       function segNews(data) {
         console.log(data);
         $.ajax({
-          url: "admin/seg",
+          url: "admin/segmentation",
           type: "POST",
           data: JSON.stringify(data),
           contentType: "application/json; charset=utf-8", // 送給 server 的格式
@@ -338,7 +340,7 @@
       // 2. 撈出未處理標籤
       function querySegs() {
         $.ajax({
-          url: "admin/list",
+          url: "admin/getPendingTags",
           type: "GET",
           success: function(resp) {
             listForm(resp);

@@ -10,28 +10,28 @@ const
   tagverify
 } = require('./fakeData');
 
-async function _createFakeNews()
+async function generateFakeNewsData()
 {
   await promiseSql.query('INSERT INTO news (id, title, description, content, href, pubTime, publisher, intent, intent_score) VALUES ?;', [news.map(x => Object.values(x))]);
 }
 
-async function _createFakeFiltercount()
+async function generateFakeFiltercountData()
 {
   await promiseSql.query('INSERT INTO filtercount (id, name, type, count, parent_name, parent_id) VALUES ?;', [filtercount.map(x => Object.values(x))]);
 }
 
-async function _createFakeNewstag()
+async function generateFakeNewstagData()
 {
   await promiseSql.query('INSERT INTO newstag (id, news_id, tag_id) VALUES ?;', [newstag.map(x => Object.values(x))]);
 }
 
-async function _createFakeTagverify()
+async function generateFakeTagverifyData()
 {
   await promiseSql.query('INSERT INTO tagverify (id, name, type, count, status) VALUES ?;', [tagverify.map(x => Object.values(x))]);
 }
 
 
-function createFakeData()
+async function generateFakeData()
 {
 
   if (ENVIRONMENT !== "test")
@@ -40,14 +40,14 @@ function createFakeData()
     return;
   }
 
-  return _createFakeNews()
-    .then(() => {return _createFakeFiltercount();})
-    .then(() => {return _createFakeNewstag();})
-    .then(() => {return _createFakeTagverify();})
-    .catch(console.log);
+  await generateFakeNewsData();
+  await generateFakeFiltercountData();
+  await generateFakeNewstagData();
+  await generateFakeTagverifyData();
+
 }
 
-function truncateFakeData()
+async function truncateFakeData()
 {
   if (ENVIRONMENT !== "test")
   {
@@ -55,7 +55,6 @@ function truncateFakeData()
     return;
   }
 
-  console.log("Truncate fake data");
   const setForeignKey = async function(status)
   {
     await promiseSql.query('SET FOREIGN_KEY_CHECKS = ?;', status);
@@ -66,22 +65,21 @@ function truncateFakeData()
     await promiseSql.query(`TRUNCATE TABLE ${table};`);
   };
 
-  return setForeignKey(0)
-    .then(() => {return truncateTable('news');})
-    .then(() => {return truncateTable('filtercount');})
-    .then(() => {return truncateTable('newstag');})
-    .then(() => {return truncateTable('tagverify');})
-    .then(() => {return setForeignKey(1);})
-    .catch(console.log);
+  await setForeignKey(0);
+  await truncateTable('news');
+  await truncateTable('filtercount');
+  await truncateTable('newstag');
+  await truncateTable('tagverify');
+  await setForeignKey(1);
 }
 
-function closeConnection()
+function closeDBConnection()
 {
-  return mysql.con.end();
+  await mysql.con.end();
 }
 
 module.exports = {
-    createFakeData,
+    generateFakeData,
     truncateFakeData,
-    closeConnection
+    closeDBConnection
 };

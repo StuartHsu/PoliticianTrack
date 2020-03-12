@@ -8,14 +8,14 @@ const nlp = require('../../model/admin/nlp');
 const newsGetTag = require('../../model/admin/newsGetTag');
 
 // 1. 執行新聞斷詞
-router.post('/seg', async function(req, res)
+router.post('/segmentation', async function(req, res)
 {
   const period =
   {
     start: req.body.start.replace(/-/g, "/") + " 00:00",
     end:req.body.end.replace(/-/g, "/") + " 23:59"
   }
-  const data = await adminTag.seg(period.start, period.end);
+  const data = await adminTag.segmentation(period.start, period.end);
 
   res.send({data: data});
 });
@@ -23,7 +23,7 @@ router.post('/seg', async function(req, res)
 // 2. 撈出未處理標籤
 router.get('/list', async function(req, res)
 {
-  const data = await adminTag.get();
+  const data = await adminTag.getPendingTags();
 
   res.send({data: data});
 });

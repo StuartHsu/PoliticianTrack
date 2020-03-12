@@ -184,6 +184,14 @@ const filtercount =
     count: 60,
     parent_name: "武漢肺炎",
     parent_id: 3
+  },
+  {
+    id: 4,
+    name: "nt14",
+    type: "NRP",
+    count: 3,
+    parent_name: "nt14",
+    parent_id: 4
   }
 ]
 
@@ -233,8 +241,12 @@ const newstag =
     id: 9,
     news_id: 7,
     tag_id: 3
+  },
+  {
+    id: 10,
+    news_id: 14,
+    tag_id: 4
   }
-
 ]
 
 const tagverify =
@@ -258,6 +270,13 @@ const tagverify =
     name: "武漢肺炎",
     type: "NI",
     count: 70,
+    status: "DONE"
+  },
+  {
+    id: 4,
+    name: "nt14",
+    type: "NRP",
+    count: 30,
     status: "DONE"
   }
 ]

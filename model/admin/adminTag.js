@@ -7,7 +7,7 @@ nodejieba.load({userDict: '../PolsTrackCrawler/util/dict.txt'});
 
 module.exports =
 {
-  seg: async function(start, end)
+  segmentation: async function(start, end)
   {
     try
     {
@@ -42,7 +42,7 @@ module.exports =
       return error;
     }
   },
-  get: async function()
+  getPendingTags: async function()
   {
     const sql = `SELECT * FROM tagverify WHERE status is null AND count > ? ORDER BY count DESC;`;
     const count = 20;
