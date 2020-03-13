@@ -21,7 +21,7 @@ router.post('/segmentation', async function(req, res)
 });
 
 // 2. 撈出未處理標籤
-router.get('/list', async function(req, res)
+router.get('/getPendingTags', async function(req, res)
 {
   const data = await adminTag.getPendingTags();
 
