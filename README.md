@@ -1,5 +1,4 @@
-PolsTrack
----
+# PolsTrack
 #### A Politician Opinion Tracking Website
 - Displays the views of politicians on various topics
 - Compares politicians’ views on specific issues
