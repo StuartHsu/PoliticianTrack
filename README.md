@@ -1,6 +1,6 @@
 # PolsTrack
 
-#### A Politician Opinion Tracking Website
+### A Politician Opinion Tracking Website
 - Displays the views of politicians on various topics
 - Compares politicians’ views on specific issues
 - Shows the most popular politicians and issues recently
@@ -23,37 +23,37 @@ Website URL: https://polstrack.com
 
 ## Technologies
 
-#### Backend
+### Backend
 - Node.js / Express.js
 - RESTful API
 - NGINX
 
-#### Front-End
+### Front-End
 - HTML
 - CSS
 - JavaScript
 - EJS
 - AJAX
 
-#### Cloud Service (AWS)
+### Cloud Service (AWS)
 - Compute: EC2
 - Storage: S3
 - Database: RDS
 - Network: CloudFront, ELB
 
-#### Database
+### Database
 - MySQL
 - Redis (Cache)
 
-#### Tools
+### Tools
 - Version Control: Git, GitHub
 - CI / CD: Jenkins, Docker
 - Test: Jest, Artillery
 - Agile: Trello (Scrum)
 
-#### Others
+### Others
 - Design Pattern: MVC, DAO
-- NLP: jieba, NLP.js
+- NLP: Jieba, NLP.js
 - Web Crawler: cheerio
 
 ## Architecture
@@ -91,22 +91,22 @@ Website URL: https://polstrack.com
 
 ## Demonstration
 
-#### Home page
+### Home page
 
 ![](https://i.imgur.com/N1eO6T9.gif)
 - Shows politicians and issues by popularity
 
-#### News page
+### News page
 
 ![](https://i.imgur.com/iaAGBQI.gif)
 - Displays the views of politicians on various topics
 
-#### Compare page
+### Compare page
 
 ![](https://i.imgur.com/lqDaAVQ.gif)
 - Compares politicians’ views on specific issues
 
-#### Hots page
+### Hots page
 
 ![](https://i.imgur.com/aRUuGED.gif)
 - Shows the most popular politicians and issues recently
