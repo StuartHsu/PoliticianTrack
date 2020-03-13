@@ -7,7 +7,7 @@
 
 Website URL: https://polstrack.com
 
-### Table of Contents
+## Table of Contents
 
 - [Technologies](#Technologies)
 - [Architecture](#Architecture)
@@ -21,42 +21,42 @@ Website URL: https://polstrack.com
     - [Hots page](#Hots-page)
 - [Contact](#Contact)
 
-### Technologies
+## Technologies
 
-##### Backend
+#### Backend
 - Node.js / Express.js
 - RESTful API
 - NGINX
 
-##### Front-End
+#### Front-End
 - HTML
 - CSS
 - JavaScript
 - EJS
 - AJAX
 
-##### Cloud Service (AWS)
+#### Cloud Service (AWS)
 - Compute: EC2
 - Storage: S3
 - Database: RDS
 - Network: CloudFront, ELB
 
-##### Database
+#### Database
 - MySQL
 - Redis (Cache)
 
-##### Tools
+#### Tools
 - Version Control: Git, GitHub
 - CI / CD: Jenkins, Docker
 - Test: Jest, Artillery
 - Agile: Trello (Scrum)
 
-##### Others
+#### Others
 - Design Pattern: MVC, DAO
 - NLP: jieba, NLP.js
 - Web Crawler: cheerio
 
-### Architecture
+## Architecture
 
 ![](https://i.imgur.com/V6zb5tC.png)
 - Redirects 443 port requests by **NGINX** after receiving request from clients
@@ -64,11 +64,11 @@ Website URL: https://polstrack.com
 - Segmented news content by **Jieba** and verified news with politicians' intention by **NLP.js**
 - Optimized data loading efficiency through in-memory cache mechanism by **Redis**
 
-### Database Schema
+## Database Schema
 
 ![](https://i.imgur.com/EfkXKD5.png)
 
-### Data Pipeline
+## Data Pipeline
 
 ![](https://i.imgur.com/FBwiK3T.png)
 - Content Segmentation
@@ -80,7 +80,7 @@ Website URL: https://polstrack.com
 - Get Specific Tag
     - 「國民黨」、「江啟臣」、「九二共識」、「習近平」
 
-### Main Features
+## Main Features
 
 - Categorize news
     - Displays the views of politicians on various topics
@@ -89,7 +89,7 @@ Website URL: https://polstrack.com
 - Most popular
     - Shows the most popular politicians and issues recently
 
-### Demonstration
+## Demonstration
 
 #### Home page
 
@@ -111,6 +111,6 @@ Website URL: https://polstrack.com
 ![](https://i.imgur.com/aRUuGED.gif)
 - Shows the most popular politicians and issues recently
 
-### Contact
+## Contact
 
 Email: yopahsu@gmail.com
