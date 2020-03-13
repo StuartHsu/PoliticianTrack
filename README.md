@@ -6,7 +6,6 @@
 
 Website URL: https://polstrack.com
 
----
 ### Table of Contents
 - [Technologies](#Technologies)
 - [Architecture](#Architecture)
@@ -21,7 +20,6 @@ Website URL: https://polstrack.com
 - [Contact](#Contact)
 
 ### Technologies
----
 ##### Backend
 - Node.js / Express.js
 - RESTful API
@@ -54,17 +52,18 @@ Website URL: https://polstrack.com
 - Design Pattern: MVC, DAO
 - NLP: jieba, NLP.js
 - Web Crawler: cheerio
----
+
 ### Architecture
 ![](https://i.imgur.com/V6zb5tC.png)
 - Redirects 443 port requests by **NGINX** after receiving request from clients
 - Scraped news content through **Web Crawler**
 - Segmented news content by **Jieba** and verified news with politicians' intention by **NLP.js**
 - Optimized data loading efficiency through in-memory cache mechanism by **Redis**
----
+
 ### Database Schema
 ![](https://i.imgur.com/EfkXKD5.png)
----
+
+
 ### Data Pipeline
 ![](https://i.imgur.com/FBwiK3T.png)
 - Content Segmentation
@@ -75,7 +74,7 @@ Website URL: https://polstrack.com
     → 人物對特定議題表達立場
 - Get Specific Tag
     - 「國民黨」、「江啟臣」、「九二共識」、「習近平」
----
+
 ### Main Features
 - Categorize news
     - Displays the views of politicians on various topics
@@ -83,23 +82,23 @@ Website URL: https://polstrack.com
     - Compares politicians' views on specific issues
 - Most popular
     - Shows the most popular politicians and issues recently
----
+
 ### Demonstration
 #### Home page
 ![](https://i.imgur.com/N1eO6T9.gif)
 - Shows politicians and issues by popularity
----
+
 #### News page
 ![](https://i.imgur.com/iaAGBQI.gif)
 - Displays the views of politicians on various topics
---- 
+
 #### Compare page
 ![](https://i.imgur.com/lqDaAVQ.gif)
 - Compares politicians’ views on specific issues
----
+
 #### Hots page
 ![](https://i.imgur.com/aRUuGED.gif)
 - Shows the most popular politicians and issues recently
----
+
 ### Contact
 Email: yopahsu@gmail.com
