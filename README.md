@@ -58,7 +58,7 @@ Website URL: https://polstrack.com
 
 ## Architecture
 
-![](https://i.imgur.com/V6zb5tC.png)
+![](https://i.imgur.com/I0J0hwS.png)
 - Redirects 443 port requests by **NGINX** after receiving request from clients
 - Scraped news content through **Web Crawler**
 - Segmented news content by **Jieba** and verified news with politicians' intention by **NLP.js**
