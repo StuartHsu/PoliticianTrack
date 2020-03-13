@@ -45,7 +45,7 @@ module.exports =
   getPendingTags: async function()
   {
     const sql = `SELECT * FROM tagverify WHERE status is null AND count > ? ORDER BY count DESC;`;
-    const count = 20;
+    const count = 200;
 
     try
     {
