@@ -1,31 +1,27 @@
-const { NlpManager } = require('node-nlp');
+const {NlpManager} = require('node-nlp');
 const fs = require('fs');
-const promiseSql = require("../../util/promiseSql.js");
+const promiseSql = require('../../util/promiseSql.js');
 const news = require('../../model/news');
 const tagCount = require('../tagCount');
 
-const manager = new NlpManager({ languages: ['zh'], nlu: { log: false } });
+const manager = new NlpManager({languages: ['zh'], nlu: {log: false}});
 
-function getEntityContentList()
-{
-  return new Promise(async function(resolve, reject)
-  {
+function getEntityContentList() {
+  return new Promise(async function(resolve, reject) {
     const data =
     {
       politicianList: [],
       country: [],
       agency: []
     };
-    const results = await tagCount.get("politician");
+    const results = await tagCount.get('politician');
     const totalResults = results.length;
 
-    for (let i = 0; i < totalResults; i++)
-    {
+    for (let i = 0; i < totalResults; i++) {
       data.politicianList.push(results[i].name);
     }
 
-    fs.readFile('../PolsTrackCrawler/util/nlp_trained_model/politician.json', async (err, data) =>
-    {
+    fs.readFile('../PolsTrackCrawler/util/nlp_trained_model/politician.json', async (err, data) => {
       data.country = JSON.parse(data).country;
       data.agency = JSON.parse(data).agency;
     });
@@ -34,41 +30,40 @@ function getEntityContentList()
   });
 }
 
-async function setNLP(entityContentList)
-{
+async function setNLP(entityContentList) {
   manager.addNamedEntityText(
-    'politician',
-    '人物',
-    ['zh'],
-    entityContentList.politicianList
+      'politician',
+      '人物',
+      ['zh'],
+      entityContentList.politicianList
   );
 
   manager.addNamedEntityText(
-    'country',
-    '國家',
-    ['zh'],
-    entityContentList.country
+      'country',
+      '國家',
+      ['zh'],
+      entityContentList.country
   );
 
   manager.addNamedEntityText(
-    'say',
-    '表示',
-    ['zh'],
-    ["表示","認為","說","覺得","痛批","批","嗆","嗆爆","一句話","呼籲","表態","自爆","稱","聲稱","反稱","估","籲","呼籲","轟","砲轟","酸","酸爆","回"]
+      'say',
+      '表示',
+      ['zh'],
+      ['表示', '認為', '說', '覺得', '痛批', '批', '嗆', '嗆爆', '一句話', '呼籲', '表態', '自爆', '稱', '聲稱', '反稱', '估', '籲', '呼籲', '轟', '砲轟', '酸', '酸爆', '回']
   );
 
   manager.addNamedEntityText(
-    'agency',
-    '機關',
-    ['zh'],
-    entityContentList.agency
+      'agency',
+      '機關',
+      ['zh'],
+      entityContentList.agency
   );
 
   manager.addNamedEntityText(
-    'medical',
-    '醫療',
-    ['zh'],
-    ['WHO']
+      'medical',
+      '醫療',
+      ['zh'],
+      ['WHO']
   );
 
   manager.addDocument('zh', '%country%', 'country');
@@ -97,10 +92,8 @@ async function setNLP(entityContentList)
   manager.addAnswer('zh', 'issue_medical', '醫療議題');
 }
 
-module.exports =
-{
-  train: async function(start, end)
-  {
+module.exports = {
+  train: async function(start, end) {
     const entityContentList = await getEntityContentList();
     setNLP(entityContentList);
 
@@ -110,54 +103,44 @@ module.exports =
     const data = await news.getPeriod(start, end);
     const totalCount = data.length;
 
-    for (let i = 0; i < totalCount; i++)
-    {
-      console.log("Training：" + i + "/" + totalCount + ", news_id：" + data[i].id);
+    for (let i = 0; i < totalCount; i++) {
+      console.log('Training：' + i + '/' + totalCount + ', news_id：' + data[i].id);
       const content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
 
-      try
-      {
+      try {
         await manager.process('zh', content);
-      }
-      catch(error)
-      {
+      } catch (error) {
         return error;
       }
     }
 
-    console.log("處理完成");
-    return ("NLP training finished");
+    console.log('處理完成');
+    return ('NLP training finished');
   },
-  process: async function(start, end)
-  {
+  process: async function(start, end) {
     manager.load('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
 
     const data = await news.getPeriod(start, end);
     const totalCount = data.length;
 
-    for (let i = 0; i < totalCount; i++)
-    {
-      console.log("Processing：" + i + "/" + totalCount + ", news_id：" + data[i].id);
+    for (let i = 0; i < totalCount; i++) {
+      console.log('Processing：' + i + '/' + totalCount + ', news_id：' + data[i].id);
       const content = data[i].title.replace('：', '表示').replace(/[A-Za-z]+/, '');
       const response = await manager.process('zh', content);
       const intent = response.nluAnswer.classifications[0].intent;
-      const intent_score = response.nluAnswer.classifications[0].score;
+      const intentScore = response.nluAnswer.classifications[0].score;
 
-      try
-      {
-        await updateIntens(intent, intent_score, data[i].id);
-      }
-      catch(error)
-      {
+      try {
+        await updateIntens(intent, intentScore, data[i].id);
+      } catch (error) {
         return error;
       }
     }
 
-    console.log("處理完成");
-    return ("News intent update ok");
+    console.log('處理完成');
+    return ('News intent update ok');
   },
-  test: async function()
-  {
+  test: async function() {
     manager.load('../PolsTrackCrawler/util/nlp_trained_model/train.nlp');
 
     const content = '黨籍案引爭議  郝龍斌：支持傅崐萁回到黨內'.replace('：', '表示').replace(/[A-Za-z]+/, '');
@@ -165,19 +148,15 @@ module.exports =
 
     return (JSON.stringify(response));
   }
-}
+};
 
 
-async function updateIntens(intent, intent_score, id)
-{
-  try
-  {
-    await promiseSql.query("UPDATE news SET intent = ?, intent_score = ? WHERE id = ?;", [intent, intent_score, id]);
+async function updateIntens(intent, intentScore, id) {
+  try {
+    await promiseSql.query('UPDATE news SET intent = ?, intent_score = ? WHERE id = ?;', [intent, intentScore, id]);
 
     return;
-  }
-  catch(error)
-  {
+  } catch (error) {
     return error;
   }
 }

@@ -1,10 +1,9 @@
-const express = require("express");
-const router = express.Router(); // create a router
-const bodyParser = require('body-parser');
+const express = require('express');
+// eslint-disable-next-line
+const router = express.Router();
 const issues = require('../../model/filter/issues');
 
-router.post('/', async function(req, res)
-{
+router.post('/', async function(req, res) {
   const param = req.body;
   const data = await issues.get(param);
 

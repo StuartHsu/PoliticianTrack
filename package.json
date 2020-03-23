@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint *.js"
   },
   "author": "",
   "license": "ISC",
@@ -27,5 +28,9 @@
     "superagent": "^5.2.1",
     "supertest": "^4.0.2",
     "xlsx": "^0.15.5"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-google": "^0.14.0"
   }
 }

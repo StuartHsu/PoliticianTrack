@@ -1,9 +1,7 @@
-const promiseSql = require("../../util/promiseSql.js");
+const promiseSql = require('../../util/promiseSql.js');
 
-module.exports =
-{
-  get: async function()
-  {
+module.exports = {
+  get: async function() {
     const sql = `
       SELECT b.parent_name AS name, count(*) AS count
       FROM newstag AS a
@@ -19,15 +17,12 @@ module.exports =
       GROUP BY b.parent_name ORDER BY count(*) DESC;
     `;
 
-    try
-    {
+    try {
       const data = await promiseSql.query(sql, null);
 
       return data;
-    }
-    catch(error)
-    {
+    } catch (error) {
       return error;
     }
   }
-}
+};

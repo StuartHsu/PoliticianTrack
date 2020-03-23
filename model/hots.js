@@ -1,21 +1,15 @@
-const promiseSql = require("../util/promiseSql.js");
+const promiseSql = require('../util/promiseSql.js');
 
-module.exports =
-{
-  get: async function(type, size, paging)
-  {
+module.exports = {
+  get: async function(type, size, paging) {
     const body = {};
-    let hotPol;
     let tagType;
     const offset = paging * size;
 
-    if (type === "politician")
-    {
-      tagType = "NRP";
-    }
-    else
-    {
-      tagType = "NI";
+    if (type === 'politician') {
+      tagType = 'NRP';
+    } else {
+      tagType = 'NI';
     }
 
     const sql = `
@@ -38,13 +32,11 @@ module.exports =
       GROUP BY a.parent_id ORDER BY count DESC LIMIT ?,?;
     `;
 
-    try
-    {
+    try {
       const hotCounts = await promiseSql.query(sql, tagType);
       const maxPage = Math.floor((hotCounts[0].total - 1) / size);
 
-      if (paging < maxPage)
-      {
+      if (paging < maxPage) {
         body.next_paging = paging + 1;
       }
 
@@ -52,21 +44,15 @@ module.exports =
       body.list = data;
 
       return body;
-    }
-    catch(error)
-    {
+    } catch (error) {
       return error;
     }
   },
-  getSub: async function(type, tagId)
-  {
-    if (type === "politician")
-    {
-      tagType = "NI";
-    }
-    else
-    {
-      tagType = "NRP";
+  getSub: async function(type, tagId) {
+    if (type === 'politician') {
+      tagType = 'NI';
+    } else {
+      tagType = 'NRP';
     }
 
     const sql = `
@@ -80,15 +66,12 @@ module.exports =
       GROUP BY a.parent_id ORDER BY count DESC;
     `;
 
-    try
-    {
+    try {
       const data = await promiseSql.query(sql, [tagId, tagType]);
 
       return data;
-    }
-    catch(error)
-    {
+    } catch (error) {
       return error;
     }
   }
-}
+};

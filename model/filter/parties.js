@@ -1,28 +1,22 @@
-const promiseSql = require("../../util/promiseSql.js");
+const promiseSql = require('../../util/promiseSql.js');
 
-module.exports =
-{
-  getParties: async function(party)
-  {
+module.exports = {
+  getParties: async function(party) {
     const sql = `
       SELECT party, count(*)
       FROM politician
       GROUP BY party HAVING count(*) > 3 ORDER BY count(*) DESC;
     `;
 
-    try
-    {
+    try {
       const data = await promiseSql.query(sql, null);
 
       return data;
-    }
-    catch(error)
-    {
+    } catch (error) {
       return error;
     }
   },
-  getPoliticians: async function(party)
-  {
+  getPoliticians: async function(party) {
     const sql = `
       SELECT filtercount.name, politician.party
       FROM filtercount
@@ -31,24 +25,18 @@ module.exports =
     `;
     let filter;
 
-    if (party.length > 0)
-    {
-      filter = ` AND politician.party IN (?) ORDER BY count DESC;`
-    }
-    else
-    {
-      filter = ` ORDER BY count DESC;`
+    if (party.length > 0) {
+      filter = ` AND politician.party IN (?) ORDER BY count DESC;`;
+    } else {
+      filter = ` ORDER BY count DESC;`;
     }
 
-    try
-    {
+    try {
       const data = await promiseSql.query(sql + filter, party);
 
       return data;
-    }
-    catch(error)
-    {
+    } catch (error) {
       return error;
     }
   }
-}
+};

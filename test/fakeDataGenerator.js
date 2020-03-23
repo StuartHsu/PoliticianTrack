@@ -10,32 +10,26 @@ const
   tagverify
 } = require('./fakeData');
 
-async function generateFakeNewsData()
-{
+async function generateFakeNewsData() {
   await promiseSql.query('INSERT INTO news (id, title, description, content, href, pubTime, publisher, intent, intent_score) VALUES ?;', [news.map(x => Object.values(x))]);
 }
 
-async function generateFakeFiltercountData()
-{
+async function generateFakeFiltercountData() {
   await promiseSql.query('INSERT INTO filtercount (id, name, type, count, parent_name, parent_id) VALUES ?;', [filtercount.map(x => Object.values(x))]);
 }
 
-async function generateFakeNewstagData()
-{
+async function generateFakeNewstagData() {
   await promiseSql.query('INSERT INTO newstag (id, news_id, tag_id) VALUES ?;', [newstag.map(x => Object.values(x))]);
 }
 
-async function generateFakeTagverifyData()
-{
+async function generateFakeTagverifyData() {
   await promiseSql.query('INSERT INTO tagverify (id, name, type, count, status) VALUES ?;', [tagverify.map(x => Object.values(x))]);
 }
 
 
-async function generateFakeData()
-{
+async function generateFakeData() {
 
-  if (ENVIRONMENT !== "test")
-  {
+  if (ENVIRONMENT !== "test") {
     console.log("Not in test enviroment");
     return;
   }
@@ -47,21 +41,17 @@ async function generateFakeData()
 
 }
 
-async function truncateFakeData()
-{
-  if (ENVIRONMENT !== "test")
-  {
+async function truncateFakeData() {
+  if (ENVIRONMENT !== "test") {
     console.log("Not in test enviroment");
     return;
   }
 
-  const setForeignKey = async function(status)
-  {
+  const setForeignKey = async function(status) {
     await promiseSql.query('SET FOREIGN_KEY_CHECKS = ?;', status);
   };
 
-  const truncateTable = async function(table)
-  {
+  const truncateTable = async function(table) {
     await promiseSql.query(`TRUNCATE TABLE ${table};`);
   };
 
@@ -73,13 +63,12 @@ async function truncateFakeData()
   await setForeignKey(1);
 }
 
-function closeDBConnection()
-{
+function closeDBConnection() {
   await mysql.con.end();
 }
 
 module.exports = {
-    generateFakeData,
-    truncateFakeData,
-    closeDBConnection
+  generateFakeData,
+  truncateFakeData,
+  closeDBConnection
 };
