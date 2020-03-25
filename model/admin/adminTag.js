@@ -63,13 +63,7 @@ module.exports = {
       if (updateData[i].inputTag) {
         const newTag = `${updateData[i].tagName} 1 ${updateData[i].inputTag}\n`;
 
-        fs.appendFile('../PolsTrackCrawler/util/dict.txt', newTag, (err) => {
-          if (err) {
-            return err;
-          }
-
-          return ('Update dict.txt ok');
-        });
+        await updateDictFile(newTag);
       } else {
         return ('No need to update');
       }
@@ -135,6 +129,17 @@ async function saveSegmentationResult(data) {
           });
         }
       });
+    });
+  });
+}
+
+function updateDictFile(newTag) {
+  return new Promise(function(resolve, reject) {
+    fs.appendFile('../PolsTrackCrawler/util/dict.txt', newTag, (err) => {
+      if (err) {
+        reject (err);
+      }
+      resolve('Update dict.txt ok');
     });
   });
 }
